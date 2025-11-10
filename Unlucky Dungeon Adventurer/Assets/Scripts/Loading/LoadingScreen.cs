@@ -65,7 +65,7 @@ public class LoadingScreen : MonoBehaviour
 
     IEnumerator ChangeHints()
     {
-        int index = 0;
+        int index = Random.Range(0, hints.Length);
         while (hints != null && hints.Length > 0)
         {
             hintText.text = "Подсказка:\n" + hints[index];

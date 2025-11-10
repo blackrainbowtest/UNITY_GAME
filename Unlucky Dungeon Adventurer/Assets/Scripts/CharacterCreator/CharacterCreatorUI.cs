@@ -68,6 +68,7 @@ public class CharacterCreatorUI : MonoBehaviour
         string role = dropdownBackground.options[dropdownBackground.value].text;
         string name = inputName.text;
         Debug.Log($"[CREATE BUTTON CLICKED] Создан герой: {name}, класс: {role}");
-        // потом сюда добавим переход на следующую сцену
+        
+        SceneLoader.LoadScene("WorldMap");
     }
 }
