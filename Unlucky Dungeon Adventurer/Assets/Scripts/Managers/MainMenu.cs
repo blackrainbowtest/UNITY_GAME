@@ -8,9 +8,14 @@ public class MainMenu : MonoBehaviour
         SceneLoader.LoadScene("CharacterCreation");
     }
 
-    public void LoadGame()
+    public void OpenSaveLoadScene()
     {
-        Debug.Log("Load game clicked — здесь будет логика загрузки сохранений");
+        SceneManager.LoadScene("SaveLoadScene", LoadSceneMode.Additive);
+    }
+
+    public void CloseSaveLoadScene()
+    {
+        SceneManager.UnloadSceneAsync("SaveLoadScene");
     }
 
     public void OpenSettings()

@@ -27,7 +27,7 @@ public class LoadingScreen : MonoBehaviour
         LoadHints();
         StartCoroutine(AnimateCubes());
         StartCoroutine(ChangeHints());
-        StartCoroutine(LoadNextScene()); // <-- добавлено
+        StartCoroutine(LoadNextScene());
     }
 
     void LoadHints()
