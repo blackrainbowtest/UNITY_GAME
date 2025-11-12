@@ -5,8 +5,14 @@ public class CloseButtonHandler : MonoBehaviour
 {
     public void CloseSaveWindow()
     {
-        var menuManager = Object.FindFirstObjectByType<MainMenu>();
+        var fade = FindFirstObjectByType<SaveLoadFade>();
+        if (fade != null)
+        {
+            fade.StartCoroutine(fade.FadeOutAndClose());
+            return;
+        }
 
+        var menuManager = FindFirstObjectByType<MainMenu>();
         if (menuManager != null)
             menuManager.CloseSaveLoadScene();
         else
