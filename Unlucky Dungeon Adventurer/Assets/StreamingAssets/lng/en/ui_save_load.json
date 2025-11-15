@@ -4,5 +4,7 @@
     "empty_slot": "Empty — tap to save",
     "button_load": "Load",
     "button_delete": "Delete",
-    "confirm_delete": "Delete this save?"
+    "confirm_delete": "Delete this save?",
+    "title_save": "Saves",
+    "title_load": "Loads"
 }

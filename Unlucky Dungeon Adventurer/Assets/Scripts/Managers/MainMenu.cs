@@ -8,8 +8,15 @@ public class MainMenu : MonoBehaviour
         SceneLoader.LoadScene("CharacterCreation");
     }
 
-    public void OpenSaveLoadScene()
+    public void OpenSaveLoadScene_Load()
     {
+        SaveSlotUI.isSaveMode = false;
+        SceneManager.LoadScene("SaveLoadScene", LoadSceneMode.Additive);
+    }
+
+    public void OpenSaveLoadScene_Save()
+    {
+        SaveSlotUI.isSaveMode = true;
         SceneManager.LoadScene("SaveLoadScene", LoadSceneMode.Additive);
     }
 
