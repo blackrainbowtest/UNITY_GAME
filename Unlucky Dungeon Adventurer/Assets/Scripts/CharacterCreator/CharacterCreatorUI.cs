@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class CharacterCreatorUI : MonoBehaviour
@@ -7,69 +6,53 @@ public class CharacterCreatorUI : MonoBehaviour
     [Header("UI Elements")]
     public TMP_InputField inputName;
     public TMP_Dropdown dropdownBackground;
-    public Image legsLayer;
-    public Button createButton; // ← новая ссылка на кнопку
 
-    [Header("Legs Sprites")]
-    public Sprite legsPaladin;
-    public Sprite legsRogue;
-    public Sprite legsSlave;
-    public Sprite legsHermit;
+    [Header("Class Options")]
+    public ClassOption[] classOptions; // настраиваем в инспекторе
 
-    private void Start()
+    private void Awake()
     {
-        // сразу блокируем кнопку
-        createButton.interactable = false;
-
-        // следим за вводом имени
-        inputName.onValueChanged.AddListener(OnNameChanged);
-
-        // следим за сменой класса
-        dropdownBackground.onValueChanged.AddListener(OnBackgroundChanged);
+        SetupDropdown();
     }
 
-    private void OnNameChanged(string newText)
+    private void SetupDropdown()
     {
-        // активируем кнопку только если имя не пустое
-        createButton.interactable = !string.IsNullOrWhiteSpace(newText);
-    }
+        dropdownBackground.ClearOptions();
 
-    public void OnBackgroundChanged(int index)
-    {
-        if (legsLayer == null)
+        var optionLabels = new System.Collections.Generic.List<string>();
+
+        // Заполняем дропдаун displayName-ами
+        foreach (var opt in classOptions)
         {
-            Debug.LogWarning("Поле legsLayer не назначено в инспекторе!");
-            return;
+            optionLabels.Add(opt.displayName);
         }
 
-        switch (index)
-        {
-            case 0:
-                legsLayer.sprite = legsPaladin;
-                break;
-            case 1:
-                legsLayer.sprite = legsRogue;
-                break;
-            case 2:
-                legsLayer.sprite = legsSlave;
-                break;
-            case 3:
-                legsLayer.sprite = legsHermit;
-                break;
-            default:
-                legsLayer.sprite = null;
-                Debug.LogWarning("Неизвестный индекс варианта: " + index);
-                break;
-        }
+        dropdownBackground.AddOptions(optionLabels);
+
+        // На всякий случай выставляем выбор на 0
+        if (classOptions.Length > 0)
+            dropdownBackground.value = 0;
     }
 
     public void OnCreateButton()
     {
-        string role = dropdownBackground.options[dropdownBackground.value].text;
         string name = inputName.text;
-        Debug.Log($"[CREATE BUTTON CLICKED] Создан герой: {name}, класс: {role}");
 
-        GameData.SavePlayer(name, role);
+        int index = dropdownBackground.value;
+
+        if (index < 0 || index >= classOptions.Length)
+        {
+            Debug.LogError($"[CREATE] Некорректный индекс класса: {index}");
+            return;
+        }
+
+        // 👇 вот ЭТО критичный момент:
+        string roleInternal = classOptions[index].internalName;
+        string roleDisplay  = classOptions[index].displayName;
+
+        Debug.Log($"[CREATE BUTTON CLICKED] Создан герой: {name}, класс: {roleDisplay} (ID: {roleInternal})");
+
+        GameData.SavePlayer(name, roleInternal);
         SceneLoader.LoadScene("WorldMap");
     }
 }

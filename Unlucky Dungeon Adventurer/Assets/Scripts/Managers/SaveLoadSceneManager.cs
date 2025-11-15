@@ -42,12 +42,16 @@ public class SaveLoadSceneManager : MonoBehaviour
             obj.GetComponent<SaveSlotUI>().Init(path);
         }
 
-        // ----- EMPTY SLOT (only in SAVE mode when no saves) -----
-        if (SaveLoadState.Mode == SaveLoadMode.Save && files.Length == 0)
+        // ----- EMPTY SLOTS (always show in SAVE mode for new saves) -----
+        if (SaveLoadState.Mode == SaveLoadMode.Save)
         {
-            string emptyPath = Path.Combine(Application.persistentDataPath, "save_0.json");
-            var obj = Instantiate(slotPrefab, slotContainer);
-            obj.GetComponent<SaveSlotUI>().Init(emptyPath);
+            int slotsToShow = 10;  // Show 10 slots total
+            for (int i = files.Length; i < slotsToShow; i++)
+            {
+                string emptyPath = Path.Combine(Application.persistentDataPath, $"save_{i}.json");
+                var obj = Instantiate(slotPrefab, slotContainer);
+                obj.GetComponent<SaveSlotUI>().Init(emptyPath);
+            }
         }
     }
 }

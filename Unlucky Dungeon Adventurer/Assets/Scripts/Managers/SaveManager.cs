@@ -3,34 +3,46 @@ using UnityEngine;
 
 public static class SaveManager
 {
-    // путь до файла сохранения
-    private static string GetPath(int slot)
+    public static void Save(SaveData data, int slotIndex)
     {
-        string fileName = slot == -1 ? "save_auto.json" : $"save_{slot}.json";
-        return Path.Combine(Application.persistentDataPath, fileName);
-    }
+        if (data == null)
+        {
+            Debug.LogError("Пустые данные сохранения");
+            return;
+        }
 
-    // 💾 Сохранение
-    public static void Save(SaveData data, int slot)
-    {
+        data.meta.slotIndex = slotIndex;
+
+        string fileName = slotIndex < 0
+            ? "save_auto.json"
+            : $"save_{slotIndex}.json";
+
+        string path = Path.Combine(Application.persistentDataPath, fileName);
+
         string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(GetPath(slot), json);
-        Debug.Log($"Game saved to slot {slot}");
+        File.WriteAllText(path, json);
+
+        Debug.Log($"[SaveManager] Сохранено в {path}");
     }
 
-    // 📂 Загрузка
-    public static SaveData Load(int slot)
+    public static SaveData Load(int slotIndex)
     {
-        string path = GetPath(slot);
+        string fileName = slotIndex < 0
+            ? "save_auto.json"
+            : $"save_{slotIndex}.json";
+
+        string path = Path.Combine(Application.persistentDataPath, fileName);
+
         if (!File.Exists(path))
         {
-            Debug.LogWarning($"Save slot {slot} not found!");
+            Debug.LogWarning($"[SaveManager] Файл не найден: {path}");
             return null;
         }
 
         string json = File.ReadAllText(path);
         SaveData data = JsonUtility.FromJson<SaveData>(json);
-        Debug.Log($"Game loaded from slot {slot}");
+
+        Debug.Log($"[SaveManager] Загрузка из {path}");
         return data;
     }
 }

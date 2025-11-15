@@ -353,8 +353,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SaveSlotUI
   slotTitle: {fileID: 5812239527791310725}
   slotInfo: {fileID: 2395524566249300596}
+  playerNameText: {fileID: 5812239527791310725}
+  levelText: {fileID: 2395524566249300596}
   background: {fileID: 583041088397587018}
-  deleteButton: {fileID: 7714629354955955924}
+  deletePrompt: {fileID: 0}
+  deletePromptText: {fileID: 0}
 --- !u!114 &1527785655722658821
 MonoBehaviour:
   m_ObjectHideFlags: 0

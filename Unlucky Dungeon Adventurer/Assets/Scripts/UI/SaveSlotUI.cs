@@ -2,17 +2,24 @@
 using TMPro;
 using UnityEngine.UI;
 using System.IO;
+using UnityEngine.EventSystems;
 
-public class SaveSlotUI : MonoBehaviour
+public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [Header("UI Elements")]
     public TextMeshProUGUI slotTitle;
     public TextMeshProUGUI slotInfo;
+    public TextMeshProUGUI playerNameText;     // Имя персонажа
+    public TextMeshProUGUI levelText;          // Уровень
     public Image background;
-    public Button deleteButton;  // 🗑 кнопка удаления
+    public GameObject deletePrompt;            // Контейнер для "удалить?" при удержании
+    public TextMeshProUGUI deletePromptText;   // Текст "удалить?"
 
     private string filePath;
     private bool isAutoSave;
+    private float holdTime = 0f;
+    private const float holdDuration = 0.5f;   // 0.5 сек удержания
+    private bool isDeletionPromptShown = false;
 
     // Режим работы меню (Save / Load)
     public static bool isSaveMode = false;
@@ -21,6 +28,7 @@ public class SaveSlotUI : MonoBehaviour
     {
         filePath = path;
         isAutoSave = autoSave;
+        isDeletionPromptShown = false;
 
         // ----- Имя слота -----
         string name = autoSave ? LanguageManager.Get("auto_save")
@@ -28,6 +36,30 @@ public class SaveSlotUI : MonoBehaviour
         slotTitle.text = name;
 
         bool exists = File.Exists(path);
+
+        // ----- Загрузка данных сейва для отображения -----
+        if (exists && !isAutoSave)
+        {
+            try
+            {
+                SaveData data = SaveManager.Load(GetSlotIndex());
+                if (data != null)
+                {
+                    playerNameText.text = data.player.name;
+                    levelText.text = $"Lvl {data.player.level} | Gold: {data.player.gold}";
+                }
+            }
+            catch
+            {
+                playerNameText.text = "---";
+                levelText.text = "";
+            }
+        }
+        else
+        {
+            playerNameText.text = "";
+            levelText.text = "";
+        }
 
         // ----- Текст под слотом -----
         if (exists)
@@ -45,24 +77,17 @@ public class SaveSlotUI : MonoBehaviour
         {
             slotInfo.text = LanguageManager.Get("empty_slot");
             background.color = new Color(1, 1, 1, 0.25f); // прозрачный для пустых
+            playerNameText.text = "";
+            levelText.text = "";
         }
 
         // ----- Клик по всему слоту -----
         GetComponent<Button>().onClick.RemoveAllListeners();
         GetComponent<Button>().onClick.AddListener(OnSlotClick);
 
-        // ----- Кнопка удаления -----
-        deleteButton.onClick.RemoveAllListeners();
-
-        if (isAutoSave)
-        {
-            deleteButton.gameObject.SetActive(false); // автосейв нельзя удалить
-        }
-        else
-        {
-            deleteButton.gameObject.SetActive(true);
-            deleteButton.onClick.AddListener(OnDelete);
-        }
+        // ----- Инициализируем prompt удаления -----
+        if (deletePrompt != null)
+            deletePrompt.SetActive(false);
     }
 
     private void OnSlotClick()
@@ -96,11 +121,19 @@ public class SaveSlotUI : MonoBehaviour
             return;
         }
 
-        int index = GetSlotIndex();
-        Debug.Log($"[SaveSlotUI] LOAD from slot {index}, path={filePath}");
+        SaveData data = SaveManager.Load(GetSlotIndex());
 
-        SaveData data = SaveManager.Load(index);
-        GameManager.Instance.LoadGameData(data);
+        if (data == null)
+        {
+            Debug.LogError("Ошибка загрузки сейва!");
+            return;
+        }
+
+        // передаём сейв
+        TempSaveCache.pendingSave = data;
+
+        // Загружаем сцену, в которой был игрок
+        SceneLoader.LoadScene(data.meta.sceneName);
     }
 
     private void OnDelete()
@@ -125,5 +158,50 @@ public class SaveSlotUI : MonoBehaviour
         string fileName = Path.GetFileNameWithoutExtension(filePath);
         string[] parts = fileName.Split('_');
         return int.Parse(parts[1]);
+    }
+
+    // ===== HOLD-TO-DELETE IMPLEMENTATION =====
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (isAutoSave || File.Exists(filePath) == false)
+            return;
+
+        holdTime = 0f;
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        isDeletionPromptShown = false;
+        if (deletePrompt != null)
+            deletePrompt.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (isAutoSave || File.Exists(filePath) == false)
+            return;
+
+        // Проверяем, нажата ли кнопка мыши на этом объекте
+        if (EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButton(0))
+        {
+            holdTime += Time.deltaTime;
+
+            if (holdTime >= holdDuration && !isDeletionPromptShown)
+            {
+                isDeletionPromptShown = true;
+                if (deletePrompt != null)
+                {
+                    deletePrompt.SetActive(true);
+                    if (deletePromptText != null)
+                        deletePromptText.text = "🗑 " + LanguageManager.Get("delete_save");
+                }
+            }
+
+            // Показываем прогресс (опционально - может быть визуальная шкала)
+        }
+        else
+        {
+            holdTime = 0f;
+        }
     }
 }
