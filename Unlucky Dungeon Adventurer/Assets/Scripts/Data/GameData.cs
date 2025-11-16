@@ -68,12 +68,24 @@ public static class GameData
         }
 
         ClassStats stats = classDatabase[role];
+
+        // создаём нового игрока на основе класса
         CurrentPlayer = new PlayerData(name, role, stats);
 
+        // тут в будущем можно задать стартовый уровень/золото
+        CurrentPlayer.level = 1;
+        CurrentPlayer.gold = 500;
+
+        // на всякий случай пересчитываем (чисто паранойя)
+        CurrentPlayer.RecalculateFinalStats();
+        CurrentPlayer.ResetToFull();
+
+        // Сохраняем минимальные вещи в PlayerPrefs (для быстрого доступа)
         PlayerPrefs.SetString("playerName", name);
         PlayerPrefs.SetString("playerClass", role);
         PlayerPrefs.Save();
     }
+
 
     // 📂 Загружаем игрока
     public static void LoadPlayer()

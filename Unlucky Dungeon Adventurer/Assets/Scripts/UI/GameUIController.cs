@@ -37,19 +37,20 @@ public class GameUIController : MonoBehaviour
     private void UpdateUI()
     {
         var p = GameData.CurrentPlayer;
-
-        // Защита: если игрока нет, не обновляем
         if (p == null)
             return;
 
-        hpFill.fillAmount = (float)p.currentHP / p.maxHP;
-        hpText.text = $"{p.currentHP}/{p.maxHP}";
+        // HP
+        hpFill.fillAmount = (float)p.currentHP / p.finalMaxHP;
+        hpText.text = $"{p.currentHP}/{p.finalMaxHP}";
 
-        mpFill.fillAmount = (float)p.currentMP / p.maxMP;
-        mpText.text = $"{p.currentMP}/{p.maxMP}";
+        // MP
+        mpFill.fillAmount = (float)p.currentMP / p.finalMaxMP;
+        mpText.text = $"{p.currentMP}/{p.finalMaxMP}";
 
-        staFill.fillAmount = (float)p.currentStamina / p.maxStamina;
-        staText.text = $"{p.currentStamina}/{p.maxStamina}";
+        // Stamina
+        staFill.fillAmount = (float)p.currentStamina / p.finalMaxStamina;
+        staText.text = $"{p.currentStamina}/{p.finalMaxStamina}";
     }
 
     private void OnEnable()

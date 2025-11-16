@@ -26,21 +26,21 @@ public class PlayerSaveData
     public int level;
     public int gold;
 
-    // 🔥 HP, MP, Stamina — current и max
+    // 🔹 БАЗОВЫЕ статы (то, что задаёт класс/уровень)
+    public int baseMaxHP;
+    public int baseMaxMP;
+    public int baseMaxStamina;
+
+    public int baseAttack;
+    public int baseDefense;
+    public int baseAgility;
+    public int baseLust;
+
+    // 🔹 ТЕКУЩИЕ значения (то, что реально на полосках)
     public int currentHP;
-    public int maxHP;
-
     public int currentMP;
-    public int maxMP;
-
     public int currentStamina;
-    public int maxStamina;
 
-    // остальные боевые параметры
-    public int attack;
-    public int defense;
-    public int agility;
-    public int lust;
     public int isPregnant;
 
     // позиция игрока на карте

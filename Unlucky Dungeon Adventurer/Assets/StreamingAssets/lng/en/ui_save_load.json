@@ -2,6 +2,7 @@
     "title": "Saves",
     "auto_save": "Autosave",
     "empty_slot": "Empty — tap to save",
+    "button_save": "Save",
     "button_load": "Load",
     "button_delete": "Delete",
     "confirm_delete": "Delete this save?",

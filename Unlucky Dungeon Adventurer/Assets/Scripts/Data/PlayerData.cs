@@ -6,28 +6,40 @@ public class PlayerData
     public string playerName;
     public string playerClass;
 
-    // Уровень и деньги
+    // 🔹 Прогресс
     public int level = 1;
     public int gold = 0;
 
-    // 🔥 Максимальные характеристики
-    public int maxHP;
-    public int maxMP;
-    public int maxStamina;
+    // 🔹 БАЗОВЫЕ статы (то, что задаёт класс + уровень)
+    public int baseMaxHP;
+    public int baseMaxMP;
+    public int baseMaxStamina;
 
-    // 🔥 Текущие характеристики
+    public int baseAttack;
+    public int baseDefense;
+    public int baseAgility;
+    public int baseLust;
+
+    // 🔹 ФИНАЛЬНЫЕ статы (база + шмот + бафы)
+    // Пока = базе. Потом добавим экипировку.
+    public int finalMaxHP;
+    public int finalMaxMP;
+    public int finalMaxStamina;
+
+    public int finalAttack;
+    public int finalDefense;
+    public int finalAgility;
+    public int finalLust;
+
+    // 🔹 ТЕКУЩИЕ значения (то, что реально на полосках)
     public int currentHP;
     public int currentMP;
     public int currentStamina;
 
-    // Основные боевые параметры
-    public int attack;
-    public int defense;
-    public int agility;
-    public int lust;
+    // Прочее
     public int isPregnant;
 
-    // Позиция на карте
+    // Позиция на карте (для сейва)
     public float mapPosX;
     public float mapPosY;
 
@@ -36,25 +48,57 @@ public class PlayerData
         this.playerName = name;
         this.playerClass = playerClass;
 
-        // Максимальные статы
-        maxHP = stats.baseHP;
-        maxMP = stats.baseMP;
-        maxStamina = 100;  // пока фиксированно
+        ApplyBaseStatsFromClass(stats);
+        RecalculateFinalStats();
+        ResetToFull();
+    }
 
-        // Текущие статы при создании
-        currentHP = maxHP;
-        currentMP = maxMP;
-        currentStamina = maxStamina;
+    /// <summary>
+    /// Берём базовые статы из шаблона класса (classDatabase)
+    /// </summary>
+    public void ApplyBaseStatsFromClass(ClassStats stats)
+    {
+        baseMaxHP = stats.baseHP;
+        baseMaxMP = stats.baseMP;
+        baseMaxStamina = 100; // временно фиксированное значение
 
-        // Базовые параметры
-        attack = stats.baseAttack;
-        defense = stats.baseDefense;
-        agility = stats.baseAgility;
-        lust = stats.baseLust;
+        baseAttack = stats.baseAttack;
+        baseDefense = stats.baseDefense;
+        baseAgility = stats.baseAgility;
+        baseLust = stats.baseLust;
+
         isPregnant = stats.baseIsPregnant;
+    }
 
-        // Позиция героя при создании
-        mapPosX = 0f;
-        mapPosY = 0f;
+    /// <summary>
+    /// Пересчёт ФИНАЛЬНЫХ статов.
+    /// Сейчас: финальные = базовые.
+    /// Потом сюда добавим шмот, бафы, дебафы.
+    /// </summary>
+    public void RecalculateFinalStats()
+    {
+        finalMaxHP = baseMaxHP;
+        finalMaxMP = baseMaxMP;
+        finalMaxStamina = baseMaxStamina;
+
+        finalAttack = baseAttack;
+        finalDefense = baseDefense;
+        finalAgility = baseAgility;
+        finalLust = baseLust;
+
+        // Если текущее HP/MP/STA больше нового максимума — режем
+        if (currentHP > finalMaxHP) currentHP = finalMaxHP;
+        if (currentMP > finalMaxMP) currentMP = finalMaxMP;
+        if (currentStamina > finalMaxStamina) currentStamina = finalMaxStamina;
+    }
+
+    /// <summary>
+    /// Полное восстановление (используем при создании или отдыхе)
+    /// </summary>
+    public void ResetToFull()
+    {
+        currentHP = finalMaxHP;
+        currentMP = finalMaxMP;
+        currentStamina = finalMaxStamina;
     }
 }

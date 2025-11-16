@@ -25,28 +25,27 @@ public class GameManager : MonoBehaviour
 
         if (p != null)
         {
-            // --- Player ---
             data.player.name = p.playerName;
             data.player.playerClass = p.playerClass;
 
             data.player.level = p.level;
             data.player.gold = p.gold;
 
-            // 🔥 сохраняем HP/MP/STA
+            // базовые статы
+            data.player.baseMaxHP = p.baseMaxHP;
+            data.player.baseMaxMP = p.baseMaxMP;
+            data.player.baseMaxStamina = p.baseMaxStamina;
+
+            data.player.baseAttack = p.baseAttack;
+            data.player.baseDefense = p.baseDefense;
+            data.player.baseAgility = p.baseAgility;
+            data.player.baseLust = p.baseLust;
+
+            // текущие значения
             data.player.currentHP = p.currentHP;
-            data.player.maxHP = p.maxHP;
-
             data.player.currentMP = p.currentMP;
-            data.player.maxMP = p.maxMP;
-
             data.player.currentStamina = p.currentStamina;
-            data.player.maxStamina = p.maxStamina;
 
-            // остальное
-            data.player.attack = p.attack;
-            data.player.defense = p.defense;
-            data.player.agility = p.agility;
-            data.player.lust = p.lust;
             data.player.isPregnant = p.isPregnant;
 
             data.player.mapPosX = p.mapPosX;
@@ -81,53 +80,49 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // --- Создаём PlayerData на основе класса ---
+        // получаем базовый шаблон класса
         ClassStats stats;
-
         if (!GameData.classDatabase.TryGetValue(data.player.playerClass, out stats))
         {
             Debug.LogWarning($"Неизвестный класс: {data.player.playerClass}. Загружаю базовый класс.");
             stats = new ClassStats();
         }
 
-        // Создаём объект PlayerData на основе базовых статов
+        // создаём PlayerData с базовыми статами из класса
         PlayerData p = new PlayerData(
             data.player.name,
             data.player.playerClass,
             stats
         );
 
-        // --- Перезаписываем сохранённые характеристики (🔥 важная часть) ---
-
+        // перезаписываем тем, что есть в сейве
         p.level = data.player.level;
         p.gold = data.player.gold;
 
-        // max/current HP/MP/Stamina
-        p.maxHP = data.player.maxHP;
+        // базовые статы из сейва (если они уже менялись по уровню и т.п.)
+        p.baseMaxHP = data.player.baseMaxHP;
+        p.baseMaxMP = data.player.baseMaxMP;
+        p.baseMaxStamina = data.player.baseMaxStamina;
+
+        p.baseAttack = data.player.baseAttack;
+        p.baseDefense = data.player.baseDefense;
+        p.baseAgility = data.player.baseAgility;
+        p.baseLust = data.player.baseLust;
+
+        // текущее состояние
         p.currentHP = data.player.currentHP;
-
-        p.maxMP = data.player.maxMP;
         p.currentMP = data.player.currentMP;
-
-        p.maxStamina = data.player.maxStamina;
         p.currentStamina = data.player.currentStamina;
 
-        // боевые характеристики
-        p.attack = data.player.attack;
-        p.defense = data.player.defense;
-        p.agility = data.player.agility;
-        p.lust = data.player.lust;
         p.isPregnant = data.player.isPregnant;
 
-        // координаты карты
         p.mapPosX = data.player.mapPosX;
         p.mapPosY = data.player.mapPosY;
 
-        // сохраняем в GameData
-        GameData.CurrentPlayer = p;
+        // пересчёт финальных статов (finalMaxHP и т.п.)
+        p.RecalculateFinalStats();
 
-        // --- World (когда подключим систему мира) ---
-        // TODO: восстановить день/время/погоду/seed
+        GameData.CurrentPlayer = p;
 
         Debug.Log($"Загружен персонаж: {p.playerName} [{p.playerClass}] | Уровень {p.level}");
     }
