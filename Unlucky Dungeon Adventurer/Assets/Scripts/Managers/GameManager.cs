@@ -21,48 +21,57 @@ public class GameManager : MonoBehaviour
     public SaveData GetCurrentGameData()
     {
         SaveData data = new SaveData();
+        var p = GameData.CurrentPlayer;
 
-        // --- Player ---
-        if (GameData.CurrentPlayer != null)
+        if (p != null)
         {
-            data.player.name = GameData.CurrentPlayer.playerName;
-            data.player.playerClass = GameData.CurrentPlayer.playerClass;
-            data.player.level = GameData.CurrentPlayer.level;
-            data.player.gold = GameData.CurrentPlayer.gold;
+            // --- Player ---
+            data.player.name = p.playerName;
+            data.player.playerClass = p.playerClass;
 
-            data.player.hp = GameData.CurrentPlayer.hp;
-            data.player.mp = GameData.CurrentPlayer.mp;
-            data.player.attack = GameData.CurrentPlayer.attack;
-            data.player.defense = GameData.CurrentPlayer.defense;
-            data.player.agility = GameData.CurrentPlayer.agility;
-            data.player.lust = GameData.CurrentPlayer.lust;
-            data.player.isPregnant = GameData.CurrentPlayer.isPregnant;
+            data.player.level = p.level;
+            data.player.gold = p.gold;
 
-            // TODO: когда будет реальная позиция на WorldMap — сюда
-            data.player.mapPosX = 0f;
-            data.player.mapPosY = 0f;
+            // 🔥 сохраняем HP/MP/STA
+            data.player.currentHP = p.currentHP;
+            data.player.maxHP = p.maxHP;
+
+            data.player.currentMP = p.currentMP;
+            data.player.maxMP = p.maxMP;
+
+            data.player.currentStamina = p.currentStamina;
+            data.player.maxStamina = p.maxStamina;
+
+            // остальное
+            data.player.attack = p.attack;
+            data.player.defense = p.defense;
+            data.player.agility = p.agility;
+            data.player.lust = p.lust;
+            data.player.isPregnant = p.isPregnant;
+
+            data.player.mapPosX = p.mapPosX;
+            data.player.mapPosY = p.mapPosY;
         }
 
         // --- World ---
-        // Позже будем забирать отсюда генерацию мира, время суток и т.п.
         data.world.worldSeed = 0;
         data.world.currentDay = 1;
-        data.world.timeOfDay = 12.0f;
+        data.world.timeOfDay = 12f;
 
         // --- Inventory ---
-        // Пока оставляем пустым, позже подключим InventorySystem.Export()
+        // оставим заглушку
 
         // --- Quests ---
-        // Тоже пока заглушка. Потом: QuestSystem.Export()
+        // тоже пусто пока
 
         // --- Meta ---
         data.meta.sceneName = SceneManager.GetActiveScene().name;
         data.meta.saveTime = System.DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
-        data.meta.saveVersion = "0.1"; // версию можно будет обновлять
-        // slotIndex мы будем проставлять в SaveManager.Save()
+        data.meta.saveVersion = "0.1";
 
         return data;
     }
+
 
     public void LoadGameData(SaveData data)
     {
@@ -72,42 +81,57 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // --- Player ---
-        // тут мы одну из двух вещей можем делать:
-        // 1) создать нового CurrentPlayer из SaveData
-        // 2) обновить уже существующего
-        // Пока сделаем новый:
-
+        // --- Создаём PlayerData на основе класса ---
         ClassStats stats;
-        if (GameData.classDatabase.TryGetValue(data.player.playerClass, out stats))
-        {
-            GameData.CurrentPlayer = new PlayerData(
-                data.player.name,
-                data.player.playerClass,
-                stats
-            );
 
-            // Перезаписываем боевые статы теми, что в сейве
-            GameData.CurrentPlayer.level = data.player.level;
-            GameData.CurrentPlayer.gold = data.player.gold;
-            GameData.CurrentPlayer.hp = data.player.hp;
-            GameData.CurrentPlayer.mp = data.player.mp;
-            GameData.CurrentPlayer.attack = data.player.attack;
-            GameData.CurrentPlayer.defense = data.player.defense;
-            GameData.CurrentPlayer.agility = data.player.agility;
-            GameData.CurrentPlayer.lust = data.player.lust;
-            GameData.CurrentPlayer.isPregnant = data.player.isPregnant;
-        }
-        else
+        if (!GameData.classDatabase.TryGetValue(data.player.playerClass, out stats))
         {
-            Debug.LogWarning($"Неизвестный класс в сейве: {data.player.playerClass}");
+            Debug.LogWarning($"Неизвестный класс: {data.player.playerClass}. Загружаю базовый класс.");
+            stats = new ClassStats();
         }
 
-        // --- World ---
-        // Здесь потом будем возвращать позицию на карте, день, время и т.п.
+        // Создаём объект PlayerData на основе базовых статов
+        PlayerData p = new PlayerData(
+            data.player.name,
+            data.player.playerClass,
+            stats
+        );
 
-        Debug.Log($"Загружен {data.player.name} ({data.player.playerClass}), уровень {data.player.level}, золото {data.player.gold}");
+        // --- Перезаписываем сохранённые характеристики (🔥 важная часть) ---
+
+        p.level = data.player.level;
+        p.gold = data.player.gold;
+
+        // max/current HP/MP/Stamina
+        p.maxHP = data.player.maxHP;
+        p.currentHP = data.player.currentHP;
+
+        p.maxMP = data.player.maxMP;
+        p.currentMP = data.player.currentMP;
+
+        p.maxStamina = data.player.maxStamina;
+        p.currentStamina = data.player.currentStamina;
+
+        // боевые характеристики
+        p.attack = data.player.attack;
+        p.defense = data.player.defense;
+        p.agility = data.player.agility;
+        p.lust = data.player.lust;
+        p.isPregnant = data.player.isPregnant;
+
+        // координаты карты
+        p.mapPosX = data.player.mapPosX;
+        p.mapPosY = data.player.mapPosY;
+
+        // сохраняем в GameData
+        GameData.CurrentPlayer = p;
+
+        // --- World (когда подключим систему мира) ---
+        // TODO: восстановить день/время/погоду/seed
+
+        Debug.Log($"Загружен персонаж: {p.playerName} [{p.playerClass}] | Уровень {p.level}");
     }
+
 
     private void Start()
     {

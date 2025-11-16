@@ -11,34 +11,44 @@ public class SaveData
     public QuestSaveData quests = new QuestSaveData();
     public MetaSaveData meta = new MetaSaveData();
 
-    // В будущем:
+    // пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
     // public KillStatsSaveData killStats = new KillStatsSaveData();
     // public AchievementsSaveData achievements = new AchievementsSaveData();
 }
 
-// -------------------- Игрок --------------------
+// -------------------- пїЅпїЅпїЅпїЅпїЅ --------------------
 [Serializable]
 public class PlayerSaveData
 {
     public string name;
     public string playerClass;
+
     public int level;
     public int gold;
 
-    public int hp;
-    public int mp;
+    // рџ”Ґ HP, MP, Stamina вЂ” current Рё max
+    public int currentHP;
+    public int maxHP;
+
+    public int currentMP;
+    public int maxMP;
+
+    public int currentStamina;
+    public int maxStamina;
+
+    // РѕСЃС‚Р°Р»СЊРЅС‹Рµ Р±РѕРµРІС‹Рµ РїР°СЂР°РјРµС‚СЂС‹
     public int attack;
     public int defense;
     public int agility;
     public int lust;
     public int isPregnant;
 
-    // позиция на карте мира (пока плоско)
+    // РїРѕР·РёС†РёСЏ РёРіСЂРѕРєР° РЅР° РєР°СЂС‚Рµ
     public float mapPosX;
     public float mapPosY;
 }
 
-// -------------------- Мир --------------------
+// -------------------- пїЅпїЅпїЅ --------------------
 [Serializable]
 public class WorldSaveData
 {
@@ -46,42 +56,42 @@ public class WorldSaveData
     public int currentDay;
     public float timeOfDay;
 
-    // В будущем: открытые подземелья, города и т.п.
+    // пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅ.пїЅ.
     // public List<Vector2Int> discoveredDungeons = new List<Vector2Int>();
     // public List<Vector2Int> discoveredCities = new List<Vector2Int>();
 }
 
-// -------------------- Инвентарь --------------------
+// -------------------- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ --------------------
 [Serializable]
 public class InventorySaveData
 {
     public List<ItemSaveData> items = new List<ItemSaveData>();
 }
 
-// Пока заглушка, потом привяжем к твоей системе предметов
+// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 [Serializable]
 public class ItemSaveData
 {
-    public string itemId;   // например "sword_wooden_001"
+    public string itemId;   // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ "sword_wooden_001"
     public int quantity;
 }
 
-// -------------------- Квесты --------------------
+// -------------------- пїЅпїЅпїЅпїЅпїЅпїЅ --------------------
 [Serializable]
 public class QuestSaveData
 {
     public List<string> active = new List<string>();
     public List<string> completed = new List<string>();
 
-    // В будущем сюда можно добавлять прогресс, таймеры и т.п.
+    // пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅ.пїЅ.
 }
 
-// -------------------- Мета-инфа про сейв --------------------
+// -------------------- пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ --------------------
 [Serializable]
 public class MetaSaveData
 {
-    public int slotIndex;         // -1 = автосейв, 0..N = обычные слоты
-    public string sceneName;      // "WorldMap", "Dungeon_01" и т.п.
-    public string saveTime;       // строка даты/времени для отображения
-    public string saveVersion;    // версия игры/схемы сейва
+    public int slotIndex;         // -1 = пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, 0..N = пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    public string sceneName;      // "WorldMap", "Dungeon_01" пїЅ пїЅ.пїЅ.
+    public string saveTime;       // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    public string saveVersion;    // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 }
