@@ -23,27 +23,42 @@ public class GameUIController : MonoBehaviour
 
     private void Start()
     {
-        UpdateUI();
+        // Подписываемся — UI обновится, когда игрок появится или его статы изменятся
+        UIEvents.OnPlayerStatsChanged += UpdateUI;
+
+        // Если игрок уже есть, обновляем сразу
+        if (GameData.CurrentPlayer != null)
+        {
+            UpdateUI();
+        }
+        // Если игрока нет — ждём события OnPlayerStatsChanged (которое должно прийти после загрузки игрока)
     }
 
-    public void UpdateUI()
+    private void UpdateUI()
     {
-        if (p == null)
-        {
-            Debug.LogWarning("GameUIController: CurrentPlayer == NULL");
-            return;
-        }
+        var p = GameData.CurrentPlayer;
 
-        // HP
+        // Защита: если игрока нет, не обновляем
+        if (p == null)
+            return;
+
         hpFill.fillAmount = (float)p.currentHP / p.maxHP;
         hpText.text = $"{p.currentHP}/{p.maxHP}";
 
-        // MP
         mpFill.fillAmount = (float)p.currentMP / p.maxMP;
         mpText.text = $"{p.currentMP}/{p.maxMP}";
 
-        // Stamina
         staFill.fillAmount = (float)p.currentStamina / p.maxStamina;
         staText.text = $"{p.currentStamina}/{p.maxStamina}";
+    }
+
+    private void OnEnable()
+    {
+        UIEvents.OnPlayerStatsChanged += UpdateUI;
+    }
+
+    private void OnDisable()
+    {
+        UIEvents.OnPlayerStatsChanged -= UpdateUI;
     }
 }

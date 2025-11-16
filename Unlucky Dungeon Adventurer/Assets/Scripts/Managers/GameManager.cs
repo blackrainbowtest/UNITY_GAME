@@ -139,6 +139,9 @@ public class GameManager : MonoBehaviour
         {
             LoadGameData(TempSaveCache.pendingSave);
             TempSaveCache.pendingSave = null;
+
+            // 🔥 УВЕДОМЛЯЕМ UI что загрузились данные игрока
+            UIEvents.OnPlayerStatsChanged?.Invoke();
         }
     }
 }
