@@ -26,6 +26,9 @@ public class PlayerSaveData
     public int level;
     public int gold;
 
+    public int experience;       // 🔥
+    public int experienceToNext; // 🔥
+
     // 🔹 БАЗОВЫЕ статы (то, что задаёт класс/уровень)
     public int baseMaxHP;
     public int baseMaxMP;

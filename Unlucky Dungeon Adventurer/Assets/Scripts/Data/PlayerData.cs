@@ -15,6 +15,9 @@ public class PlayerData
     public int baseMaxMP;
     public int baseMaxStamina;
 
+    public int experience;
+    public int experienceToNext;
+
     public int baseAttack;
     public int baseDefense;
     public int baseAgility;
@@ -48,8 +51,17 @@ public class PlayerData
         this.playerName = name;
         this.playerClass = playerClass;
 
+        // базовые статы от класса
         ApplyBaseStatsFromClass(stats);
+
+        // опыт
+        experience = 0;
+        experienceToNext = ExperienceTable.GetExpRequiredForLevel(1);
+
+        // высчитываем финальные значения (пока == базовым)
         RecalculateFinalStats();
+
+        // устанавливаем current HP/MP/STA = максимальным
         ResetToFull();
     }
 
@@ -101,4 +113,48 @@ public class PlayerData
         currentMP = finalMaxMP;
         currentStamina = finalMaxStamina;
     }
+
+    /// <summary>
+    /// Добавляет опыт персонажу.
+    /// </summary>
+    public void GainExperience(int amount)
+    {
+        experience += amount;
+
+        while (experience >= experienceToNext)
+        {
+            experience -= experienceToNext;
+            LevelUp();
+        }
+    }
+
+    /// <summary>
+    /// Повышает уровень персонажа.
+    /// </summary>
+    private void LevelUp()
+    {
+        level++;
+
+        // Получаем правила роста для текущего класса
+        var prog = ClassProgressionManager.Data[playerClass];
+
+        // растим базовые статы по данным JSON
+        baseMaxHP      += prog.hpPerLevel;
+        baseMaxMP      += prog.mpPerLevel;
+        baseMaxStamina += prog.staminaPerLevel;
+
+        baseAttack  += prog.attackPerLevel;
+        baseDefense += prog.defensePerLevel;
+        baseAgility += prog.agilityPerLevel;
+        baseLust    += prog.lustPerLevel;
+
+        // пересчитываем финальные
+        RecalculateFinalStats();
+
+        // новый порог опыта
+        experienceToNext = ExperienceTable.GetExpRequiredForLevel(level);
+
+        Debug.Log($"LEVEL UP! {playerName} теперь уровня {level}");
+    }
+
 }

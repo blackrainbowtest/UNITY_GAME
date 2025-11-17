@@ -1,0 +1,38 @@
+{
+    "Paladin": {
+        "hpPerLevel": 12,
+        "mpPerLevel": 4,
+        "staminaPerLevel": 3,
+        "attackPerLevel": 3,
+        "defensePerLevel": 2,
+        "agilityPerLevel": 1,
+        "lustPerLevel": 0
+    },
+    "Hermit": {
+        "hpPerLevel": 8,
+        "mpPerLevel": 8,
+        "staminaPerLevel": 4,
+        "attackPerLevel": 1,
+        "defensePerLevel": 1,
+        "agilityPerLevel": 2,
+        "lustPerLevel": 0
+    },
+    "Rogue": {
+        "hpPerLevel": 6,
+        "mpPerLevel": 3,
+        "staminaPerLevel": 5,
+        "attackPerLevel": 2,
+        "defensePerLevel": 1,
+        "agilityPerLevel": 3,
+        "lustPerLevel": 1
+    },
+    "Slave": {
+        "hpPerLevel": 5,
+        "mpPerLevel": 2,
+        "staminaPerLevel": 4,
+        "attackPerLevel": 1,
+        "defensePerLevel": 1,
+        "agilityPerLevel": 1,
+        "lustPerLevel": 1
+    }
+}
