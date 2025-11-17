@@ -1,11 +1,13 @@
 {
     "title": "Saves",
     "auto_save": "Autosave",
-    "empty_slot": "Empty — tap to save",
+    "empty_slot": "Empty",
+    "empty_slot_desc": "No saved data",
     "button_save": "Save",
     "button_load": "Load",
     "button_delete": "Delete",
     "confirm_delete": "Delete this save?",
     "title_save": "Saves",
-    "title_load": "Loads"
+    "title_load": "Loads",
+    "delete_save": "X"
 }

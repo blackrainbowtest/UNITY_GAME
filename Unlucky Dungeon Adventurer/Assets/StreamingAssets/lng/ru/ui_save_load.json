@@ -1,11 +1,13 @@
 {
     "title": "Сохранения",
     "auto_save": "Автосохранение",
-    "empty_slot": "Пусто — нажмите, чтобы сохранить",
+    "empty_slot": "Пусто",
+    "empty_slot_desc": "Слот не содержит сохранения",
     "button_save": "Сохранить",
     "button_load": "Загрузить",
     "button_delete": "Удалить",
     "confirm_delete": "Удалить сохранение?",
     "title_save": "Сохранения",
-    "title_load": "Загрузки"
+    "title_load": "Загрузки",
+    "delete_save": "X"
 }

@@ -30,23 +30,32 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         isAutoSave = autoSave;
         isDeletionPromptShown = false;
 
-        // ----- Имя слота -----
-        string name = autoSave ? LanguageManager.Get("auto_save")
-                               : Path.GetFileNameWithoutExtension(path);
-        slotTitle.text = name;
+        if (deletePrompt != null)
+            deletePrompt.SetActive(false);
 
         bool exists = File.Exists(path);
 
-        // ----- Загрузка данных сейва для отображения -----
-        if (exists && !isAutoSave)
+        // ---------- Заголовок ----------
+        slotTitle.text = autoSave
+            ? LanguageManager.Get("auto_save")
+            : Path.GetFileNameWithoutExtension(path);
+
+        // ---------- Имя персонажа + уровень ----------
+        if (exists)
         {
             try
             {
                 SaveData data = SaveManager.Load(GetSlotIndex());
+
                 if (data != null)
                 {
                     playerNameText.text = data.player.name;
                     levelText.text = $"Lvl {data.player.level} | Gold: {data.player.gold}";
+                }
+                else
+                {
+                    playerNameText.text = "---";
+                    levelText.text = "";
                 }
             }
             catch
@@ -61,33 +70,31 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             levelText.text = "";
         }
 
-        // ----- Текст под слотом -----
+        // ---------- Подпись под слотом ----------
         if (exists)
         {
             string date = File.GetLastWriteTime(path).ToString("dd.MM.yyyy HH:mm");
 
-            if (SaveLoadState.Mode == SaveLoadMode.Save)
-                slotInfo.text = $"{LanguageManager.Get("button_save")}: {date}";
-            else
-                slotInfo.text = $"{LanguageManager.Get("button_load")}: {date}";
+            slotInfo.text = SaveLoadState.Mode == SaveLoadMode.Save
+                ? $"{LanguageManager.Get("button_save")}: {date}"
+                : $"{LanguageManager.Get("button_load")}: {date}";
 
             background.color = Color.white;
         }
         else
         {
             slotInfo.text = LanguageManager.Get("empty_slot");
-            background.color = new Color(1, 1, 1, 0.25f); // прозрачный для пустых
-            playerNameText.text = "";
-            levelText.text = "";
+            background.color = new Color(1, 1, 1, 0.25f);
         }
 
-        // ----- Клик по всему слоту -----
-        GetComponent<Button>().onClick.RemoveAllListeners();
-        GetComponent<Button>().onClick.AddListener(OnSlotClick);
+        // ---------- Удаление ----------
+        if (isAutoSave || !exists)
+            deletePrompt?.SetActive(false);
 
-        // ----- Инициализируем prompt удаления -----
-        if (deletePrompt != null)
-            deletePrompt.SetActive(false);
+        // ---------- Клик ----------
+        Button btn = GetComponent<Button>();
+        btn.onClick.RemoveAllListeners();
+        btn.onClick.AddListener(OnSlotClick);
     }
 
     private void OnSlotClick()
@@ -156,8 +163,18 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             return -1;
 
         string fileName = Path.GetFileNameWithoutExtension(filePath);
-        string[] parts = fileName.Split('_');
-        return int.Parse(parts[1]);
+
+        // Ожидаем формат save_0, save_1, ...
+        if (!fileName.StartsWith("save_"))
+            return -1;  // чтобы не падало
+
+        string num = fileName.Substring(5); // всё после "save_"
+
+        if (int.TryParse(num, out int index))
+            return index;
+
+        Debug.LogError($"[SaveSlotUI] Неверный формат имени файла: {fileName}");
+        return -1;
     }
 
     // ===== HOLD-TO-DELETE IMPLEMENTATION =====
@@ -193,7 +210,7 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 {
                     deletePrompt.SetActive(true);
                     if (deletePromptText != null)
-                        deletePromptText.text = "🗑 " + LanguageManager.Get("delete_save");
+                        deletePromptText.text = LanguageManager.Get("delete_save");
                 }
             }
 

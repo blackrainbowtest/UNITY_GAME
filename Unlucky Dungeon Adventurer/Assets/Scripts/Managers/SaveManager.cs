@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEngine;
 
 public static class SaveManager
@@ -44,5 +45,22 @@ public static class SaveManager
 
         Debug.Log($"[SaveManager] Загрузка из {path}");
         return data;
+    }
+
+    public static void SaveAuto(SaveData data)
+    {
+        try
+        {
+            string path = Path.Combine(Application.persistentDataPath, "save_auto.json");
+
+            string json = JsonUtility.ToJson(data, true);
+            File.WriteAllText(path, json);
+
+            Debug.Log("[AUTO SAVE] Автосейв выполнен: " + path);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Ошибка автосохранения: " + ex.Message);
+        }
     }
 }
