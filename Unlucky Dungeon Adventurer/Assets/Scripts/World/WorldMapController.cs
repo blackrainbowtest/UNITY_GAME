@@ -4,9 +4,23 @@ public class WorldMapController : MonoBehaviour
 {
     private void Start()
     {
-        Debug.Log("[WorldMap] WorldMapController запущен");
+        if (GameManager.Instance == null)
+        {
+            Debug.LogWarning("[WorldMap] GameManager отсутствует — загружаю Preloader");
+            SceneLoader.LoadScene("Preloader");
+            return;
+        }
 
-        // если пришли после создания персонажа — создаём автосейв
+        if (GameData.CurrentPlayer == null)
+        {
+            Debug.LogWarning("[WorldMap] CurrentPlayer отсутствует — загружаю сохранение");
+            if (TempSaveCache.pendingSave != null)
+            {
+                GameManager.Instance.LoadGameData(TempSaveCache.pendingSave);
+                TempSaveCache.pendingSave = null;
+            }
+        }
+
         TryAutoSaveOnEnter();
     }
 

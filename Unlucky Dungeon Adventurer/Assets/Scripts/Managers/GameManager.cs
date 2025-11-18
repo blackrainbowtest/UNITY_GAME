@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log("[GameManager] Awake — Singleton готов");
         if (Instance == null)
         {
             Instance = this;
@@ -130,13 +131,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        if (TempSaveCache.pendingSave != null)
-        {
-            LoadGameData(TempSaveCache.pendingSave);
-            TempSaveCache.pendingSave = null;
-
-            // 🔥 УВЕДОМЛЯЕМ UI что загрузились данные игрока
-            UIEvents.OnPlayerStatsChanged?.Invoke();
-        }
+        // GameInitializer будет управлять инициализацией
+        // GameManager только предоставляет методы для загрузки/сохранения
+        Debug.Log("[GameManager] Start — готов к работе");
     }
 }

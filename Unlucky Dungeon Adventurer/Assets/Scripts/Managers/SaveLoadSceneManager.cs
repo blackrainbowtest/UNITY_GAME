@@ -36,6 +36,9 @@ public class SaveLoadSceneManager : MonoBehaviour
         // ----- REGULAR SAVES -----
         string[] files = Directory.GetFiles(Application.persistentDataPath, "save_*.json");
 
+        // убираем автосейв
+        files = System.Array.FindAll(files, f => !f.Contains("auto"));
+
         foreach (string path in files)
         {
             var obj = Instantiate(slotPrefab, slotContainer);

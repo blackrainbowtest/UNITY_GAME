@@ -61,6 +61,9 @@ public static class GameData
     // 💾 Сохраняем игрока
     public static void SavePlayer(string name, string role)
     {
+        Debug.Log($"[SavePlayer] Создан игрок: {name}, класс={role}");
+        Debug.Log($"[SavePlayer] CurrentPlayer теперь: {CurrentPlayer != null}");
+
         if (!classDatabase.ContainsKey(role))
         {
             Debug.LogWarning($"Неизвестный класс: {role}");

@@ -23,15 +23,14 @@ public class GameUIController : MonoBehaviour
 
     private void Start()
     {
-        // Подписываемся — UI обновится, когда игрок появится или его статы изменятся
+        // Подписываемся на изменения статов
         UIEvents.OnPlayerStatsChanged += UpdateUI;
 
-        // Если игрок уже есть, обновляем сразу
-        if (GameData.CurrentPlayer != null)
+        // Пытаемся обновить UI, если инициализация уже завершена
+        if (GameInitializer.IsInitialized() && GameData.CurrentPlayer != null)
         {
             UpdateUI();
         }
-        // Если игрока нет — ждём события OnPlayerStatsChanged (которое должно прийти после загрузки игрока)
     }
 
     private void UpdateUI()

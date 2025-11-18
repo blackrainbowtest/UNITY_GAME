@@ -1,0 +1,82 @@
+ИЗМЕНЁННЫЕ ФАЙЛЫ - Система инициализации
+═════════════════════════════════════════════════════════════════════════
+
+📝 НОВЫЕ ФАЙЛЫ:
+───────────────
+✓ Scripts/Core/GameInitializer.cs
+  └─ Новый singleton для управления инициализацией игры
+  └─ Использует корутину для гарантирования правильного порядка
+  └─ Автоматически создаётся благодаря [RuntimeInitializeOnLoadMethod]
+
+
+📝 МОДИФИЦИРОВАННЫЕ ФАЙЛЫ:
+──────────────────────────
+
+1. Scripts/Managers/GameManager.cs
+   ├─ Удалена логика в Update() (была источником гонки)
+   ├─ Удален метод TryLoadPlayer()
+   ├─ Start() теперь просто выводит Debug лог
+   └─ Оставлены методы LoadGameData() и GetCurrentGameData()
+
+2. Scripts/Events/UIEvents.cs
+   ├─ Добавлено новое событие: OnGameInitialized
+   ├─ Документированы оба события
+   └─ OnPlayerStatsChanged остаётся как раньше
+
+3. Scripts/UI/GameUIController.cs
+   ├─ Start() теперь проверяет GameInitializer.IsInitialized()
+   ├─ UpdateUI() имеет защиту от null
+   ├─ Подписывается на события через OnEnable/OnDisable
+   └─ Логика проще и понятнее
+
+4. Scripts/Data/PlayerData.cs
+   ├─ Добавлены property шорткаты:
+   │  ├─ public int maxHP => finalMaxHP;
+   │  ├─ public int maxMP => finalMaxMP;
+   │  └─ public int maxStamina => finalMaxStamina;
+   └─ Для удобства использования в UI
+
+
+📊 ПРИНЦИП РАБОТЫ:
+──────────────────
+
+СТАРАЯ СИСТЕМА (с race condition):
+  SaveSlotUI.Load() → TempSaveCache.pendingSave → Сцена загружается
+  ↓↓↓
+  GameManager.Awake() / Start() / Update() → ???
+  ↓↓↓
+  GameUIController.Start() → null reference! ❌
+
+НОВАЯ СИСТЕМА (синхронизированная):
+  SaveSlotUI.Load() → TempSaveCache.pendingSave → Сцена загружается
+  ↓
+  GameInitializer.Awake() → создание singleton
+  ↓
+  GameInitializer.Start() → запуск InitializeGame() корутина
+  ├─ yield return null (один кадр - инициализируются все Start())
+  ├─ Загрузка данных из TempSaveCache или PlayerPrefs
+  ├─ OnGameInitialized событие
+  └─ OnPlayerStatsChanged событие
+  ↓
+  GameUIController.Start() → подписка на события
+  ↓
+  GameUIController получает OnPlayerStatsChanged → UpdateUI() ✓
+
+
+🔧 ЧТО НУЖНО ПРОВЕРИТЬ В РЕДАКТОРЕ:
+────────────────────────────────────
+✓ Сцены загружаются корректно
+✓ UI обновляется после загрузки игры
+✓ Нет null reference exceptions
+✓ SaveData загружается правильно
+✓ CurrentPlayer содержит корректные данные
+
+
+⚙️ ТЕСТИРОВАНИЕ:
+────────────────
+1. Новая игра → Сцена загружается → UI видна
+2. Загрузка игры → TempSaveCache.pendingSave → UI обновляется корректно
+3. Проверка Debug.Log - должны видеть порядок инициализации
+4. Проверка значений HP/MP/Stamina - должны быть из сейва
+
+═════════════════════════════════════════════════════════════════════════

@@ -46,6 +46,11 @@ public class PlayerData
     public float mapPosX;
     public float mapPosY;
 
+    // Свойства для удобства (используют финальные значения)
+    public int maxHP => finalMaxHP;
+    public int maxMP => finalMaxMP;
+    public int maxStamina => finalMaxStamina;
+
     public PlayerData(string name, string playerClass, ClassStats stats)
     {
         this.playerName = name;
