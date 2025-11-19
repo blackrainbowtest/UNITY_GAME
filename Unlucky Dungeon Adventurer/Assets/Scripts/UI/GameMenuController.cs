@@ -29,22 +29,18 @@ public class GameMenuController : MonoBehaviour
     {
         isOpen = true;
         StartCoroutine(Fade(menuGroup, 0f, 1f, 0.25f));
-
         menuGroup.interactable = true;
         menuGroup.blocksRaycasts = true;
-
-        Time.timeScale = 0; // ставим игру на паузу
+        Time.timeScale = 0;
     }
 
     public void Close()
     {
         isOpen = false;
-
         StartCoroutine(Fade(menuGroup, 1f, 0f, 0.25f));
         menuGroup.interactable = false;
         menuGroup.blocksRaycasts = false;
-
-        Time.timeScale = 1; // снимаем паузу
+        Time.timeScale = 1;
     }
 
     private void HideInstant()
@@ -68,7 +64,6 @@ public class GameMenuController : MonoBehaviour
         g.alpha = b;
     }
 
-    // кнопки
     public void OnResumeClicked()
     {
         Close();
@@ -81,27 +76,17 @@ public class GameMenuController : MonoBehaviour
 
     public void OnSaveClicked()
     {
-        // режим сохранения
         SaveLoadState.Mode = SaveLoadMode.Save;
-
-        // закрываем меню
         Close();
-
-        // включаем время (окно SaveLoad должно работать)
         Time.timeScale = 1;
-
-        // открываем сцену поверх
         SceneManager.LoadScene("SaveLoadScene", LoadSceneMode.Additive);
     }
 
     public void OnLoadClicked()
     {
-        // режим загрузки
         SaveLoadState.Mode = SaveLoadMode.Load;
-
         Close();
         Time.timeScale = 1;
-
         SceneManager.LoadScene("SaveLoadScene", LoadSceneMode.Additive);
     }
 
