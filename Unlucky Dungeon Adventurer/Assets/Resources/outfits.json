@@ -1,0 +1,32 @@
+{
+  "outfits": [
+    {
+      "id": "paladin_default",
+      "legs": "Paladin",
+      "chest": "PaladinChest",
+      "hands": "PaladinHands",
+      "head": "PaladinHelm"
+    },
+    {
+      "id": "rogue_default",
+      "legs": "Rogue",
+      "chest": "RogueChest",
+      "hands": "RogueHands",
+      "head": "RogueHood"
+    },
+    {
+      "id": "slave_default",
+      "legs": "Slave",
+      "chest": "SlaveChest",
+      "hands": "SlaveHands",
+      "head": "SlaveCap"
+    },
+    {
+      "id": "hermit_default",
+      "legs": "Hermit",
+      "chest": "HermitRobe",
+      "hands": "HermitGloves",
+      "head": "HermitHood"
+    }
+  ]
+}
