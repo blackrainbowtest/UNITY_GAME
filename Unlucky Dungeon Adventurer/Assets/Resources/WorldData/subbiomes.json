@@ -1,0 +1,18 @@
+{
+  "subbiomes": [
+    { "id": "ConiferousForest", "parent": "Forest" },
+    { "id": "TropicalForest",   "parent": "Forest" },
+    { "id": "DeadForest",       "parent": "Forest" },
+    { "id": "FoggyForest",      "parent": "Forest" },
+
+    { "id": "SandDunes",   "parent": "Desert" },
+    { "id": "RockyDesert", "parent": "Desert" },
+    { "id": "Oasis",       "parent": "Desert" },
+    { "id": "DeadSand",    "parent": "Desert" },
+
+    { "id": "StoneCave",    "parent": "Cave" },
+    { "id": "CrystalCave",  "parent": "Cave" },
+    { "id": "MagmaCave",    "parent": "Cave" },
+    { "id": "DemonicCave",  "parent": "Cave" }
+  ]
+}

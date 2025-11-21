@@ -1,0 +1,14 @@
+{
+  "biomes": [
+    { "id": "Forest",     "group": "Nature", "color": "#2e6b33" },
+    { "id": "Grassland",  "group": "Nature", "color": "#6fc25c" },
+    { "id": "Desert",     "group": "Dry",    "color": "#d9be6a" },
+    { "id": "Mountain",   "group": "Rock",   "color": "#9c9c9c" },
+    { "id": "Swamp",      "group": "Nature", "color": "#425132" },
+    { "id": "Snow",       "group": "Cold",   "color": "#dce8f2" },
+    { "id": "Cave",       "group": "Underground", "color": "#555555" },
+    { "id": "Volcanic",   "group": "Fire",   "color": "#b33d1f" },
+    { "id": "Demonic",    "group": "Chaos",  "color": "#7b1e45" },
+    { "id": "Crystal",    "group": "Magic",  "color": "#6fd6ff" }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "structures": [
+    { "id": "Village",      "category": "Settlement" },
+    { "id": "Hut",          "category": "Settlement" },
+    { "id": "Mill",         "category": "Settlement" },
+    { "id": "Castle",       "category": "Settlement" },
+    { "id": "MageTower",    "category": "Magic" },
+
+    { "id": "AncientRuins", "category": "Ruins" },
+    { "id": "BrokenTemple", "category": "Ruins" },
+
+    { "id": "BanditCamp",   "category": "Enemy" },
+    { "id": "GoblinCamp",   "category": "Enemy" },
+
+    { "id": "CaveEntrance", "category": "Entrance" },
+    { "id": "DungeonGate",  "category": "Entrance" }
+  ]
+}
