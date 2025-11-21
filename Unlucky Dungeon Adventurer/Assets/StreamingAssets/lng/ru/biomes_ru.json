@@ -1,0 +1,21 @@
+{
+  "forest": "Лес",
+  "desert": "Пустыня",
+  "tundra": "Тундра",
+  "mountains": "Горы",
+  "cave": "Пещера",
+  "plains": "Равнины",
+
+  "forest_pine": "Хвойный лес",
+  "forest_tropical": "Тропический лес",
+  "forest_dark": "Тёмный лес",
+
+  "desert_sand": "Песчаная пустыня",
+  "desert_rocky": "Каменистая пустыня",
+  "desert_oasis": "Оазис",
+
+  "cave_default": "Пещера",
+  "cave_lava": "Лавовая пещера",
+  "cave_crystal": "Кристальная пещера",
+  "cave_demonic": "Демоническая пещера"
+}

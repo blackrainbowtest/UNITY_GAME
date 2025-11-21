@@ -1,18 +1,66 @@
 {
   "subbiomes": [
-    { "id": "ConiferousForest", "parent": "Forest" },
-    { "id": "TropicalForest",   "parent": "Forest" },
-    { "id": "DeadForest",       "parent": "Forest" },
-    { "id": "FoggyForest",      "parent": "Forest" },
+    {
+      "id": "forest_pine",
+      "parent": "forest",
+      "spriteId": "forest_pine",
+      "mapColor": "#24542B"
+    },
+    {
+      "id": "forest_tropical",
+      "parent": "forest",
+      "spriteId": "forest_tropical",
+      "mapColor": "#2C7A3C"
+    },
+    {
+      "id": "forest_dark",
+      "parent": "forest",
+      "spriteId": "forest_dark",
+      "mapColor": "#1D3820"
+    },
 
-    { "id": "SandDunes",   "parent": "Desert" },
-    { "id": "RockyDesert", "parent": "Desert" },
-    { "id": "Oasis",       "parent": "Desert" },
-    { "id": "DeadSand",    "parent": "Desert" },
+    {
+      "id": "desert_sand",
+      "parent": "desert",
+      "spriteId": "desert_sand",
+      "mapColor": "#E7D68A"
+    },
+    {
+      "id": "desert_rocky",
+      "parent": "desert",
+      "spriteId": "desert_rocky",
+      "mapColor": "#C0A56B"
+    },
+    {
+      "id": "desert_oasis",
+      "parent": "desert",
+      "spriteId": "desert_oasis",
+      "mapColor": "#8BD4B0"
+    },
 
-    { "id": "StoneCave",    "parent": "Cave" },
-    { "id": "CrystalCave",  "parent": "Cave" },
-    { "id": "MagmaCave",    "parent": "Cave" },
-    { "id": "DemonicCave",  "parent": "Cave" }
+    {
+      "id": "cave_default",
+      "parent": "cave",
+      "spriteId": "cave_default",
+      "mapColor": "#473D69"
+    },
+    {
+      "id": "cave_lava",
+      "parent": "cave",
+      "spriteId": "cave_lava",
+      "mapColor": "#B33014"
+    },
+    {
+      "id": "cave_crystal",
+      "parent": "cave",
+      "spriteId": "cave_crystal",
+      "mapColor": "#7A4DE0"
+    },
+    {
+      "id": "cave_demonic",
+      "parent": "cave",
+      "spriteId": "cave_demonic",
+      "mapColor": "#7A0B0B"
+    }
   ]
 }

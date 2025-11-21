@@ -1,0 +1,21 @@
+{
+  "forest": "Forest",
+  "desert": "Desert",
+  "tundra": "Tundra",
+  "mountains": "Mountains",
+  "cave": "Cave",
+  "plains": "Plains",
+
+  "forest_pine": "Pine Forest",
+  "forest_tropical": "Tropical Forest",
+  "forest_dark": "Dark Forest",
+
+  "desert_sand": "Sandy Desert",
+  "desert_rocky": "Rocky Desert",
+  "desert_oasis": "Oasis",
+
+  "cave_default": "Cave",
+  "cave_lava": "Lava Cave",
+  "cave_crystal": "Crystal Cave",
+  "cave_demonic": "Demonic Cave"
+}

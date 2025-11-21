@@ -1,14 +1,58 @@
 {
   "biomes": [
-    { "id": "Forest",     "group": "Nature", "color": "#2e6b33" },
-    { "id": "Grassland",  "group": "Nature", "color": "#6fc25c" },
-    { "id": "Desert",     "group": "Dry",    "color": "#d9be6a" },
-    { "id": "Mountain",   "group": "Rock",   "color": "#9c9c9c" },
-    { "id": "Swamp",      "group": "Nature", "color": "#425132" },
-    { "id": "Snow",       "group": "Cold",   "color": "#dce8f2" },
-    { "id": "Cave",       "group": "Underground", "color": "#555555" },
-    { "id": "Volcanic",   "group": "Fire",   "color": "#b33d1f" },
-    { "id": "Demonic",    "group": "Chaos",  "color": "#7b1e45" },
-    { "id": "Crystal",    "group": "Magic",  "color": "#6fd6ff" }
+    {
+      "id": "forest",
+      "subbiomes": ["forest_pine", "forest_tropical", "forest_dark"],
+      "moveCost": 1.0,
+      "eventChance": 0.12,
+      "goodChance": 0.45,
+      "badChance": 0.55,
+      "mapColor": "#3C7A3F"
+    },
+    {
+      "id": "desert",
+      "subbiomes": ["desert_sand", "desert_rocky", "desert_oasis"],
+      "moveCost": 1.3,
+      "eventChance": 0.10,
+      "goodChance": 0.25,
+      "badChance": 0.75,
+      "mapColor": "#D6BF62"
+    },
+    {
+      "id": "tundra",
+      "subbiomes": ["tundra_snow", "tundra_rock", "tundra_frozen_lake"],
+      "moveCost": 1.5,
+      "eventChance": 0.08,
+      "goodChance": 0.15,
+      "badChance": 0.85,
+      "mapColor": "#C8D7DF"
+    },
+    {
+      "id": "mountains",
+      "subbiomes": ["mountain_high", "mountain_low", "mountain_pass"],
+      "moveCost": 2.0,
+      "eventChance": 0.09,
+      "goodChance": 0.10,
+      "badChance": 0.90,
+      "mapColor": "#777777"
+    },
+    {
+      "id": "cave",
+      "subbiomes": ["cave_default", "cave_lava", "cave_crystal", "cave_demonic"],
+      "moveCost": 1.8,
+      "eventChance": 0.20,
+      "goodChance": 0.10,
+      "badChance": 0.90,
+      "mapColor": "#2D2350"
+    },
+    {
+      "id": "plains",
+      "subbiomes": ["plains_green", "plains_flowers", "plains_savanna"],
+      "moveCost": 0.9,
+      "eventChance": 0.14,
+      "goodChance": 0.60,
+      "badChance": 0.40,
+      "mapColor": "#86C26A"
+    }
   ]
 }
