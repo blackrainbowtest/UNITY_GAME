@@ -25,6 +25,7 @@ public class PlayerSaveData
 
     public int level;
     public int gold;
+    public int worldSeed;
 
     public int experience;       // 🔥
     public int experienceToNext; // 🔥

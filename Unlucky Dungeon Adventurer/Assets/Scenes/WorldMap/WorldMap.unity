@@ -749,7 +749,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 328055468}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -4076,6 +4076,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb8bee8f15af7e34a96f85dd5c12d530, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldMapController
+  viewRadius: 15
+  tilePrefab: {fileID: 0}
+  tileContainer: {fileID: 0}
 --- !u!4 &2112944102
 Transform:
   m_ObjectHideFlags: 0

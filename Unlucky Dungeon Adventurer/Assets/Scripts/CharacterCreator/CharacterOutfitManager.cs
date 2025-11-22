@@ -73,7 +73,7 @@ public class CharacterOutfitManager : MonoBehaviour
         // Load JSON if not assigned
         if (outfitsJson == null)
         {
-            outfitsJson = Resources.Load<TextAsset>("outfits");
+            outfitsJson = Resources.Load<TextAsset>("WorldData/outfits");
         }
 
         if (outfitsJson != null)

@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
         {
             data.player.name = p.playerName;
             data.player.playerClass = p.playerClass;
+            data.player.worldSeed = p.worldSeed;
 
             data.player.level = p.level;
             data.player.gold = p.gold;
@@ -95,6 +96,7 @@ public class GameManager : MonoBehaviour
             data.player.playerClass,
             stats
         );
+        p.worldSeed = data.player.worldSeed;
 
         // перезаписываем тем, что есть в сейве
         p.level = data.player.level;

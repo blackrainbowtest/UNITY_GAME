@@ -58,7 +58,7 @@ public static class BiomeDB
         _subById = new Dictionary<string, SubBiomeConfig>();
 
         // --- Biomes ---
-        TextAsset biomesJson = Resources.Load<TextAsset>("biomes");
+        TextAsset biomesJson = Resources.Load<TextAsset>("WorldData/biomes");
         if (biomesJson == null)
         {
             Debug.LogError("[BiomeDB] biomes.json not found in Resources/");

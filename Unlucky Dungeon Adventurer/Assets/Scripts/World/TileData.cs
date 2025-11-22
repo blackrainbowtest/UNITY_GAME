@@ -15,7 +15,7 @@ public class TileData
     public string structureId;
 
     // Геймплейные свойства
-    public int moveCost;          // How much time/energy does it take to take a step?
+    public float moveCost;          // How much time/energy does it take to take a step?
     public float eventChance;     // chance of an event on a tile
     public float goodEventChance; // chance of a good event
     public float badEventChance;  // chance of a bad event

@@ -45,6 +45,9 @@ public class PlayerData
     // Позиция на карте (для сейва)
     public float mapPosX;
     public float mapPosY;
+    
+    // World seed for procedural generation (saved with player)
+    public int worldSeed;
 
     // Свойства для удобства (используют финальные значения)
     public int maxHP => finalMaxHP;
@@ -55,6 +58,9 @@ public class PlayerData
     {
         this.playerName = name;
         this.playerClass = playerClass;
+        
+        // assign a world seed for this player
+        worldSeed = Random.Range(0, 99999999);
 
         // базовые статы от класса
         ApplyBaseStatsFromClass(stats);
