@@ -1,0 +1,37 @@
+# Required tile sprite IDs (collected from WorldData biomes and subbiomes)
+
+# Biome IDs (used as fallback spriteId)
+forest
+desert
+tundra
+mountains
+cave
+plains
+
+# Sub-biome sprite IDs (from WorldData/subbiomes.json)
+forest_pine
+forest_tropical
+forest_dark
+
+desert_sand
+desert_rocky
+desert_oasis
+
+cave_default
+cave_lava
+cave_crystal
+cave_demonic
+
+plains_green
+plains_flowers
+plains_savanna
+
+mountain_high
+mountain_low
+mountain_pass
+
+tundra_snow
+tundra_rock
+tundra_frozen_lake
+
+# Add any custom sprite IDs you use in JSON files below this list

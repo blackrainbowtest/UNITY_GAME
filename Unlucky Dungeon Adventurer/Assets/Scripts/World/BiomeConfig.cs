@@ -84,10 +84,11 @@ public static class BiomeDB
         }
 
         // --- SubBiomes ---
-        TextAsset subJson = Resources.Load<TextAsset>("subbiomes");
+        // subbiomes are stored under WorldData to match DataRegistry
+        TextAsset subJson = Resources.Load<TextAsset>("WorldData/subbiomes");
         if (subJson == null)
         {
-            Debug.LogWarning("[BiomeDB] subbiomes.json not found in Resources/ (optional)");
+            Debug.LogWarning("[BiomeDB] WorldData/subbiomes.json not found in Resources/ (optional)");
         }
         else
         {

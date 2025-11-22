@@ -33,12 +33,22 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (deletePrompt != null)
             deletePrompt.SetActive(false);
 
+        // Diagnostic: ensure UI references are assigned to avoid NullReferenceException
+        if (slotTitle == null) Debug.LogError("[SaveSlotUI] slotTitle is not assigned in the inspector.");
+        if (slotInfo == null) Debug.LogError("[SaveSlotUI] slotInfo is not assigned in the inspector.");
+        if (playerNameText == null) Debug.LogError("[SaveSlotUI] playerNameText is not assigned in the inspector.");
+        if (levelText == null) Debug.LogError("[SaveSlotUI] levelText is not assigned in the inspector.");
+        if (background == null) Debug.LogError("[SaveSlotUI] background Image is not assigned in the inspector.");
+
         bool exists = File.Exists(path);
 
         // ---------- Заголовок ----------
-        slotTitle.text = autoSave
-            ? LanguageManager.Get("auto_save")
-            : Path.GetFileNameWithoutExtension(path);
+        if (slotTitle != null)
+        {
+            slotTitle.text = autoSave
+                ? LanguageManager.Get("auto_save")
+                : Path.GetFileNameWithoutExtension(path);
+        }
 
         // ---------- Имя персонажа + уровень ----------
         if (exists)
@@ -49,13 +59,13 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
                 if (data != null)
                 {
-                    playerNameText.text = data.player.name;
-                    levelText.text = $"Lvl {data.player.level} | Gold: {data.player.gold}";
+                    if (playerNameText != null) playerNameText.text = data.player.name;
+                    if (levelText != null) levelText.text = $"Lvl {data.player.level} | Gold: {data.player.gold}";
                 }
                 else
                 {
-                    playerNameText.text = "---";
-                    levelText.text = "";
+                    if (playerNameText != null) playerNameText.text = "---";
+                    if (levelText != null) levelText.text = "";
                 }
             }
             catch
@@ -66,8 +76,8 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         else
         {
-            playerNameText.text = "";
-            levelText.text = "";
+            if (playerNameText != null) playerNameText.text = "";
+            if (levelText != null) levelText.text = "";
         }
 
         // ---------- Подпись под слотом ----------
@@ -75,16 +85,23 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             string date = File.GetLastWriteTime(path).ToString("dd.MM.yyyy HH:mm");
 
-            slotInfo.text = SaveLoadState.Mode == SaveLoadMode.Save
-                ? $"{LanguageManager.Get("button_save")}: {date}"
-                : $"{LanguageManager.Get("button_load")}: {date}";
+            if (slotInfo != null)
+            {
+                slotInfo.text = SaveLoadState.Mode == SaveLoadMode.Save
+                    ? $"{LanguageManager.Get("button_save")}: {date}"
+                    : $"{LanguageManager.Get("button_load")}: {date}";
+            }
 
-            background.color = Color.white;
+            if (background != null)
+                background.color = Color.white;
         }
         else
         {
-            slotInfo.text = LanguageManager.Get("empty_slot");
-            background.color = new Color(1, 1, 1, 0.25f);
+            if (slotInfo != null)
+                slotInfo.text = LanguageManager.Get("empty_slot");
+
+            if (background != null)
+                background.color = new Color(1, 1, 1, 0.25f);
         }
 
         // ---------- Удаление ----------
@@ -93,8 +110,15 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         // ---------- Клик ----------
         Button btn = GetComponent<Button>();
-        btn.onClick.RemoveAllListeners();
-        btn.onClick.AddListener(OnSlotClick);
+        if (btn == null)
+        {
+            Debug.LogError("[SaveSlotUI] No Button component found on the SaveSlot prefab. Attach a Button or update the prefab.");
+        }
+        else
+        {
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(OnSlotClick);
+        }
     }
 
     private void OnSlotClick()
