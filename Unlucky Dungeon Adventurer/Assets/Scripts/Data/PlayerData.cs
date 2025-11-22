@@ -76,6 +76,29 @@ public class PlayerData
         ResetToFull();
     }
 
+    // Constructor overload that allows explicitly specifying the world seed.
+    public PlayerData(string name, string playerClass, ClassStats stats, int seed)
+    {
+        this.playerName = name;
+        this.playerClass = playerClass;
+
+        // use provided seed (no random generation here)
+        worldSeed = seed;
+
+        // базовые статы от класса
+        ApplyBaseStatsFromClass(stats);
+
+        // опыт
+        experience = 0;
+        experienceToNext = ExperienceTable.GetExpRequiredForLevel(1);
+
+        // высчитываем финальные значения (пока == базовым)
+        RecalculateFinalStats();
+
+        // устанавливаем current HP/MP/STA = максимальным
+        ResetToFull();
+    }
+
     /// <summary>
     /// Берём базовые статы из шаблона класса (classDatabase)
     /// </summary>

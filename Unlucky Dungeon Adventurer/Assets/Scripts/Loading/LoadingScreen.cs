@@ -35,7 +35,6 @@ public class LoadingScreen : MonoBehaviour
         TextAsset jsonFile = Resources.Load<TextAsset>("hints_" + language);
         if (jsonFile != null)
         {
-            Debug.Log("JSON найден: " + jsonFile.text);
             HintData data = JsonUtility.FromJson<HintData>(jsonFile.text);
             hints = data.hints;
         }

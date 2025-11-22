@@ -59,7 +59,8 @@ public static class GameData
     };
 
     // 💾 Сохраняем игрока
-    public static void SavePlayer(string name, string role)
+    // If 'seed' is provided, use it when creating the player; otherwise create as before.
+    public static void SavePlayer(string name, string role, int? seed = null)
     {
         Debug.Log($"[SavePlayer] Создан игрок: {name}, класс={role}");
         Debug.Log($"[SavePlayer] CurrentPlayer теперь: {CurrentPlayer != null}");
@@ -73,7 +74,21 @@ public static class GameData
         ClassStats stats = classDatabase[role];
 
         // создаём нового игрока на основе класса
-        CurrentPlayer = new PlayerData(name, role, stats);
+        if (CurrentPlayer == null)
+        {
+            if (seed.HasValue)
+                CurrentPlayer = new PlayerData(name, role, stats, seed.Value);
+            else
+                CurrentPlayer = new PlayerData(name, role, stats);
+        }
+        else
+        {
+            // If a CurrentPlayer already exists (rare), just update name/class
+            CurrentPlayer.playerName = name;
+            CurrentPlayer.playerClass = role;
+            CurrentPlayer.ApplyBaseStatsFromClass(stats);
+            CurrentPlayer.RecalculateFinalStats();
+        }
 
         // тут в будущем можно задать стартовый уровень/золото
         CurrentPlayer.level = 1;
@@ -86,6 +101,8 @@ public static class GameData
         // Сохраняем минимальные вещи в PlayerPrefs (для быстрого доступа)
         PlayerPrefs.SetString("playerName", name);
         PlayerPrefs.SetString("playerClass", role);
+        // Сохраняем worldSeed чтобы при загрузке из PlayerPrefs мир был тем же
+        PlayerPrefs.SetInt("worldSeed", CurrentPlayer.worldSeed);
         PlayerPrefs.Save();
     }
 
@@ -100,5 +117,13 @@ public static class GameData
             CurrentPlayer = new PlayerData(name, role, classDatabase[role]);
         else
             CurrentPlayer = new PlayerData(name, role, new ClassStats());
+
+        // Если в PlayerPrefs есть сохранённый seed — восстановим его (иначе остаётся случайный)
+        int storedSeed = PlayerPrefs.GetInt("worldSeed", -1);
+        if (storedSeed >= 0)
+        {
+            CurrentPlayer.worldSeed = storedSeed;
+            Debug.Log($"[GameData] Loaded worldSeed from PlayerPrefs: {storedSeed}");
+        }
     }
 }

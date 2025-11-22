@@ -64,14 +64,10 @@ public class CharacterCreatorUI : MonoBehaviour
 
         Debug.Log($"[CREATE BUTTON CLICKED] Создан герой: {name}, класс: {roleDisplay} (ID: {roleInternal})");
 
-        GameData.SavePlayer(name, roleInternal);
-
-        // Apply the selected seed to the newly created player so world generation is deterministic
-        if (GameData.CurrentPlayer != null)
-        {
-            GameData.CurrentPlayer.worldSeed = Mathf.Max(10000, selectedSeed);
-            Debug.Log($"[CREATE] Assigned worldSeed = {GameData.CurrentPlayer.worldSeed}");
-        }
+        // Create the player and pass the explicitly selected seed so SavePlayer doesn't generate one.
+        int seedToUse = Mathf.Max(10000, selectedSeed);
+        GameData.SavePlayer(name, roleInternal, seedToUse);
+        Debug.Log($"[CREATE] Assigned worldSeed = {seedToUse}");
         SceneLoader.LoadScene("WorldMap");
     }
 

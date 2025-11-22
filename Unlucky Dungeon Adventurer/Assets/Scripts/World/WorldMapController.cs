@@ -7,6 +7,8 @@ public class WorldMapController : MonoBehaviour
     public int viewRadius = 15;
     public GameObject tilePrefab;
     public Transform tileContainer;
+    // Size (world units) of a single tile. Use this to space tiles and avoid overlap.
+    public float tileSize = 1f;
 
     private Dictionary<Vector2Int, GameObject> visibleTiles;
     private WorldGenerator generator;
@@ -35,13 +37,7 @@ public class WorldMapController : MonoBehaviour
             }
         }
 
-        int seed = GameData.CurrentPlayer != null
-            ? GameData.CurrentPlayer.worldSeed
-            : Random.Range(0, 99999999);
-        generator = new WorldGenerator(seed);
-        visibleTiles = new Dictionary<Vector2Int, GameObject>();
-
-
+        // Ensure GameManager exists before attempting to load player/save data
         if (GameManager.Instance == null)
         {
             Debug.LogWarning("[WorldMap] GameManager отсутствует — загружаю Preloader");
@@ -49,18 +45,63 @@ public class WorldMapController : MonoBehaviour
             return;
         }
 
+        // If CurrentPlayer isn't set yet, try to load pending save (if any)
         if (GameData.CurrentPlayer == null)
         {
-            Debug.LogWarning("[WorldMap] CurrentPlayer отсутствует — загружаю сохранение");
+            Debug.LogWarning("[WorldMap] CurrentPlayer отсутствует — пытаюсь загрузить отложенный сейв");
             if (TempSaveCache.pendingSave != null)
             {
                 GameManager.Instance.LoadGameData(TempSaveCache.pendingSave);
                 TempSaveCache.pendingSave = null;
+                Debug.Log("[WorldMap] Отложенный сейв загружен");
             }
         }
 
+        // Now initialize generator using the (possibly newly loaded) player's seed.
+        int seed = GameData.CurrentPlayer != null
+            ? GameData.CurrentPlayer.worldSeed
+            : Random.Range(0, 99999999);
+        Debug.Log($"[WorldMap] Using worldSeed = {seed}");
+        generator = new WorldGenerator(seed);
+        visibleTiles = new Dictionary<Vector2Int, GameObject>();
+
         TryAutoSaveOnEnter();
         UpdateMapAroundPlayer();
+
+        // For diagnostics: compute a small deterministic region hash to compare between runs
+        try
+        {
+            int hash = ComputeRegionHash(playerTilePos.x, playerTilePos.y, 6);
+            Debug.Log($"[WorldMap] Map hash at start (seed={seed}): {hash}");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning("[WorldMap] Failed to compute map hash: " + ex.Message);
+        }
+    }
+
+    // Compute a simple deterministic hash of tiles in a square region using the generator's seed.
+    private int ComputeRegionHash(int centerX, int centerY, int radius)
+    {
+        unchecked
+        {
+            int h = 17;
+            for (int dx = -radius; dx <= radius; dx++)
+            {
+                for (int dy = -radius; dy <= radius; dy++)
+                {
+                    int x = centerX + dx;
+                    int y = centerY + dy;
+                    var t = generator.GetTile(x, y);
+                    // include biomeId, subBiomeId and spriteId into hash
+                    h = h * 31 + (t.biomeId != null ? t.biomeId.GetHashCode() : 0);
+                    h = h * 31 + (t.subBiomeId != null ? t.subBiomeId.GetHashCode() : 0);
+                    h = h * 31 + (t.spriteId != null ? t.spriteId.GetHashCode() : 0);
+                    h = h * 31 + Mathf.RoundToInt(t.moveCost * 100f);
+                }
+            }
+            return h;
+        }
     }
 
     private void TryAutoSaveOnEnter()
@@ -74,10 +115,13 @@ public class WorldMapController : MonoBehaviour
 
     void Update()
     {
-        // Обновление только если игрок реально переместился
+        // === ВМЕСТО игрока — следуем за позицией КАМЕРЫ ===
+        Vector3 camPos = Camera.main.transform.position;
+
+        // Переводим мировые координаты камеры → в координаты тайла
         var newPos = new Vector2Int(
-            Mathf.FloorToInt(GameData.CurrentPlayer.mapPosX),
-            Mathf.FloorToInt(GameData.CurrentPlayer.mapPosY)
+            Mathf.FloorToInt(camPos.x / tileSize),
+            Mathf.FloorToInt(camPos.y / tileSize)
         );
 
         if (newPos != playerTilePos)
@@ -91,6 +135,7 @@ public class WorldMapController : MonoBehaviour
     {
         HashSet<Vector2Int> desiredTiles = new HashSet<Vector2Int>();
 
+        // Генерация тайлов вокруг центра КАМЕРЫ
         for (int dx = -viewRadius; dx <= viewRadius; dx++)
         {
             for (int dy = -viewRadius; dy <= viewRadius; dy++)
@@ -103,7 +148,7 @@ public class WorldMapController : MonoBehaviour
             }
         }
 
-        // Remove those tiles that are no longer needed
+        // Удаляем тайлы вне зоны видимости
         List<Vector2Int> toRemove = new List<Vector2Int>();
         foreach (var kv in visibleTiles)
         {
@@ -169,7 +214,8 @@ public class WorldMapController : MonoBehaviour
             return;
         }
 
-        obj.transform.localPosition = new Vector3(pos.x, pos.y, 0);
+        obj.transform.localPosition = new Vector3(pos.x * tileSize, pos.y * tileSize, 0);
+        obj.transform.localScale = new Vector3(tileSize, tileSize, 1f);
         obj.SetActive(true);
 
         var tr = obj.GetComponent<TileRenderer>();

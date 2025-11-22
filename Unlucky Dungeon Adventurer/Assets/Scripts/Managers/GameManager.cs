@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
             data.player.name = p.playerName;
             data.player.playerClass = p.playerClass;
             data.player.worldSeed = p.worldSeed;
+            Debug.Log($"[GameManager] Preparing save: player.worldSeed={p.worldSeed}");
 
             data.player.level = p.level;
             data.player.gold = p.gold;
@@ -97,6 +98,7 @@ public class GameManager : MonoBehaviour
             stats
         );
         p.worldSeed = data.player.worldSeed;
+        Debug.Log($"[GameManager] Loaded player.worldSeed from save: {data.player.worldSeed} -> assigned to p.worldSeed={p.worldSeed}");
 
         // перезаписываем тем, что есть в сейве
         p.level = data.player.level;

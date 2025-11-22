@@ -92,6 +92,7 @@ public class TileRenderer : MonoBehaviour
                 sr.sprite = null; // leave null; WorldMapController may create/assign placeholder sprites
                 sr.color = data.color;
             }
+        }
             // Debug.LogWarning($"[TileRenderer] Sprite for id '{data.spriteId}' not found in spriteDB. Using color fallback.");
     }
 }

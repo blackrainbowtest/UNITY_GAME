@@ -22,8 +22,7 @@ public static class SaveManager
 
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(path, json);
-
-        Debug.Log($"[SaveManager] Сохранено в {path}");
+        Debug.Log($"[SaveManager] Сохранено в {path} | player.worldSeed={data.player.worldSeed} world.worldSeed={data.world.worldSeed}");
     }
 
     public static SaveData Load(int slotIndex)
@@ -42,8 +41,7 @@ public static class SaveManager
 
         string json = File.ReadAllText(path);
         SaveData data = JsonUtility.FromJson<SaveData>(json);
-
-        Debug.Log($"[SaveManager] Загрузка из {path}");
+        Debug.Log($"[SaveManager] Загрузка из {path} | player.worldSeed={data.player.worldSeed} world.worldSeed={data.world.worldSeed}");
         return data;
     }
 
@@ -56,7 +54,7 @@ public static class SaveManager
             string json = JsonUtility.ToJson(data, true);
             File.WriteAllText(path, json);
 
-            Debug.Log("[AUTO SAVE] Автосейв выполнен: " + path);
+            Debug.Log("[AUTO SAVE] Автосейв выполнен: " + path + $" | player.worldSeed={data.player.worldSeed} world.worldSeed={data.world.worldSeed}");
         }
         catch (Exception ex)
         {
