@@ -60,7 +60,11 @@ public class PlayerData
         this.playerClass = playerClass;
         
         // assign a world seed for this player
-        worldSeed = Random.Range(0, 99999999);
+        // NOTE: do not auto-generate a worldSeed here. Seed creation should be
+        // performed explicitly (e.g. in CharacterCreator). Leave as -1 to mark
+        // "not set" so load code can restore a saved seed or the creator can
+        // assign one.
+        worldSeed = -1;
 
         // базовые статы от класса
         ApplyBaseStatsFromClass(stats);

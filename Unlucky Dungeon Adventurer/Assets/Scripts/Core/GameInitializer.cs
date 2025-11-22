@@ -103,10 +103,10 @@ public class GameInitializer : MonoBehaviour
         Debug.Log("[GameInitializer] Инициализация завершена, уведомляю UI...");
         
         // Сначала сообщаем что инициализация завершена
-        UIEvents.OnGameInitialized?.Invoke();
-        
+        UIEvents.InvokeGameInitialized();
+
         // Затем обновляем UI с текущими статами
-        UIEvents.OnPlayerStatsChanged?.Invoke();
+        UIEvents.InvokePlayerStatsChanged();
 
         isInitialized = true;
         isInitializing = false;
