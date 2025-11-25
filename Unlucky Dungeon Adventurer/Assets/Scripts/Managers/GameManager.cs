@@ -69,7 +69,21 @@ public class GameManager : MonoBehaviour
         // --- Meta ---
         data.meta.sceneName = SceneManager.GetActiveScene().name;
         data.meta.saveTime = System.DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
-        data.meta.saveVersion = "0.1";
+        data.meta.saveVersion = "0.1.0021";
+
+        // Save biome at player's current position (only for WorldMap scene)
+        if (data.meta.sceneName == "WorldMap" && p != null)
+        {
+            int px = Mathf.FloorToInt(p.mapPosX);
+            int py = Mathf.FloorToInt(p.mapPosY);
+            int seed = p.worldSeed;
+            string biomeId = null;
+            if (seed >= 10000)
+            {
+                biomeId = TileGenerator.GenerateTile(px, py, seed)?.biomeId;
+            }
+            data.meta.currentBiome = biomeId ?? "unknown";
+        }
 
         return data;
     }

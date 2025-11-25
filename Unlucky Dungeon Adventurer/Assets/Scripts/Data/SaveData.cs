@@ -98,4 +98,5 @@ public class MetaSaveData
     public string sceneName;      // "WorldMap", "Dungeon_01" � �.�.
     public string saveTime;       // ������ ����/������� ��� �����������
     public string saveVersion;    // ������ ����/����� �����
+    public string currentBiome;   // Биом, на котором стоит персонаж
 }

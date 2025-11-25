@@ -83,11 +83,13 @@ public static class GameData
         }
         else
         {
-            // If a CurrentPlayer already exists (rare), just update name/class
+            // If a CurrentPlayer already exists (rare), just update name/class and always set seed if provided
             CurrentPlayer.playerName = name;
             CurrentPlayer.playerClass = role;
             CurrentPlayer.ApplyBaseStatsFromClass(stats);
             CurrentPlayer.RecalculateFinalStats();
+            if (seed.HasValue)
+                CurrentPlayer.worldSeed = seed.Value;
         }
 
         // тут в будущем можно задать стартовый уровень/золото
