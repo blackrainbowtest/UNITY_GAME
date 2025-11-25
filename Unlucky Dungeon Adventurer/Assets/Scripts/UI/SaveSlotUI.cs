@@ -59,7 +59,11 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
                 if (data != null)
                 {
-                    if (playerNameText != null) playerNameText.text = data.player.name;
+                    if (playerNameText != null)
+                    {
+                        string autosaveLabel = isAutoSave ? LanguageManager.Get("auto_save") + " " : "";
+                        playerNameText.text = autosaveLabel + data.player.name;
+                    }
                     if (levelText != null) levelText.text = $"Lvl {data.player.level} | Gold: {data.player.gold}";
                 }
                 else
@@ -87,9 +91,18 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
             if (slotInfo != null)
             {
-                slotInfo.text = SaveLoadState.Mode == SaveLoadMode.Save
+                string mainLabel = SaveLoadState.Mode == SaveLoadMode.Save
                     ? $"{LanguageManager.Get("button_save")}: {date}"
                     : $"{LanguageManager.Get("button_load")}: {date}";
+
+                // Add location and gold info if available
+                SaveData data = SaveManager.Load(GetSlotIndex());
+                string location = data != null ? LanguageManager.Get("location") + ": " + data.meta.sceneName : "";
+                string gold = data != null ? LanguageManager.Get("gold") + ": " + data.player.gold : "";
+
+                slotInfo.text = mainLabel
+                    + (string.IsNullOrEmpty(location) ? "" : "\n" + location)
+                    + (string.IsNullOrEmpty(gold) ? "" : ", " + gold);
             }
 
             if (background != null)
