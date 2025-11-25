@@ -1,8 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class WorldMapController : MonoBehaviour
 {
+    [Header("UI")]
+    public TextMeshProUGUI locationText;
+
     public int viewRadius = 15;
     public GameObject tilePrefab;
     public Transform tileContainer;
@@ -266,5 +270,32 @@ public class WorldMapController : MonoBehaviour
         playerMarker.SetPosition(coords, tileSize);
 
         Debug.Log($"[WorldMap] Player marker placed at {coords}");
+        UpdatePlayerLocationInfo();
+    }
+
+    private void UpdatePlayerLocationInfo()
+    {
+        if (locationText == null || generator == null)
+            return;
+
+        var p = GameData.CurrentPlayer;
+        if (p == null)
+            return;
+
+        Vector2Int coords = new Vector2Int(
+            Mathf.RoundToInt(p.mapPosX),
+            Mathf.RoundToInt(p.mapPosY)
+        );
+
+        TileData tile = generator.GetTile(coords.x, coords.y);
+
+        // Загружаем локализацию биомов, если ещё не загружена
+        LanguageManager.LoadLanguage("biomes_" + LanguageManager.CurrentLanguage);
+        string biome = tile.biomeId != null ? LanguageManager.Get(tile.biomeId) : LanguageManager.Get("Unknown");
+        string subBiome = tile.subBiomeId != null ? LanguageManager.Get(tile.subBiomeId) : "";
+        string spriteId = tile.spriteId ?? "";
+
+        locationText.text = 
+            $"{biome} {subBiome}\n({coords.x}, {coords.y})";
     }
 }
