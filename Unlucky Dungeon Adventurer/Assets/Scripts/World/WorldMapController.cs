@@ -296,6 +296,6 @@ public class WorldMapController : MonoBehaviour
         string spriteId = tile.spriteId ?? "";
 
         locationText.text = 
-            $"{biome} {subBiome}\n({coords.x}, {coords.y})";
+            $"{biome}: {subBiome}\n(X: {coords.x}, Y: {coords.y})";
     }
 }
