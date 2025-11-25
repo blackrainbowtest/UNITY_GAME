@@ -6,6 +6,9 @@
   "cave": "Пещера",
   "plains": "Равнины",
 
+  "unknown": "Неизвестно",
+  "Unknown": "Неизвестно",
+
   "forest_pine": "Хвойный лес",
   "forest_tropical": "Тропический лес",
   "forest_dark": "Тёмный лес",
@@ -17,5 +20,13 @@
   "cave_default": "Пещера",
   "cave_lava": "Лавовая пещера",
   "cave_crystal": "Кристальная пещера",
-  "cave_demonic": "Демоническая пещера"
+  "cave_demonic": "Демоническая пещера",
+
+  "tundra_snow": "Снежная тундра",
+  "tundra_rock": "Каменистая тундра",
+  "tundra_frozen_lake": "Замёрзшее озеро тундры",
+
+  "plains_green": "Зелёные равнины",
+  "plains_flowers": "Цветочные равнины",
+  "plains_savanna": "Саванна"
 }
