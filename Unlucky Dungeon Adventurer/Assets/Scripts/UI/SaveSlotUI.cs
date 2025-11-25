@@ -95,9 +95,16 @@ public class SaveSlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     ? $"{LanguageManager.Get("button_save")}: {date}"
                     : $"{LanguageManager.Get("button_load")}: {date}";
 
-                // Add location and gold info if available
+                // Add biome and gold info if available
                 SaveData data = SaveManager.Load(GetSlotIndex());
-                string location = data != null ? LanguageManager.Get("location") + ": " + data.meta.sceneName : "";
+                string biome = "";
+                if (data != null && !string.IsNullOrEmpty(data.meta.currentBiome))
+                {
+                    // Загружаем локализацию биомов, если ещё не загружена
+                    LanguageManager.LoadLanguage("biomes_" + LanguageManager.CurrentLanguage);
+                    biome = LanguageManager.Get(data.meta.currentBiome);
+                }
+                string location = !string.IsNullOrEmpty(biome) ? LanguageManager.Get("location") + ": " + biome : "";
                 string gold = data != null ? LanguageManager.Get("gold") + ": " + data.player.gold : "";
 
                 slotInfo.text = mainLabel

@@ -6,6 +6,7 @@ public class WorldMapController : MonoBehaviour
     public int viewRadius = 15;
     public GameObject tilePrefab;
     public Transform tileContainer;
+    public PlayerMarkerController playerMarker;
     public float tileSize = 1f;
 
     private Dictionary<Vector2Int, GameObject> visibleTiles;
@@ -101,6 +102,8 @@ public class WorldMapController : MonoBehaviour
         {
             Debug.LogWarning("[WorldMap] Failed region hash: " + ex.Message);
         }
+
+        InitializePlayerMarker();
     }
 
     private void OnPlayerLoaded()
@@ -243,5 +246,25 @@ public class WorldMapController : MonoBehaviour
             }
             return h;
         }
+    }
+
+    private void InitializePlayerMarker()
+    {
+        if (playerMarker == null)
+        {
+            Debug.LogWarning("[WorldMap] PlayerMarker reference is not set!");
+            return;
+        }
+
+        var p = GameData.CurrentPlayer;
+
+        Vector2Int coords = new Vector2Int(
+            Mathf.RoundToInt(p.mapPosX),
+            Mathf.RoundToInt(p.mapPosY)
+        );
+
+        playerMarker.SetPosition(coords, tileSize);
+
+        Debug.Log($"[WorldMap] Player marker placed at {coords}");
     }
 }
