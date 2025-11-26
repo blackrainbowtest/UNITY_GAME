@@ -13,6 +13,9 @@ public class WorldMapController : MonoBehaviour
     public PlayerMarkerController playerMarker;
     public float tileSize = 1f;
 
+    [Header("Minimap")]
+    [SerializeField] private MinimapController minimap;
+
     private Dictionary<Vector2Int, GameObject> visibleTiles;
     private WorldGenerator generator;
     private Vector2Int playerTilePos;
@@ -60,7 +63,6 @@ public class WorldMapController : MonoBehaviour
             return;
         }
 
-        // If CurrentPlayer is still NULL — wait for it
         if (GameData.CurrentPlayer == null)
         {
             if (!waitingForPlayer)
@@ -71,9 +73,7 @@ public class WorldMapController : MonoBehaviour
             }
             return;
         }
-        
-        // If there's a pending save cached by the Save UI, apply it now to ensure
-        // GameData.CurrentPlayer is populated before we create the world.
+
         if (TempSaveCache.pendingSave != null)
         {
             Debug.Log("[WorldMap] Found TempSaveCache.pendingSave — applying save before world init");
@@ -82,19 +82,46 @@ public class WorldMapController : MonoBehaviour
             UIEvents.InvokePlayerLoaded();
         }
 
-        // Now we can safely get the seed
         int seed = GameData.CurrentPlayer.worldSeed;
         if (seed < 10000)
         {
             Debug.LogError("[WorldMap] INVALID SEED IN SAVE! Seed must be >10000. Fix character creation.");
-            seed = 10000; // fallback
+            seed = 10000;
         }
 
         Debug.Log($"[WorldMap] Using worldSeed = {seed}");
+
+        // 1) Создаём генератор мира
         generator = new WorldGenerator(seed);
+
+        // 2) Подготавливаем словарь отрендеренных тайлов
         visibleTiles = new Dictionary<Vector2Int, GameObject>();
 
+        // ------------------------------------
+        // >>> 3) ТУТ ДОБАВЛЯЕМ МИНИКАРТУ <<<
+        // ------------------------------------
+        Vector2Int playerTile = new Vector2Int(
+            Mathf.RoundToInt(GameData.CurrentPlayer.mapPosX),
+            Mathf.RoundToInt(GameData.CurrentPlayer.mapPosY)
+        );
+
+        if (minimap != null)
+        {
+            minimap.Initialize(viewRadius, playerTile);
+            minimap.OnMinimapTileClicked += HandleMinimapClick;
+
+            Debug.Log("[WorldMap] Minimap initialized.");
+        }
+        else
+        {
+            Debug.LogWarning("[WorldMap] Minimap reference is missing!");
+        }
+        // ------------------------------------
+
+
         TryAutoSaveOnEnter();
+
+        // 4) Генерация тайлов вокруг камеры
         UpdateMapAroundCamera();
 
         try
@@ -107,8 +134,14 @@ public class WorldMapController : MonoBehaviour
             Debug.LogWarning("[WorldMap] Failed region hash: " + ex.Message);
         }
 
+        // 5) Создание маркера игрока
         InitializePlayerMarker();
+        
+        // 6) Инициализация миникарты с начальными тайлами и маркером игрока
+        RefreshMinimapTiles();
+        minimap?.DrawPlayerMarker(playerTile);
     }
+
 
     private void OnPlayerLoaded()
     {
@@ -147,7 +180,47 @@ public class WorldMapController : MonoBehaviour
         {
             playerTilePos = newPos;
             UpdateMapAroundCamera();
+            
+            // Update minimap center
+            minimap?.SetCenter(playerTilePos);
+            RefreshMinimapTiles();
         }
+
+        // Update minimap display every frame
+        UpdateMinimapDisplay();
+    }
+
+    /// <summary>
+    /// Обновляет отображение миникарты (тайлы + рамка камеры + маркер игрока)
+    /// </summary>
+    private void UpdateMinimapDisplay()
+    {
+        if (minimap == null) return;
+
+        // Сначала очищаем текстуру, затем перерисовываем тайлы и рамку,
+        // чтобы старая рамка не оставалась на месте
+        minimap.Clear();
+
+        // Обновляем тайлы под текущим окном миникарты
+        RefreshMinimapTiles();
+
+            // Calculate visible camera bounds in tiles
+            Vector2Int cameraViewBounds = GetCameraViewBoundsInTiles();
+            Vector2Int camMinTile = playerTilePos - cameraViewBounds;
+            Vector2Int camMaxTile = playerTilePos + cameraViewBounds;
+        
+            // Draw camera frame on minimap
+            minimap.DrawCameraFrame(camMinTile, camMaxTile);
+
+            // Draw player marker at actual player position
+            if (GameData.CurrentPlayer != null)
+            {
+                Vector2Int actualPlayerPos = new Vector2Int(
+                    Mathf.RoundToInt(GameData.CurrentPlayer.mapPosX),
+                    Mathf.RoundToInt(GameData.CurrentPlayer.mapPosY)
+                );
+                minimap.DrawPlayerMarker(actualPlayerPos);
+            }
     }
 
     private void UpdateMapAroundCamera()
@@ -227,6 +300,16 @@ public class WorldMapController : MonoBehaviour
             tr.RenderTile(data);
         }
 
+        if (minimap != null)
+        {
+            // Берём фактический цвет тайла
+            var sr = obj.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                minimap.UpdateTile(pos, sr.color);
+            }
+        }
+
         visibleTiles[pos] = obj;
     }
 
@@ -297,5 +380,111 @@ public class WorldMapController : MonoBehaviour
 
         locationText.text = 
             $"{biome}: {subBiome}\n(X: {coords.x}, Y: {coords.y})";
+    }
+
+        /// <summary>
+        /// Вычисляет размер видимой области камеры в тайлах
+        /// </summary>
+        private Vector2Int GetCameraViewBoundsInTiles()
+        {
+            if (Camera.main == null) return Vector2Int.zero;
+
+            // Получаем размер камеры в world units
+            float camHeight = Camera.main.orthographicSize * 2f;
+            float camWidth = camHeight * Camera.main.aspect;
+
+            // Конвертируем в тайлы (округляем вверх чтобы захватить все видимые тайлы)
+            int tilesWidth = Mathf.CeilToInt(camWidth / tileSize / 2f);
+            int tilesHeight = Mathf.CeilToInt(camHeight / tileSize / 2f);
+
+                // Debug log (раскомментируй для отладки)
+                // Debug.Log($"[WorldMap] Camera bounds: {tilesWidth}x{tilesHeight} tiles (orthoSize={Camera.main.orthographicSize}, aspect={Camera.main.aspect})");
+
+            return new Vector2Int(tilesWidth, tilesHeight);
+        }
+
+    private void HandleMinimapClick(Vector2Int tilePos)
+    {
+        Debug.Log($"[WorldMap] Minimap clicked at tile {tilePos}");
+        MoveCameraTo(tilePos);
+    }
+
+    private void MoveCameraTo(Vector2Int worldTile)
+    {
+        if (Camera.main == null)
+        {
+            Debug.LogWarning("[WorldMap] Main camera not found!");
+            return;
+        }
+
+        // Convert tile position to world position
+        Vector3 targetPos = new Vector3(
+            worldTile.x * tileSize,
+            worldTile.y * tileSize,
+            Camera.main.transform.position.z
+        );
+
+        // Smooth camera movement with Lerp for drag
+        Camera.main.transform.position = Vector3.Lerp(
+            Camera.main.transform.position,
+            targetPos,
+            0.3f // Smooth factor - adjust for more/less smoothness
+        );
+        
+        // Update player tile position based on camera
+        Vector2Int newTilePos = new Vector2Int(
+            Mathf.FloorToInt(Camera.main.transform.position.x / tileSize),
+            Mathf.FloorToInt(Camera.main.transform.position.y / tileSize)
+        );
+        
+        if (newTilePos != playerTilePos)
+        {
+            playerTilePos = newTilePos;
+            UpdateMapAroundCamera();
+            
+            // Update minimap
+            minimap?.SetCenter(playerTilePos);
+            RefreshMinimapTiles();
+        }
+        
+        // Draw player marker at actual player position
+        if (GameData.CurrentPlayer != null)
+        {
+            Vector2Int actualPlayerPos = new Vector2Int(
+                Mathf.RoundToInt(GameData.CurrentPlayer.mapPosX),
+                Mathf.RoundToInt(GameData.CurrentPlayer.mapPosY)
+            );
+            minimap?.DrawPlayerMarker(actualPlayerPos);
+        }
+    }
+
+    private void RefreshMinimapTiles()
+    {
+        if (minimap == null || generator == null) return;
+
+        // Обновляем все тайлы в области видимости миникарты
+        for (int dx = -viewRadius; dx <= viewRadius; dx++)
+        {
+            for (int dy = -viewRadius; dy <= viewRadius; dy++)
+            {
+                Vector2Int pos = new Vector2Int(playerTilePos.x + dx, playerTilePos.y + dy);
+                TileData tileData = generator.GetTile(pos.x, pos.y);
+                
+                // Получаем цвет тайла из существующего объекта или генерируем новый
+                Color tileColor;
+                if (visibleTiles.TryGetValue(pos, out GameObject tileObj))
+                {
+                    var sr = tileObj.GetComponent<SpriteRenderer>();
+                    tileColor = sr != null ? sr.color : Color.gray;
+                }
+                else
+                {
+                    // Если тайл ещё не создан, используем цвет из TileData
+                    tileColor = tileData.color;
+                }
+                
+                minimap.UpdateTile(pos, tileColor);
+            }
+        }
     }
 }
