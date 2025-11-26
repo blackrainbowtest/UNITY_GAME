@@ -34,7 +34,7 @@ public static class MinimapCoordinateConverter
 
         RectTransform rectTransform = minimapImage.rectTransform;
 
-        // Конвертим позицию курсора в локальные координаты RawImage
+        // Convert cursor position to RawImage local coordinates
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 rectTransform,
                 eventData.position,
@@ -46,11 +46,11 @@ public static class MinimapCoordinateConverter
 
         Rect rect = rectTransform.rect;
 
-        // Нормализуем в 0..1
+        // Normalize to 0..1 range
         float normalizedX = Mathf.InverseLerp(rect.xMin, rect.xMax, localPoint.x);
         float normalizedY = Mathf.InverseLerp(rect.yMin, rect.yMax, localPoint.y);
 
-        // Переводим в координаты пикселей текстуры
+        // Convert to texture pixel coordinates
         int pixelX = Mathf.Clamp(
             Mathf.FloorToInt(normalizedX * tilesPerSide),
             0, tilesPerSide - 1
@@ -60,7 +60,7 @@ public static class MinimapCoordinateConverter
             0, tilesPerSide - 1
         );
 
-        // Переводим в координаты мира
+        // Convert to world coordinates
         worldTile = new Vector2Int(originX + pixelX, originY + pixelY);
         return true;
     }

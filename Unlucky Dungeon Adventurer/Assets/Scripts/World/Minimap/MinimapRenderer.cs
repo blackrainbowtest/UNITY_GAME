@@ -55,20 +55,20 @@ public static class MinimapRenderer
         int minY = camMinTile.y - originY;
         int maxY = camMaxTile.y - originY;
 
-        // Клампим на всякий случай
+        // Clamp to texture bounds
         minX = Mathf.Clamp(minX, 0, tilesPerSide - 1);
         maxX = Mathf.Clamp(maxX, 0, tilesPerSide - 1);
         minY = Mathf.Clamp(minY, 0, tilesPerSide - 1);
         maxY = Mathf.Clamp(maxY, 0, tilesPerSide - 1);
 
-        // Горизонтальные линии
+        // Horizontal lines
         for (int x = minX; x <= maxX; x++)
         {
             texture.SetPixel(x, minY, frameColor);
             texture.SetPixel(x, maxY, frameColor);
         }
 
-        // Вертикальные линии
+        // Vertical lines
         for (int y = minY; y <= maxY; y++)
         {
             texture.SetPixel(minX, y, frameColor);

@@ -191,17 +191,17 @@ public class WorldMapController : MonoBehaviour
     }
 
     /// <summary>
-    /// Обновляет отображение миникарты (тайлы + рамка камеры + маркер игрока)
+    /// Updates minimap display (tiles + camera frame + player marker)
     /// </summary>
     private void UpdateMinimapDisplay()
     {
         if (minimap == null) return;
 
-        // Сначала очищаем текстуру, затем перерисовываем тайлы и рамку,
-        // чтобы старая рамка не оставалась на месте
+        // Clear texture first, then redraw tiles and frame
+        // to prevent old frame from persisting
         minimap.Clear();
 
-        // Обновляем тайлы под текущим окном миникарты
+        // Update tiles in current minimap window
         RefreshMinimapTiles();
 
             // Calculate visible camera bounds in tiles
@@ -302,7 +302,7 @@ public class WorldMapController : MonoBehaviour
 
         if (minimap != null)
         {
-            // Берём фактический цвет тайла
+            // Get actual tile color from SpriteRenderer
             var sr = obj.GetComponent<SpriteRenderer>();
             if (sr != null)
             {
@@ -479,7 +479,7 @@ public class WorldMapController : MonoBehaviour
                 }
                 else
                 {
-                    // Если тайл ещё не создан, используем цвет из TileData
+                    // If tile not yet spawned, use color from TileData
                     tileColor = tileData.color;
                 }
                 
