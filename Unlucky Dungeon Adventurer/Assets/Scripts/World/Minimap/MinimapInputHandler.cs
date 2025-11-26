@@ -2,18 +2,23 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// Обработчик ввода для миникарты (клики, перетаскивание)
+/// Handles input detection for the minimap, distinguishing between clicks and drags.
+/// Uses a small pixel threshold to prevent accidental drag activation on taps.
 /// </summary>
 public class MinimapInputHandler
 {
     private bool isDragging;
     private Vector2 pointerDownPosition;
-    private const float dragThreshold = 2f; // Reduced threshold for better sensitivity
+    
+    /// <summary>Minimum pixel distance to activate drag (prevents accidental drag on tap)</summary>
+    private const float dragThreshold = 2f;
 
+    /// <summary>Whether drag operation is currently active</summary>
     public bool IsDragging => isDragging;
 
     /// <summary>
-    /// Вызывается при нажатии на миникарту
+    /// Records initial pointer position when pressed.
+    /// Call this from OnPointerDown.
     /// </summary>
     public void OnPointerDown(PointerEventData eventData)
     {
@@ -22,8 +27,11 @@ public class MinimapInputHandler
     }
 
     /// <summary>
-    /// Проверяет, начался ли drag (превышен порог движения)
+    /// Checks if pointer has moved far enough to activate drag.
+    /// Returns true once threshold is exceeded.
     /// </summary>
+    /// <param name="eventData">Current pointer event data</param>
+    /// <returns>True if drag should be processed</returns>
     public bool CheckDragStart(PointerEventData eventData)
     {
         if (isDragging)
@@ -40,7 +48,7 @@ public class MinimapInputHandler
     }
 
     /// <summary>
-    /// Сбрасывает состояние drag
+    /// Resets drag state. Call this from OnPointerUp.
     /// </summary>
     public void Reset()
     {

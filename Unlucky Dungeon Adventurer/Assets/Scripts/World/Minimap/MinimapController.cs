@@ -3,67 +3,86 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+/// <summary>
+/// Main controller for the minimap system.
+/// Handles rendering, user input (click/drag), and interaction with the world map.
+/// Supports both PC (mouse) and mobile (touch) input.
+/// </summary>
 public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
+    #region Inspector Fields
+    
     [Header("References")]
     [SerializeField] private RawImage minimapImage;
 
-    [Header("Settings")]
+    [Header("Visual Settings")]
     [SerializeField] private Color emptyColor = new Color(0f, 0f, 0f, 0f);
     [SerializeField] private Color cameraFrameColor = Color.yellow;
     [SerializeField] private Color playerMarkerColor = Color.red;
+    
+    #endregion
 
-    // Кол-во тайлов по одной стороне (31 при viewRadius = 15)
+    #region Private Fields
+    
+    /// <summary>Number of tiles per side (e.g., 31 when viewRadius = 15)</summary>
     private int tilesPerSide;
 
-    // Текстура миникарты
+    /// <summary>Texture representing the minimap (1 pixel = 1 tile)</summary>
     private Texture2D minimapTexture;
 
-    // В каком участке мира сейчас "окно" миникарты
+    /// <summary>World coordinates of the minimap window's bottom-left corner</summary>
     private int originX;
     private int originY;
 
-    // Флаг "есть изменения, нужно Apply"
+    /// <summary>Indicates texture needs Apply() call</summary>
     private bool dirty;
 
-    // Обработчик ввода
+    /// <summary>Handles input detection (drag threshold, click vs drag)</summary>
     private MinimapInputHandler inputHandler;
     
-    // Для отслеживания drag движения
+    /// <summary>Tracks drag state for camera movement</summary>
     private Vector2Int lastDragTile;
     private Vector2Int dragStartCenterTile;
+    
+    #endregion
 
-    // Для будущей навигации: мир-тайл, по которому кликнули
+    #region Events & Properties
+    
+    /// <summary>Invoked when user clicks/drags on minimap to navigate world</summary>
     public event Action<Vector2Int> OnMinimapTileClicked;
 
-    // Глобальная блокировка ввода мира, пока удерживается указатель над миникартой
+    /// <summary>Global flag preventing world input while minimap is being interacted with</summary>
     public static bool InputCaptured { get; private set; }
+    
+    #endregion
 
+    #region Initialization
+    
     /// <summary>
-    /// Инициализация миникарты.
-    /// Вызываем из WorldMapController после того,
-    /// как знаем viewRadius и стартовый тайл игрока.
+    /// Initializes the minimap system with the given view radius and player position.
+    /// Creates the minimap texture (1 pixel = 1 world tile) and sets up input handlers.
     /// </summary>
+    /// <param name="viewRadius">Radius of visible tiles around player</param>
+    /// <param name="playerTile">Initial player tile position in world coordinates</param>
     public void Initialize(int viewRadius, Vector2Int playerTile)
     {
         tilesPerSide = viewRadius * 2 + 1;
         inputHandler = new MinimapInputHandler();
 
-        // Создаём текстуру 1 тайл = 1 пиксель
+        // Create texture: 1 pixel per tile, no mipmaps
         minimapTexture = new Texture2D(
             tilesPerSide,
             tilesPerSide,
             TextureFormat.RGBA32,
             false
         );
-        minimapTexture.filterMode = FilterMode.Point;
+        minimapTexture.filterMode = FilterMode.Point; // Crisp pixel art rendering
         minimapTexture.wrapMode = TextureWrapMode.Clamp;
 
         MinimapRenderer.ClearTexture(minimapTexture, emptyColor);
 
         if (minimapImage == null)
         {
-            // Если забыли проставить через инспектор — пробуем взять с того же объекта
             minimapImage = GetComponent<RawImage>();
         }
 
@@ -71,28 +90,31 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         {
             minimapImage.texture = minimapTexture;
         }
-        else
-        {
-            Debug.LogError("[Minimap] RawImage reference is missing!");
-        }
 
         SetCenter(playerTile);
     }
+    
+    #endregion
 
+    #region Public Methods - Rendering
+    
     /// <summary>
-    /// Устанавливаем центр миникарты по мировому тайлу (координата игрока).
+    /// Centers the minimap window on the specified world tile.
+    /// Typically called when camera moves or player position changes.
     /// </summary>
+    /// <param name="centerTile">World tile to center minimap on</param>
     public void SetCenter(Vector2Int centerTile)
     {
-        // Окно миникарты = квадрат tilesPerSide × tilesPerSide
         originX = centerTile.x - tilesPerSide / 2;
         originY = centerTile.y - tilesPerSide / 2;
     }
 
     /// <summary>
-    /// Обновляем цвет конкретного тайла на миникарте.
-    /// worldTile — координата в мире (та же, что у тайл-генератора).
+    /// Updates the color of a specific tile on the minimap.
+    /// Used to reflect terrain changes or newly revealed areas.
     /// </summary>
+    /// <param name="worldTile">World coordinates of the tile</param>
+    /// <param name="color">Color to set (typically from tile's SpriteRenderer)</param>
     public void UpdateTile(Vector2Int worldTile, Color color)
     {
         if (MinimapRenderer.UpdateTile(minimapTexture, worldTile, originX, originY, tilesPerSide, color))
@@ -102,9 +124,11 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     }
 
     /// <summary>
-    /// Рисуем рамку камеры по тайлам мира.
-    /// Сейчас просто обводка. Вызовешь позже, когда захочешь.
+    /// Draws the camera viewport frame on the minimap.
+    /// Shows player what area is currently visible on screen.
     /// </summary>
+    /// <param name="camMinTile">Bottom-left corner of camera view in world tiles</param>
+    /// <param name="camMaxTile">Top-right corner of camera view in world tiles</param>
     public void DrawCameraFrame(Vector2Int camMinTile, Vector2Int camMaxTile)
     {
         MinimapRenderer.DrawCameraFrame(
@@ -119,6 +143,10 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         dirty = true;
     }
 
+    /// <summary>
+    /// Draws the player position marker on the minimap.
+    /// </summary>
+    /// <param name="playerTile">Current player position in world tiles</param>
     public void DrawPlayerMarker(Vector2Int playerTile)
     {
         if (MinimapRenderer.DrawPlayerMarker(
@@ -134,16 +162,22 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     }
 
     /// <summary>
-    /// Полностью очищает текстуру миникарты указанным цветом.
+    /// Clears the entire minimap texture to the empty color.
+    /// Called before redrawing to prevent artifacts.
     /// </summary>
     public void Clear()
     {
         MinimapRenderer.ClearTexture(minimapTexture, emptyColor);
         dirty = true;
     }
+    
+    #endregion
 
+    #region Unity Lifecycle
+    
     /// <summary>
-    /// Применяем накопленные изменения к текстуре раз в кадр.
+    /// Applies accumulated texture changes once per frame for performance.
+    /// Uses LateUpdate to ensure all rendering operations complete before Apply().
     /// </summary>
     private void LateUpdate()
     {
@@ -153,13 +187,20 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
             dirty = false;
         }
     }
+    
+    #endregion
 
+    #region Input Handling - EventSystem Callbacks
+    
+    /// <summary>
+    /// Called when pointer is pressed down on the minimap.
+    /// Captures input to prevent world interactions and prepares drag tracking.
+    /// </summary>
     public void OnPointerDown(PointerEventData eventData)
     {
         inputHandler?.OnPointerDown(eventData);
-        InputCaptured = true; // блокируем ввод мира на всё время удержания
+        InputCaptured = true;
         
-        // Запоминаем начальную позицию для drag
         if (MinimapCoordinateConverter.TryGetWorldTile(
             eventData,
             minimapImage,
@@ -176,17 +217,23 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         }
     }
 
+    /// <summary>
+    /// Called when pointer is released from the minimap.
+    /// Processes click event if drag didn't occur, releases input capture.
+    /// </summary>
     public void OnPointerUp(PointerEventData eventData)
     {
-        // Если не было перетаскивания - обрабатываем как клик
         if (inputHandler != null && !inputHandler.IsDragging)
         {
             ProcessMinimapInteraction(eventData);
         }
         inputHandler?.Reset();
-        InputCaptured = false; // снимаем блокировку
+        InputCaptured = false;
     }
 
+    /// <summary>
+    /// Handles minimap click event by invoking camera navigation.
+    /// </summary>
     private void ProcessMinimapInteraction(PointerEventData eventData)
     {
         if (MinimapCoordinateConverter.TryGetWorldTile(
@@ -202,20 +249,19 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     }
 
     /// <summary>
-    /// Обработка перетаскивания по миникарте.
-    /// Постоянно вызывается при движении курсора/пальца во время drag.
+    /// Handles drag operations on the minimap.
+    /// Smoothly pans the camera based on minimap drag delta.
+    /// Ignores input if pointer leaves minimap bounds.
     /// </summary>
     public void OnDrag(PointerEventData eventData)
     {
         if (inputHandler == null) return;
 
-        // Проверяем, достаточно ли сдвинулись для активации drag
         if (!inputHandler.CheckDragStart(eventData))
         {
-            return; // Ещё не начали drag
+            return;
         }
 
-        // Получаем текущую позицию на миникарте
         if (MinimapCoordinateConverter.TryGetWorldTile(
             eventData,
             minimapImage,
@@ -224,15 +270,12 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
             originY,
             out Vector2Int currentTile))
         {
-            // Вычисляем смещение от начальной позиции drag
             Vector2Int delta = lastDragTile - currentTile;
-            
-            // Инвертируем движение: если тянем вверх на миникарте (currentTile.y больше),
-            // камера должна двигаться вниз (в сторону меньших Y)
             Vector2Int targetTile = dragStartCenterTile + delta;
             
             OnMinimapTileClicked?.Invoke(targetTile);
         }
-        // Если вышли за пределы миникарты — просто игнорируем
     }
+    
+    #endregion
 }

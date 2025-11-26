@@ -3,13 +3,22 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// Утилита для конвертации координат миникарты
+/// Static utility for converting between screen space, minimap texture space, and world tile coordinates.
+/// Handles coordinate transformations for minimap interactions.
 /// </summary>
 public static class MinimapCoordinateConverter
 {
     /// <summary>
-    /// Конвертирует позицию указателя в мировые координаты тайла
+    /// Converts screen pointer position to world tile coordinates.
+    /// Accounts for minimap's RectTransform positioning and texture mapping.
     /// </summary>
+    /// <param name="eventData">Pointer event containing screen position</param>
+    /// <param name="minimapImage">RawImage component displaying the minimap</param>
+    /// <param name="tilesPerSide">Size of minimap texture in tiles</param>
+    /// <param name="originX">World X coordinate of minimap's bottom-left corner</param>
+    /// <param name="originY">World Y coordinate of minimap's bottom-left corner</param>
+    /// <param name="worldTile">Output: world tile coordinates</param>
+    /// <returns>True if conversion succeeded (pointer within bounds)</returns>
     public static bool TryGetWorldTile(
         PointerEventData eventData,
         RawImage minimapImage,
@@ -57,8 +66,16 @@ public static class MinimapCoordinateConverter
     }
 
     /// <summary>
-    /// Конвертирует мировые координаты в локальные координаты текстуры миникарты
+    /// Converts world tile coordinates to local minimap texture coordinates.
+    /// Useful for determining if a tile is visible on the current minimap view.
     /// </summary>
+    /// <param name="worldTile">World tile coordinates</param>
+    /// <param name="originX">World X coordinate of minimap's bottom-left corner</param>
+    /// <param name="originY">World Y coordinate of minimap's bottom-left corner</param>
+    /// <param name="tilesPerSide">Size of minimap texture in tiles</param>
+    /// <param name="localX">Output: local texture X coordinate (0 to tilesPerSide-1)</param>
+    /// <param name="localY">Output: local texture Y coordinate (0 to tilesPerSide-1)</param>
+    /// <returns>True if tile is within minimap bounds</returns>
     public static bool TryGetLocalCoordinates(
         Vector2Int worldTile,
         int originX,
@@ -70,7 +87,6 @@ public static class MinimapCoordinateConverter
         localX = worldTile.x - originX;
         localY = worldTile.y - originY;
 
-        // Проверяем, что координаты в пределах текстуры
         if (localX < 0 || localX >= tilesPerSide ||
             localY < 0 || localY >= tilesPerSide)
         {

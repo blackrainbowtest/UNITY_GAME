@@ -1,13 +1,18 @@
 using UnityEngine;
 
 /// <summary>
-/// Утилита для рендеринга миникарты
+/// Static utility providing low-level rendering operations for minimap textures.
+/// All methods directly manipulate texture pixels for performance.
+/// Remember to call texture.Apply() after batch operations.
 /// </summary>
 public static class MinimapRenderer
 {
     /// <summary>
-    /// Очищает всю текстуру миникарты
+    /// Clears entire minimap texture to specified color.
+    /// Typically used before redrawing to prevent visual artifacts.
     /// </summary>
+    /// <param name="texture">Target minimap texture</param>
+    /// <param name="clearColor">Color to fill texture with (usually transparent)</param>
     public static void ClearTexture(Texture2D texture, Color clearColor)
     {
         if (texture == null) return;
@@ -24,8 +29,16 @@ public static class MinimapRenderer
     }
 
     /// <summary>
-    /// Рисует рамку камеры на миникарте
+    /// Draws camera viewport frame on the minimap.
+    /// Renders a rectangular outline showing the current visible area.
     /// </summary>
+    /// <param name="texture">Target minimap texture</param>
+    /// <param name="camMinTile">World coordinates of camera's bottom-left tile</param>
+    /// <param name="camMaxTile">World coordinates of camera's top-right tile</param>
+    /// <param name="originX">World X of minimap's bottom-left corner</param>
+    /// <param name="originY">World Y of minimap's bottom-left corner</param>
+    /// <param name="tilesPerSide">Size of minimap texture</param>
+    /// <param name="frameColor">Color for the frame outline (typically yellow)</param>
     public static void DrawCameraFrame(
         Texture2D texture,
         Vector2Int camMinTile,
@@ -64,8 +77,16 @@ public static class MinimapRenderer
     }
 
     /// <summary>
-    /// Рисует маркер игрока на миникарте
+    /// Draws player position marker on the minimap.
+    /// Renders as a single colored pixel at the player's location.
     /// </summary>
+    /// <param name="texture">Target minimap texture</param>
+    /// <param name="playerTile">Player's world tile position</param>
+    /// <param name="originX">World X of minimap's bottom-left corner</param>
+    /// <param name="originY">World Y of minimap's bottom-left corner</param>
+    /// <param name="tilesPerSide">Size of minimap texture</param>
+    /// <param name="markerColor">Color for player marker (typically red)</param>
+    /// <returns>True if marker was drawn (player within minimap bounds)</returns>
     public static bool DrawPlayerMarker(
         Texture2D texture,
         Vector2Int playerTile,
@@ -88,8 +109,16 @@ public static class MinimapRenderer
     }
 
     /// <summary>
-    /// Обновляет цвет конкретного тайла на миникарте
+    /// Updates the color of a specific tile on the minimap.
+    /// Typically called when terrain is revealed or modified.
     /// </summary>
+    /// <param name="texture">Target minimap texture</param>
+    /// <param name="worldTile">World coordinates of tile to update</param>
+    /// <param name="originX">World X of minimap's bottom-left corner</param>
+    /// <param name="originY">World Y of minimap's bottom-left corner</param>
+    /// <param name="tilesPerSide">Size of minimap texture</param>
+    /// <param name="color">New color for the tile</param>
+    /// <returns>True if tile was updated (within minimap bounds)</returns>
     public static bool UpdateTile(
         Texture2D texture,
         Vector2Int worldTile,
@@ -103,7 +132,6 @@ public static class MinimapRenderer
         int localX = worldTile.x - originX;
         int localY = worldTile.y - originY;
 
-        // Если тайл вне текущего окна миникарты — игнорируем
         if (localX < 0 || localX >= tilesPerSide ||
             localY < 0 || localY >= tilesPerSide)
         {
