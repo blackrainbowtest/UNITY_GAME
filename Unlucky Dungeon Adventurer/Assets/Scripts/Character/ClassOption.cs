@@ -3,6 +3,8 @@ using System;
 [Serializable]
 public class ClassOption
 {
-    public string displayName;   // то, что видит игрок (можно по-русски)
-    public string internalName;  // то, что совпадает с ключом в classDatabase
+    // Localized name shown to the player (can contain non-English text)
+    public string displayName;
+    // Internal key used to lookup class data in the class database
+    public string internalName;
 }
