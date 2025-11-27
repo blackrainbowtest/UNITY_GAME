@@ -302,12 +302,9 @@ public class WorldMapController : MonoBehaviour
 
         if (minimap != null)
         {
-            // Get actual tile color from SpriteRenderer
-            var sr = obj.GetComponent<SpriteRenderer>();
-            if (sr != null)
-            {
-                minimap.UpdateTile(pos, sr.color);
-            }
+            // Use tile's biome color from TileData, not SpriteRenderer color
+            // (SpriteRenderer.color is white when sprite is used)
+            minimap.UpdateTile(pos, data.color);
         }
 
         visibleTiles[pos] = obj;
@@ -462,7 +459,7 @@ public class WorldMapController : MonoBehaviour
     {
         if (minimap == null || generator == null) return;
 
-        // Обновляем все тайлы в области видимости миникарты
+        // Update all tiles in minimap view radius
         for (int dx = -viewRadius; dx <= viewRadius; dx++)
         {
             for (int dy = -viewRadius; dy <= viewRadius; dy++)
@@ -470,20 +467,9 @@ public class WorldMapController : MonoBehaviour
                 Vector2Int pos = new Vector2Int(playerTilePos.x + dx, playerTilePos.y + dy);
                 TileData tileData = generator.GetTile(pos.x, pos.y);
                 
-                // Получаем цвет тайла из существующего объекта или генерируем новый
-                Color tileColor;
-                if (visibleTiles.TryGetValue(pos, out GameObject tileObj))
-                {
-                    var sr = tileObj.GetComponent<SpriteRenderer>();
-                    tileColor = sr != null ? sr.color : Color.gray;
-                }
-                else
-                {
-                    // If tile not yet spawned, use color from TileData
-                    tileColor = tileData.color;
-                }
-                
-                minimap.UpdateTile(pos, tileColor);
+                // Always use biome color from TileData for minimap
+                // (not SpriteRenderer color, which is white when sprite is used)
+                minimap.UpdateTile(pos, tileData.color);
             }
         }
     }
