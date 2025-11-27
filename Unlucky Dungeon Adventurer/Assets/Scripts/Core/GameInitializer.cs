@@ -2,20 +2,20 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// Управляет инициализацией игры и загрузкой игрока.
-/// Предотвращает race conditions при загрузке SaveData.
-/// 
-/// ПОРЯДОК ИНИЦИАЛИЗАЦИИ:
-/// 1. SaveSlotUI.Load() → устанавливает TempSaveCache.pendingSave
-/// 2. Загружается новая сцена
-/// 3. GameInitializer.Awake() → создаёт singleton
-/// 4. GameInitializer.Start() → запускает корутину InitializeGame()
-///    - Фаза 1: Проверяет TempSaveCache
-///    - Фаза 2: Если нужно — загружает из PlayerPrefs
-///    - Фаза 3: Ждёт один кадр для инициализации других скриптов
-///    - Фаза 4: Отправляет события OnGameInitialized и OnPlayerStatsChanged
-/// 5. GameUIController.Start() → проверяет IsInitialized() и подписывается на события
-/// 6. GameUIController получает событие → обновляет UI
+/// Coordinates game initialization and player loading.
+/// Ensures correct ordering to avoid race conditions when applying save data.
+///
+/// Initialization flow (high level):
+/// 1) SaveSlotUI.Load() may set TempSaveCache.pendingSave
+/// 2) Scene loads
+/// 3) GameInitializer.Awake() creates the singleton
+/// 4) GameInitializer.Start() starts InitializeGame() coroutine which:
+///    - Phase 1: checks TempSaveCache
+///    - Phase 2: attempts PlayerPrefs load if needed
+///    - Phase 3: yields one frame to let other scripts initialize
+///    - Phase 4: invokes OnGameInitialized and OnPlayerStatsChanged events
+/// 5) GameUIController.Start() subscribes if IsInitialized()
+/// 6) UI updates when events are received
 /// </summary>
 public class GameInitializer : MonoBehaviour
 {
@@ -25,8 +25,8 @@ public class GameInitializer : MonoBehaviour
     private bool isInitializing = false;
 
     /// <summary>
-    /// Гарантирует существование GameInitializer в сцене.
-    /// Вызовите это, если нужно принудительно создать инициализатор.
+    /// Ensure a GameInitializer exists in the scene.
+    /// Call this to programmatically create the initializer if absent.
     /// </summary>
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void EnsureExists()
@@ -40,7 +40,7 @@ public class GameInitializer : MonoBehaviour
 
     private void Awake()
     {
-        // Создаём singleton, если его нет
+    // Create singleton instance and make persistent
         if (Instance == null)
         {
             Instance = this;
@@ -56,7 +56,7 @@ public class GameInitializer : MonoBehaviour
 
     private void Start()
     {
-        // Если не инициализировались — инициализируемся
+        // Start initialization coroutine if not already initialized
         if (!isInitialized && !isInitializing)
         {
             StartCoroutine(InitializeGame());
@@ -64,48 +64,43 @@ public class GameInitializer : MonoBehaviour
     }
 
     /// <summary>
-    /// Корутина инициализации: гарантирует правильный порядок загрузки
+    /// Initialization coroutine — performs ordered loading and event dispatch.
     /// </summary>
     private IEnumerator InitializeGame()
     {
         isInitializing = true;
+        Debug.Log("[GameInitializer] Starting initialization...");
 
-        Debug.Log("[GameInitializer] Начинаю инициализацию...");
-
-        // Фаза 1: Проверяем, есть ли ожидающее сохранение
+        // Phase 1: apply pending save if present
         if (TempSaveCache.pendingSave != null)
         {
-            Debug.Log("[GameInitializer] Обнаружено сохранение в TempSaveCache");
+            Debug.Log("[GameInitializer] Pending save found in TempSaveCache");
             GameManager.Instance.LoadGameData(TempSaveCache.pendingSave);
             TempSaveCache.pendingSave = null;
         }
-        // Фаза 2: Если игрока нет — пытаемся загрузить из PlayerPrefs
+        // Phase 2: attempt to load player from PlayerPrefs if none present
         else if (GameData.CurrentPlayer == null)
         {
-            Debug.Log("[GameInitializer] Загружаю игрока из PlayerPrefs...");
+            Debug.Log("[GameInitializer] Loading player from PlayerPrefs...");
             GameData.LoadPlayer();
 
             if (GameData.CurrentPlayer == null)
             {
-                Debug.Log("[GameInitializer] PlayerPrefs пуст, создаю пустого игрока");
+                Debug.Log("[GameInitializer] No saved player found, creating default player");
                 GameData.CurrentPlayer = new PlayerData("", "Hermit", new ClassStats());
             }
         }
         else
         {
-            Debug.Log("[GameInitializer] CurrentPlayer уже инициализирован");
+            Debug.Log("[GameInitializer] CurrentPlayer already initialized");
         }
 
-        // Фаза 3: Ждём один кадр, чтобы гарантировать инициализацию всех скриптов
+        // Phase 3: wait one frame to allow other scripts to finish their Awake/Start
         yield return null;
 
-        // Фаза 4: Отправляем события об инициализации
-        Debug.Log("[GameInitializer] Инициализация завершена, уведомляю UI...");
-        
-        // Сначала сообщаем что инициализация завершена
+        // Phase 4: fire initialization events so UI and other systems can update
+        Debug.Log("[GameInitializer] Initialization complete; notifying systems...");
         UIEvents.InvokeGameInitialized();
-
-        // Затем обновляем UI с текущими статами
         UIEvents.InvokePlayerStatsChanged();
 
         isInitialized = true;
