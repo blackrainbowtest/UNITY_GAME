@@ -8,17 +8,15 @@ public class Preloader : MonoBehaviour
 		StartCoroutine(LoadMainMenu());
 	}
 
-	/**
-	 * Automatically load this data when the game starts.
-	 */
+	// Load persistent game data early in the lifecycle.
+	// Awake runs before any Start methods, so it's a good place for registry initialization.
 	private void Awake()
 	{
 		DataRegistry.LoadAll();
 	}
 
-	/**
-	 * Wait for a frame to ensure GameManager is created
-	 */
+	// Defer scene loading by one frame to ensure any required singletons (e.g. GameManager)
+	// created in Awake/Start are ready before switching scenes.
 	private System.Collections.IEnumerator LoadMainMenu()
 	{
 		yield return null;
