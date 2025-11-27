@@ -29,6 +29,7 @@ public class SubBiomeConfig
     public string parent;     // id base biom
     public string spriteId;
     public string mapColor;   // "#RRGGBB"
+    public float spawnChance; // 0..1 probability to apply this sub-biome
 }
 
 [Serializable]

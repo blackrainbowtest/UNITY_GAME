@@ -4,63 +4,90 @@
       "id": "forest_pine",
       "parent": "forest",
       "spriteId": "forest_pine",
-      "mapColor": "#24542B"
+      "mapColor": "#24542B",
+      "spawnChance": 0.7
     },
     {
       "id": "forest_tropical",
       "parent": "forest",
       "spriteId": "forest_tropical",
-      "mapColor": "#2C7A3C"
-    },
-    {
-      "id": "forest_dark",
-      "parent": "forest",
-      "spriteId": "forest_dark",
-      "mapColor": "#1D3820"
+      "mapColor": "#2C7A3C",
+      "spawnChance": 0.6
     },
 
     {
       "id": "desert_sand",
       "parent": "desert",
       "spriteId": "desert_sand",
-      "mapColor": "#E7D68A"
+      "mapColor": "#E7D68A",
+      "spawnChance": 0.65
     },
     {
       "id": "desert_rocky",
       "parent": "desert",
       "spriteId": "desert_rocky",
-      "mapColor": "#C0A56B"
-    },
-    {
-      "id": "desert_oasis",
-      "parent": "desert",
-      "spriteId": "desert_oasis",
-      "mapColor": "#8BD4B0"
+      "mapColor": "#C0A56B",
+      "spawnChance": 0.5
     },
 
     {
       "id": "cave_default",
       "parent": "cave",
       "spriteId": "cave_default",
-      "mapColor": "#473D69"
+      "mapColor": "#473D69",
+      "spawnChance": 0.4
     },
     {
       "id": "cave_lava",
       "parent": "cave",
       "spriteId": "cave_lava",
-      "mapColor": "#B33014"
+      "mapColor": "#B33014",
+      "spawnChance": 0.25
+    },
+
+    {
+      "id": "tundra_snow",
+      "parent": "tundra",
+      "spriteId": "tundra_snow",
+      "mapColor": "#E8F1F5",
+      "spawnChance": 0.6
     },
     {
-      "id": "cave_crystal",
-      "parent": "cave",
-      "spriteId": "cave_crystal",
-      "mapColor": "#7A4DE0"
+      "id": "tundra_rock",
+      "parent": "tundra",
+      "spriteId": "tundra_rock",
+      "mapColor": "#9BADB5",
+      "spawnChance": 0.5
+    },
+
+    {
+      "id": "mountain_high",
+      "parent": "mountains",
+      "spriteId": "mountain_high",
+      "mapColor": "#5A5A5A",
+      "spawnChance": 0.55
     },
     {
-      "id": "cave_demonic",
-      "parent": "cave",
-      "spriteId": "cave_demonic",
-      "mapColor": "#7A0B0B"
+      "id": "mountain_low",
+      "parent": "mountains",
+      "spriteId": "mountain_low",
+      "mapColor": "#8C8C8C",
+      "spawnChance": 0.5
+    },
+
+    {
+      "id": "plains_green",
+      "parent": "plains",
+      "spriteId": "plains_green",
+      "mapColor": "#7ABF5E",
+      "spawnChance": 0.6
+    },
+    {
+      "id": "plains_flowers",
+      "parent": "plains",
+      "spriteId": "plains_flowers",
+      "mapColor": "#A8D68F",
+      "spawnChance": 0.35
     }
   ]
 }

@@ -5,6 +5,7 @@ public class SubBiomeData
 {
     public string id;
     public string parent;
+    public float spawnChance; // 0..1
 }
 
 [Serializable]

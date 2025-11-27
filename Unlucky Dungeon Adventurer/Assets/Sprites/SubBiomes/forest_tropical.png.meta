@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 03944a4e212d5224199af56b95eede61
+guid: 71e83243a0bd4aa45bf4b1a6711ff8dd
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5819171782403267220
-    second: tigress_main_idle_0
+      213: 1949312211515618535
+    second: forest_tropical_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,10 +72,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 4096
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,7 +100,7 @@ TextureImporter:
     buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 47
+    textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: tigress_main_idle_0
+      name: forest_tropical_0
       rect:
         serializedVersion: 2
-        x: 2
+        x: 0
         y: 0
-        width: 1022
-        height: 1482
+        width: 1024
+        height: 1024
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c6560ee58162e3fa0800000000000000
-      internalID: -5819171782403267220
+      spriteID: 7e438b3e0295d0b10800000000000000
+      internalID: 1949312211515618535
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      tigress_main_idle_0: -5819171782403267220
+      forest_tropical_0: 1949312211515618535
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

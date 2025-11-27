@@ -32,8 +32,15 @@ public static class TileGenerator
         if (biome != null && biome.subbiomes != null && biome.subbiomes.Length > 0)
         {
             int idx = rng.Next(0, biome.subbiomes.Length);
-            subBiomeId = biome.subbiomes[idx];
-            subBiome = BiomeDB.GetSubBiome(subBiomeId);
+            var candidateId = biome.subbiomes[idx];
+            var candidate = BiomeDB.GetSubBiome(candidateId);
+            // Apply sub-biome only if chance passes; otherwise keep base biome
+            float chance = Mathf.Clamp01(candidate?.spawnChance ?? 1f);
+            if ((float)rng.NextDouble() < chance)
+            {
+                subBiomeId = candidateId;
+                subBiome = candidate;
+            }
         }
 
         // 3. Fill TileData
