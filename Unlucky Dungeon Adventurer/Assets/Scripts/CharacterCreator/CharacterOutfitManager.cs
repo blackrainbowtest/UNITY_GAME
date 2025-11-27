@@ -27,29 +27,6 @@ public class CharacterOutfitManager : MonoBehaviour
     private Dictionary<string, Sprite> spriteMap;
     private OutfitCollection outfitsCollection;
 
-    [System.Serializable]
-    public struct SpriteEntry
-    {
-        public string key;
-        public Sprite sprite;
-    }
-
-    [System.Serializable]
-    public class OutfitDefinition
-    {
-        public string id;
-        public string legs;
-        public string chest;
-        public string hands;
-        public string head;
-    }
-
-    [System.Serializable]
-    public class OutfitCollection
-    {
-        public OutfitDefinition[] outfits;
-    }
-
     private void Awake()
     {
         InitializeOutfits();
@@ -76,49 +53,19 @@ public class CharacterOutfitManager : MonoBehaviour
             outfitsJson = Resources.Load<TextAsset>("WorldData/outfits");
         }
 
-        if (outfitsJson != null)
-        {
-            try
-            {
-                outfitsCollection = JsonUtility.FromJson<OutfitCollection>(outfitsJson.text);
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"[OutfitManager] Failed to parse outfits JSON: {ex.Message}");
-            }
-        }
+        outfitsCollection = OutfitUtils.LoadOutfits(outfitsJson);
 
         // Build sprite map
-        spriteMap = new Dictionary<string, Sprite>();
-        if (spriteEntries != null)
-        {
-            foreach (var e in spriteEntries)
-            {
-                if (!string.IsNullOrEmpty(e.key) && e.sprite != null)
-                {
-                    spriteMap[e.key] = e.sprite;
-                }
-            }
-        }
+        spriteMap = OutfitUtils.BuildSpriteMap(spriteEntries);
 
         // Diagnostic: report hardcoded legs sprite fields so we can see if they're assigned at runtime
         Debug.Log($"[OutfitManager] Hardcoded legs sprites - Paladin: {(legsPaladin!=null?legsPaladin.name:"null")}, Rogue: {(legsRogue!=null?legsRogue.name:"null")}, Slave: {(legsSlave!=null?legsSlave.name:"null")}, Hermit: {(legsHermit!=null?legsHermit.name:"null")} ");
 
         // Ensure common keys exist in the sprite map by falling back to the hardcoded fields.
-        void TryAdd(string key, Sprite s)
-        {
-            if (s == null) return;
-            if (!spriteMap.ContainsKey(key))
-            {
-                spriteMap[key] = s;
-                Debug.Log($"[OutfitManager] Added fallback sprite map entry '{key}' -> {s.name}");
-            }
-        }
-
-        TryAdd("Paladin", legsPaladin);
-        TryAdd("Rogue", legsRogue);
-        TryAdd("Slave", legsSlave);
-        TryAdd("Hermit", legsHermit);
+        OutfitUtils.TryAddFallback(spriteMap, "Paladin", legsPaladin);
+        OutfitUtils.TryAddFallback(spriteMap, "Rogue", legsRogue);
+        OutfitUtils.TryAddFallback(spriteMap, "Slave", legsSlave);
+        OutfitUtils.TryAddFallback(spriteMap, "Hermit", legsHermit);
     }
 
     // Apply by index (dropdown index).
