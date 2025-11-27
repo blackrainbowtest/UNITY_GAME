@@ -11,7 +11,8 @@ public class CharacterCreatorUI : MonoBehaviour
     private int selectedSeed = 10000;
 
     [Header("Class Options")]
-    public ClassOption[] classOptions; // настраиваем в инспекторе
+    // Class options configured in the inspector
+    public ClassOption[] classOptions;
 
     private void Awake()
     {
@@ -33,7 +34,7 @@ public class CharacterCreatorUI : MonoBehaviour
 
         var optionLabels = new System.Collections.Generic.List<string>();
 
-        // Заполняем дропдаун displayName-ами
+    // Populate dropdown with each option's displayName
         foreach (var opt in classOptions)
         {
             optionLabels.Add(opt.displayName);
@@ -41,7 +42,7 @@ public class CharacterCreatorUI : MonoBehaviour
 
         dropdownBackground.AddOptions(optionLabels);
 
-        // На всякий случай выставляем выбор на 0
+    // Ensure default selected index is 0 if options exist
         if (classOptions.Length > 0)
             dropdownBackground.value = 0;
     }
@@ -58,9 +59,9 @@ public class CharacterCreatorUI : MonoBehaviour
             return;
         }
 
-        // 👇 вот ЭТО критичный момент:
-        string roleInternal = classOptions[index].internalName;
-        string roleDisplay  = classOptions[index].displayName;
+    // Critical: use internalName as the class key, displayName for UI
+    string roleInternal = classOptions[index].internalName;
+    string roleDisplay  = classOptions[index].displayName;
 
         Debug.Log($"[CREATE BUTTON CLICKED] Создан герой: {name}, класс: {roleDisplay} (ID: {roleInternal})");
 
