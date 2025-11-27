@@ -255,9 +255,17 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     /// </summary>
     public void OnDrag(PointerEventData eventData)
     {
-        if (inputHandler == null) return;
+        if (inputHandler == null) 
+            return;
 
         if (!inputHandler.CheckDragStart(eventData))
+            return;
+
+        RectTransform rectTransform = minimapImage.rectTransform;
+        if (!RectTransformUtility.RectangleContainsScreenPoint(
+                rectTransform,
+                eventData.position,
+                eventData.pressEventCamera))
         {
             return;
         }
@@ -272,7 +280,7 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         {
             Vector2Int delta = lastDragTile - currentTile;
             Vector2Int targetTile = dragStartCenterTile + delta;
-            
+
             OnMinimapTileClicked?.Invoke(targetTile);
         }
     }
