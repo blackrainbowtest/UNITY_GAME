@@ -5,8 +5,7 @@ public static class BiomeInfluence
         int x, int y,
         string centerBiome)
     {
-        string bestBiome = null;
-        int bestPower = -1;
+        Dictionary<string,int> score = new();
 
         // 8 направлений
         int[,] dirs =
@@ -21,14 +20,30 @@ public static class BiomeInfluence
             int ny = y + dirs[i,1];
             string nb = biomeGetter(nx, ny);
 
-            if (nb != null && nb != centerBiome)
+            if (nb == null || nb == centerBiome)
+                continue;
+
+            int power = BiomePower.GetPower(nb);
+
+            if (!score.ContainsKey(nb))
+                score[nb] = 0;
+
+            score[nb] += power;
+        }
+
+        if (score.Count == 0)
+            return null;
+
+        // return key with max score
+        string bestBiome = null;
+        int bestValue = -1;
+
+        foreach (var kv in score)
+        {
+            if (kv.Value > bestValue)
             {
-                int p = BiomePower.GetPower(nb);
-                if (p > bestPower)
-                {
-                    bestPower = p;
-                    bestBiome = nb;
-                }
+                bestValue = kv.Value;
+                bestBiome = kv.Key;
             }
         }
 

@@ -40,16 +40,22 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     /// <summary>Handles input detection (drag threshold, click vs drag)</summary>
     private MinimapInputHandler inputHandler;
     
-    /// <summary>Tracks drag state for camera movement</summary>
-    private Vector2Int lastDragTile;
-    private Vector2Int dragStartCenterTile;
+    // ---- Новые поля для плавного drag ----
+    private Vector2 dragStartLocalPos;      // точка, где зажали мышь/палец в локальных координатах миникарты
+    private Vector2 dragStartCenterWorld;   // центр мира (в тайлах, но float) в момент начала drag
     
     #endregion
 
     #region Events & Properties
     
-    /// <summary>Invoked when user clicks/drags on minimap to navigate world</summary>
+    /// <summary>Invoked when user clicks on minimap to jump camera to a tile</summary>
     public event Action<Vector2Int> OnMinimapTileClicked;
+
+    /// <summary>
+    /// Invoked when user drags on minimap.
+    /// Param: desired world center (in tile coordinates, float) for camera/minimap.
+    /// </summary>
+    public event Action<Vector2> OnMinimapCenterDragged;
 
     /// <summary>Global flag preventing world input while minimap is being interacted with</summary>
     public static bool InputCaptured { get; private set; }
@@ -201,18 +207,21 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         inputHandler?.OnPointerDown(eventData);
         InputCaptured = true;
         
-        if (MinimapCoordinateConverter.TryGetWorldTile(
-            eventData,
-            minimapImage,
-            tilesPerSide,
-            originX,
-            originY,
-            out Vector2Int startTile))
+        // Запоминаем стартовый центр мира (по тайлам, float)
+        dragStartCenterWorld = new Vector2(
+            originX + tilesPerSide * 0.5f,
+            originY + tilesPerSide * 0.5f
+        );
+
+        // И стартовую локальную позицию указателя относительно миникарты
+        if (minimapImage != null)
         {
-            lastDragTile = startTile;
-            dragStartCenterTile = new Vector2Int(
-                originX + tilesPerSide / 2,
-                originY + tilesPerSide / 2
+            RectTransform rectTransform = minimapImage.rectTransform;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                rectTransform,
+                eventData.position,
+                eventData.pressEventCamera,
+                out dragStartLocalPos
             );
         }
     }
@@ -225,8 +234,10 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     {
         if (inputHandler != null && !inputHandler.IsDragging)
         {
-            ProcessMinimapInteraction(eventData);
+            // короткий tap по миникарте — прыжок камеры в тайл
+            ProcessMinimapClick(eventData);
         }
+
         inputHandler?.Reset();
         InputCaptured = false;
     }
@@ -234,7 +245,7 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     /// <summary>
     /// Handles minimap click event by invoking camera navigation.
     /// </summary>
-    private void ProcessMinimapInteraction(PointerEventData eventData)
+    private void ProcessMinimapClick(PointerEventData eventData)
     {
         if (MinimapCoordinateConverter.TryGetWorldTile(
             eventData,
@@ -261,7 +272,12 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         if (!inputHandler.CheckDragStart(eventData))
             return;
 
+        if (minimapImage == null)
+            return;
+
         RectTransform rectTransform = minimapImage.rectTransform;
+
+        // Если ушли за пределы миникарты — игнорируем
         if (!RectTransformUtility.RectangleContainsScreenPoint(
                 rectTransform,
                 eventData.position,
@@ -270,19 +286,38 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
             return;
         }
 
-        if (MinimapCoordinateConverter.TryGetWorldTile(
-            eventData,
-            minimapImage,
-            tilesPerSide,
-            originX,
-            originY,
-            out Vector2Int currentTile))
+        // текущая локальная позиция курсора/пальца
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                rectTransform,
+                eventData.position,
+                eventData.pressEventCamera,
+                out Vector2 currentLocalPos))
         {
-            Vector2Int delta = lastDragTile - currentTile;
-            Vector2Int targetTile = dragStartCenterTile + delta;
-
-            OnMinimapTileClicked?.Invoke(targetTile);
+            return;
         }
+
+        // смещение в пикселях внутри миникарты
+        Vector2 localDelta = currentLocalPos - dragStartLocalPos;
+
+        // переводим пиксели → тайловые единицы (1 текстурный пиксель = 1 тайл)
+        // но UI-Rect может иметь любой размер.
+        Rect rect = rectTransform.rect;
+        if (Mathf.Approximately(rect.width, 0f) || Mathf.Approximately(rect.height, 0f))
+            return;
+
+        float tilesPerPixelX = tilesPerSide / rect.width;
+        float tilesPerPixelY = tilesPerSide / rect.height;
+
+        // Направление: тянем карту — камера двигается в противоположную сторону
+        Vector2 worldDelta = new Vector2(
+            -localDelta.x * tilesPerPixelX,
+            -localDelta.y * tilesPerPixelY
+        );
+
+        Vector2 targetCenterWorld = dragStartCenterWorld + worldDelta;
+
+        // Сообщаем наружу: "хочу, чтобы центр мира был вот здесь"
+        OnMinimapCenterDragged?.Invoke(targetCenterWorld);
     }
     
     #endregion

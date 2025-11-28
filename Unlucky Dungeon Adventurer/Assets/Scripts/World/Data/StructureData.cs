@@ -1,5 +1,14 @@
 using System;
 
+/*
+spawnChance
+rarity
+minDistanceBetween
+maxPerBiome
+loot table
+enemy list
+*/
+
 [Serializable]
 public class StructureData
 {
