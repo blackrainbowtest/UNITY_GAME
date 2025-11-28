@@ -9,43 +9,213 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 89c14c07ecd82f144a5e3d2a644a2c0b, type: 3}
   m_Name: TileSpriteDB
   m_EditorClassIdentifier: Assembly-CSharp::TileSpriteDB
   entries:
   - id: forest
-    sprite: {fileID: 0}
+    sprite: {fileID: 21300000, guid: d894c4766ce7eca4f99d0f11fa0201cc, type: 3}
   - id: desert
-    sprite: {fileID: 0}
+    sprite: {fileID: 21300000, guid: 10ee691555d10ee4abc0ff9d090eb2ee, type: 3}
   - id: tundra
-    sprite: {fileID: 0}
+    sprite: {fileID: 21300000, guid: 67fdf19e0e6e9f04e82a7edc3f3c6dc9, type: 3}
   - id: mountains
-    sprite: {fileID: 0}
+    sprite: {fileID: 21300000, guid: 18e1772171352ee429493507e4358aa1, type: 3}
   - id: cave
-    sprite: {fileID: 0}
+    sprite: {fileID: 21300000, guid: c021363de442d724891b830caff55337, type: 3}
   - id: plains
-    sprite: {fileID: 0}
+    sprite: {fileID: 21300000, guid: f06fa13bb8a309d4491bb521e94073c0, type: 3}
   - id: forest_pine
     sprite: {fileID: 0}
   - id: forest_tropical
+    sprite: {fileID: 0}
+  - id: forest_dense
+    sprite: {fileID: 0}
+  - id: forest_moss
     sprite: {fileID: 0}
   - id: desert_sand
     sprite: {fileID: 0}
   - id: desert_rocky
     sprite: {fileID: 0}
-  - id: cave_default
+  - id: desert_dunes
     sprite: {fileID: 0}
-  - id: cave_lava
+  - id: tundra_snow
     sprite: {fileID: 0}
-  - id: plains_green
+  - id: tundra_rock
     sprite: {fileID: 0}
-  - id: plains_flowers
+  - id: tundra_frozen
     sprite: {fileID: 0}
   - id: mountain_high
     sprite: {fileID: 0}
   - id: mountain_low
     sprite: {fileID: 0}
-  - id: tundra_snow
+  - id: mountain_cliffs
     sprite: {fileID: 0}
-  - id: tundra_rock
+  - id: plains_green
+    sprite: {fileID: 0}
+  - id: plains_flowers
+    sprite: {fileID: 0}
+  - id: plains_brown
+    sprite: {fileID: 0}
+  - id: cave_default
+    sprite: {fileID: 0}
+  - id: cave_lava
+    sprite: {fileID: 0}
+  - id: cave_dark
+    sprite: {fileID: 0}
+  - id: sub_forest_0
+    sprite: {fileID: 0}
+  - id: sub_forest_1
+    sprite: {fileID: 0}
+  - id: sub_forest_2
+    sprite: {fileID: 0}
+  - id: sub_forest_3
+    sprite: {fileID: 0}
+  - id: sub_forest_4
+    sprite: {fileID: 0}
+  - id: sub_forest_5
+    sprite: {fileID: 0}
+  - id: sub_forest_6
+    sprite: {fileID: 0}
+  - id: sub_forest_7
+    sprite: {fileID: 0}
+  - id: sub_forest_15
+    sprite: {fileID: 0}
+  - id: sub_forest_31
+    sprite: {fileID: 0}
+  - id: sub_forest_63
+    sprite: {fileID: 0}
+  - id: sub_forest_127
+    sprite: {fileID: 0}
+  - id: sub_forest_255
+    sprite: {fileID: 0}
+  - id: sub_desert_0
+    sprite: {fileID: 0}
+  - id: sub_desert_1
+    sprite: {fileID: 0}
+  - id: sub_desert_2
+    sprite: {fileID: 0}
+  - id: sub_desert_3
+    sprite: {fileID: 0}
+  - id: sub_desert_4
+    sprite: {fileID: 0}
+  - id: sub_desert_5
+    sprite: {fileID: 0}
+  - id: sub_desert_15
+    sprite: {fileID: 0}
+  - id: sub_desert_31
+    sprite: {fileID: 0}
+  - id: sub_desert_63
+    sprite: {fileID: 0}
+  - id: sub_desert_127
+    sprite: {fileID: 0}
+  - id: sub_desert_255
+    sprite: {fileID: 0}
+  - id: sub_tundra_0
+    sprite: {fileID: 0}
+  - id: sub_tundra_1
+    sprite: {fileID: 0}
+  - id: sub_tundra_2
+    sprite: {fileID: 0}
+  - id: sub_tundra_3
+    sprite: {fileID: 0}
+  - id: sub_tundra_4
+    sprite: {fileID: 0}
+  - id: sub_tundra_7
+    sprite: {fileID: 0}
+  - id: sub_tundra_15
+    sprite: {fileID: 0}
+  - id: sub_tundra_31
+    sprite: {fileID: 0}
+  - id: sub_tundra_63
+    sprite: {fileID: 0}
+  - id: sub_tundra_127
+    sprite: {fileID: 0}
+  - id: sub_tundra_255
+    sprite: {fileID: 0}
+  - id: sub_mountains_0
+    sprite: {fileID: 0}
+  - id: sub_mountains_1
+    sprite: {fileID: 0}
+  - id: sub_mountains_2
+    sprite: {fileID: 0}
+  - id: sub_mountains_3
+    sprite: {fileID: 0}
+  - id: sub_mountains_7
+    sprite: {fileID: 0}
+  - id: sub_mountains_15
+    sprite: {fileID: 0}
+  - id: sub_mountains_31
+    sprite: {fileID: 0}
+  - id: sub_mountains_63
+    sprite: {fileID: 0}
+  - id: sub_mountains_127
+    sprite: {fileID: 0}
+  - id: sub_mountains_255
+    sprite: {fileID: 0}
+  - id: sub_plains_0
+    sprite: {fileID: 0}
+  - id: sub_plains_1
+    sprite: {fileID: 0}
+  - id: sub_plains_2
+    sprite: {fileID: 0}
+  - id: sub_plains_3
+    sprite: {fileID: 0}
+  - id: sub_plains_7
+    sprite: {fileID: 0}
+  - id: sub_plains_15
+    sprite: {fileID: 0}
+  - id: sub_plains_31
+    sprite: {fileID: 0}
+  - id: sub_plains_63
+    sprite: {fileID: 0}
+  - id: sub_plains_127
+    sprite: {fileID: 0}
+  - id: sub_plains_255
+    sprite: {fileID: 0}
+  - id: sub_cave_0
+    sprite: {fileID: 0}
+  - id: sub_cave_31
+    sprite: {fileID: 0}
+  - id: sub_cave_63
+    sprite: {fileID: 0}
+  - id: sub_cave_127
+    sprite: {fileID: 0}
+  - id: sub_cave_255
+    sprite: {fileID: 0}
+  - id: sub_forest_inner_1
+    sprite: {fileID: 0}
+  - id: sub_forest_inner_2
+    sprite: {fileID: 0}
+  - id: sub_forest_inner_3
+    sprite: {fileID: 0}
+  - id: sub_desert_inner_1
+    sprite: {fileID: 0}
+  - id: sub_desert_inner_2
+    sprite: {fileID: 0}
+  - id: sub_desert_inner_3
+    sprite: {fileID: 0}
+  - id: sub_tundra_inner_1
+    sprite: {fileID: 0}
+  - id: sub_tundra_inner_2
+    sprite: {fileID: 0}
+  - id: sub_tundra_inner_3
+    sprite: {fileID: 0}
+  - id: sub_mountains_inner_1
+    sprite: {fileID: 0}
+  - id: sub_mountains_inner_2
+    sprite: {fileID: 0}
+  - id: sub_mountains_inner_3
+    sprite: {fileID: 0}
+  - id: sub_plains_inner_1
+    sprite: {fileID: 0}
+  - id: sub_plains_inner_2
+    sprite: {fileID: 0}
+  - id: sub_plains_inner_3
+    sprite: {fileID: 0}
+  - id: sub_cave_inner_1
+    sprite: {fileID: 0}
+  - id: sub_cave_inner_2
+    sprite: {fileID: 0}
+  - id: sub_cave_inner_3
     sprite: {fileID: 0}

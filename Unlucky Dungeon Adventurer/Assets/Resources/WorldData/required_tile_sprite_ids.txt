@@ -1,6 +1,13 @@
-# Required tile sprite IDs (collected from WorldData biomes and subbiomes)
+# ===========================================
+# Required tile sprite IDs (updated version)
+# ===========================================
+# ID must EXACTLY match TileData.spriteId
+# and all dynamic sub-biome IDs produced by TileGenerator
+# ===========================================
 
-# Biome IDs (used as fallback spriteId)
+# ===================
+# BASE BIOMES (fallback)
+# ===================
 forest
 desert
 tundra
@@ -8,23 +15,149 @@ mountains
 cave
 plains
 
-# Sub-biome sprite IDs (from WorldData/subbiomes.json)
+# ===================
+# FORCE-DEFINED SUB-BIOMES (your PNG tiles)
+# ===================
+
+# Forest
 forest_pine
 forest_tropical
+forest_dense
+forest_moss
 
+# Desert
 desert_sand
 desert_rocky
+desert_dunes
 
-cave_default
-cave_lava
-
-plains_green
-plains_flowers
-
-mountain_high
-mountain_low
-
+# Tundra
 tundra_snow
 tundra_rock
+tundra_frozen
 
-# Add any custom sprite IDs you use in JSON files below this list
+# Mountains
+mountain_high
+mountain_low
+mountain_cliffs
+
+# Plains
+plains_green
+plains_flowers
+plains_brown
+
+# Cave
+cave_default
+cave_lava
+cave_dark
+
+# =============================
+# AUTO-GENERATED BLEND SUBBIOMES
+# (these ARE REQUIRED by TileGenerator)
+# =============================
+
+# Blend masks around biome borders
+# Format: sub_{biome}_{mask}
+# mask is byte 0–255 (we include common mask values only)
+sub_forest_0
+sub_forest_1
+sub_forest_2
+sub_forest_3
+sub_forest_4
+sub_forest_5
+sub_forest_6
+sub_forest_7
+sub_forest_15
+sub_forest_31
+sub_forest_63
+sub_forest_127
+sub_forest_255
+
+sub_desert_0
+sub_desert_1
+sub_desert_2
+sub_desert_3
+sub_desert_4
+sub_desert_5
+sub_desert_15
+sub_desert_31
+sub_desert_63
+sub_desert_127
+sub_desert_255
+
+sub_tundra_0
+sub_tundra_1
+sub_tundra_2
+sub_tundra_3
+sub_tundra_4
+sub_tundra_7
+sub_tundra_15
+sub_tundra_31
+sub_tundra_63
+sub_tundra_127
+sub_tundra_255
+
+sub_mountains_0
+sub_mountains_1
+sub_mountains_2
+sub_mountains_3
+sub_mountains_7
+sub_mountains_15
+sub_mountains_31
+sub_mountains_63
+sub_mountains_127
+sub_mountains_255
+
+sub_plains_0
+sub_plains_1
+sub_plains_2
+sub_plains_3
+sub_plains_7
+sub_plains_15
+sub_plains_31
+sub_plains_63
+sub_plains_127
+sub_plains_255
+
+sub_cave_0
+sub_cave_31
+sub_cave_63
+sub_cave_127
+sub_cave_255
+
+# =============================
+# INNER-LAYERS (smooth 2–3 tile blending zones)
+# Formats:
+# sub_{biome}_inner_1
+# sub_{biome}_inner_2
+# sub_{biome}_inner_3
+# =============================
+
+sub_forest_inner_1
+sub_forest_inner_2
+sub_forest_inner_3
+
+sub_desert_inner_1
+sub_desert_inner_2
+sub_desert_inner_3
+
+sub_tundra_inner_1
+sub_tundra_inner_2
+sub_tundra_inner_3
+
+sub_mountains_inner_1
+sub_mountains_inner_2
+sub_mountains_inner_3
+
+sub_plains_inner_1
+sub_plains_inner_2
+sub_plains_inner_3
+
+sub_cave_inner_1
+sub_cave_inner_2
+sub_cave_inner_3
+
+# ===================
+# CUSTOM SPRITE IDS (optional)
+# Add your sprite names here
+# ===================
+
