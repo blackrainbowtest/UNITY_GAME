@@ -31,6 +31,16 @@ public class CameraPan : MonoBehaviour
         }
     }
 
+    private MinimapController minimap;
+    void Start()
+    {
+        minimap = FindAnyObjectByType<MinimapController>();
+        if (minimap != null)
+        {
+            minimap.OnMinimapCenterDragged += HandleMinimapDrag;
+        }
+    }
+
     void Update()
     {
         // Блокируем перемещение камеры, если захвачен ввод миникартой
@@ -174,6 +184,29 @@ public class CameraPan : MonoBehaviour
             }
         }
         return idx;
+    }
+
+    // Получаем плавную цель от миникарты
+    private void HandleMinimapDrag(Vector2 worldCenter)
+    {
+        autoCenter = false;  // отменяем автополет если был
+
+        float tx = worldCenter.x;
+        float ty = worldCenter.y;
+
+        Vector3 target = new Vector3(
+            tx,
+            ty,
+            transform.position.z
+        );
+
+        // Двигаем камеру плавно
+        float speed = 15f;  // регулируется по ощущениям
+        transform.position = Vector3.Lerp(
+            transform.position,
+            target,
+            speed * Time.deltaTime
+        );
     }
 
 	public void CenterToPlayer(Vector3 playerPos)
