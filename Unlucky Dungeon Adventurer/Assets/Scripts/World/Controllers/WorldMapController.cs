@@ -148,6 +148,7 @@ public class WorldMapController : MonoBehaviour
         {
             minimap.Initialize(viewRadius, playerTile);
             minimap.OnMinimapTileClicked += HandleMinimapClick;
+            minimap.OnMinimapCenterDragged += HandleMinimapDrag;
         }
 
         // 4) Autosave
@@ -453,6 +454,45 @@ public class WorldMapController : MonoBehaviour
                 Mathf.RoundToInt(GameData.CurrentPlayer.mapPosY)
             );
             minimap?.DrawPlayerMarker(actual);
+        }
+    }
+
+    // NEW: плавное перетаскивание миникарты
+    private void HandleMinimapDrag(Vector2 worldCenter)
+    {
+        if (Camera.main == null)
+            return;
+
+        // worldCenter — координаты центра карты в тайлах (могут быть дробные)
+        float tx = worldCenter.x;
+        float ty = worldCenter.y;
+
+        // конвертация тайлов → мировые координаты
+        Vector3 target = new Vector3(
+            tx * tileSize,
+            ty * tileSize,
+            Camera.main.transform.position.z
+        );
+
+        // Плавное перемещение камеры к точке
+        Camera.main.transform.position = Vector3.Lerp(
+            Camera.main.transform.position,
+            target,
+            0.15f   // степень плавности
+        );
+
+        // Обновление логики карты вокруг камеры
+        Vector2Int newTilePos = new(
+            Mathf.FloorToInt(Camera.main.transform.position.x / tileSize),
+            Mathf.FloorToInt(Camera.main.transform.position.y / tileSize)
+        );
+
+        if (newTilePos != playerTilePos)
+        {
+            playerTilePos = newTilePos;
+            UpdateMapAroundCamera();
+            minimap?.SetCenter(playerTilePos);
+            RefreshMinimapTiles();
         }
     }
 
