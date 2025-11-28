@@ -45,7 +45,7 @@ public class PlayerMarkerController : MonoBehaviour, IPointerClickHandler, IPoin
 
     public void MoveTo(Vector2Int newCoords, float tileSize)
     {
-        Debug.Log($"[PlayerMarker] MoveTo called: {newCoords}");
+        // Debug.Log($"[PlayerMarker] MoveTo called: {newCoords}");
         SetPosition(newCoords, tileSize);
     }
 
@@ -55,7 +55,7 @@ public class PlayerMarkerController : MonoBehaviour, IPointerClickHandler, IPoin
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("[PlayerMarker] CLICK on player marker");
+        // Debug.Log("[PlayerMarker] CLICK on player marker");
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -84,7 +84,7 @@ public class PlayerMarkerController : MonoBehaviour, IPointerClickHandler, IPoin
 
         if (pressTimer >= longPressThreshold)
         {
-            Debug.Log("[PlayerMarker] LONG PRESS on player marker");
+            // Debug.Log("[PlayerMarker] LONG PRESS on player marker");
             isPressing = false;
         }
     }

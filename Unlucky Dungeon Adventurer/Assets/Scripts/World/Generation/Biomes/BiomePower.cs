@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public static class BiomePower
 {
     private static readonly Dictionary<string, int> power = new()

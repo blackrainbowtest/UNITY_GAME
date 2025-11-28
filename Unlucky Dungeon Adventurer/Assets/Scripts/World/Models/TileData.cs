@@ -17,6 +17,8 @@ public class TileData
 
     // Structures
     public string structureId;
+    // Activity (optional overlay/icon)
+    public string activityId;
 
     // Gameplay
     public float moveCost;

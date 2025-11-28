@@ -1990,15 +1990,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 693030643}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb8bee8f15af7e34a96f85dd5c12d530, type: 3}
+  m_Script: {fileID: 11500000, guid: df59aec36eba1d94780c952449288e35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldMapController
   locationText: {fileID: 1758625049}
   viewRadius: 15
   tilePrefab: {fileID: 219260356855222189, guid: bb86c1f6acdfcf34e90d319e8efc72a9, type: 3}
   tileContainer: {fileID: 122567557}
+  tileSize: 1
   playerMarker: {fileID: 1539624590}
-  tileSize: 8
   minimap: {fileID: 1337224853}
 --- !u!1 &754657737
 GameObject:

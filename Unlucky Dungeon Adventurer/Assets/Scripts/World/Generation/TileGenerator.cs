@@ -34,8 +34,10 @@ public static class TileGenerator
         tile.subBiomeIds = new List<string>();
 
         // 3. Dominant neighboring biome
+        // Wrap ChooseBiomeId (нужен worldSeed) в лямбду без третьего аргумента
+        Func<int,int,string> biomeGetter = (ix, iy) => ChooseBiomeId(ix, iy, worldSeed);
         string dominant = BiomeInfluence.GetDominantNeighbor(
-            ChooseBiomeId,
+            biomeGetter,
             x, y,
             biomeId
         );
@@ -44,7 +46,7 @@ public static class TileGenerator
         {
             // Mask
             byte mask = BiomeMaskUtils.GetMask(
-                ChooseBiomeId,
+                biomeGetter,
                 x, y,
                 biomeId
             );

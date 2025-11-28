@@ -17,6 +17,12 @@ public class StructureData
 }
 
 [Serializable]
+public class StructureDataList
+{
+    public StructureData[] structures;
+}
+
+[Serializable]
 public class StructureDataCollection
 {
     public StructureData[] structures;

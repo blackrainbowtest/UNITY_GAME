@@ -1,3 +1,5 @@
+using System;
+
 public static class BiomeMaskUtils
 {
     // Битовые значения по 8 направлениям

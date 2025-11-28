@@ -10,7 +10,7 @@ public static class LanguageManager
     public static void LoadLanguage(string fileName)
     {
         string path = Path.Combine(Application.streamingAssetsPath, "lng", CurrentLanguage, fileName + ".json");
-        Debug.Log("[LanguageManager] Load: " + path);
+        // Debug.Log("[LanguageManager] Load: " + path);
 
         if (!File.Exists(path))
         {
@@ -24,7 +24,7 @@ public static class LanguageManager
         try
         {
             texts = ParseSimpleJson(json);
-            Debug.Log($"[LanguageManager] Loaded {texts.Count} keys");
+            // Debug.Log($"[LanguageManager] Loaded {texts.Count} keys");
         }
         catch (System.Exception e)
         {
@@ -40,7 +40,7 @@ public static class LanguageManager
         return key;
     }
 
-    // Очень простой парсер, работает с JSON формата { "ключ": "текст" }
+    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ JSON пїЅпїЅпїЅпїЅпїЅпїЅпїЅ { "пїЅпїЅпїЅпїЅ": "пїЅпїЅпїЅпїЅпїЅ" }
     private static Dictionary<string, string> ParseSimpleJson(string json)
     {
         var dict = new Dictionary<string, string>();

@@ -69,37 +69,37 @@ public class GameInitializer : MonoBehaviour
     private IEnumerator InitializeGame()
     {
         isInitializing = true;
-        Debug.Log("[GameInitializer] Starting initialization...");
+        // Debug.Log("[GameInitializer] Starting initialization...");
 
         // Phase 1: apply pending save if present
         if (TempSaveCache.pendingSave != null)
         {
-            Debug.Log("[GameInitializer] Pending save found in TempSaveCache");
+            // Debug.Log("[GameInitializer] Pending save found in TempSaveCache");
             GameManager.Instance.LoadGameData(TempSaveCache.pendingSave);
             TempSaveCache.pendingSave = null;
         }
         // Phase 2: attempt to load player from PlayerPrefs if none present
         else if (GameData.CurrentPlayer == null)
         {
-            Debug.Log("[GameInitializer] Loading player from PlayerPrefs...");
+            // Debug.Log("[GameInitializer] Loading player from PlayerPrefs...");
             GameData.LoadPlayer();
 
             if (GameData.CurrentPlayer == null)
             {
-                Debug.Log("[GameInitializer] No saved player found, creating default player");
+                // Debug.Log("[GameInitializer] No saved player found, creating default player");
                 GameData.CurrentPlayer = new PlayerData("", "Hermit", new ClassStats());
             }
         }
         else
         {
-            Debug.Log("[GameInitializer] CurrentPlayer already initialized");
+            // Debug.Log("[GameInitializer] CurrentPlayer already initialized");
         }
 
         // Phase 3: wait one frame to allow other scripts to finish their Awake/Start
         yield return null;
 
         // Phase 4: fire initialization events so UI and other systems can update
-        Debug.Log("[GameInitializer] Initialization complete; notifying systems...");
+        // Debug.Log("[GameInitializer] Initialization complete; notifying systems...");
         UIEvents.InvokeGameInitialized();
         UIEvents.InvokePlayerStatsChanged();
 

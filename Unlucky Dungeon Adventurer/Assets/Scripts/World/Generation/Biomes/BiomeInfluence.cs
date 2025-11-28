@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 public static class BiomeInfluence
 {
     public static string GetDominantNeighbor(

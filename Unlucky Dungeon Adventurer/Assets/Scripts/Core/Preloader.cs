@@ -12,7 +12,8 @@ public class Preloader : MonoBehaviour
 	// Awake runs before any Start methods, so it's a good place for registry initialization.
 	private void Awake()
 	{
-		DataRegistry.LoadAll();
+		DataRegistry.EnsureLoaded();
+		BiomeDB.EnsureLoaded();
 	}
 
 	// Defer scene loading by one frame to ensure any required singletons (e.g. GameManager)

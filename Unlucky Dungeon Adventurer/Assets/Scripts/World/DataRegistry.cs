@@ -1,105 +1,134 @@
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
-/// DataRegistry is a global static container for GAME DATA:
-/// - Structures (cities, villages, caves, dungeons)
-/// - Activities (quests, events, resources)
+/// DataRegistry — единый источник данных для:
+/// - SubBiomeData
+/// - StructureData
+/// - ActivityData
+///
+/// Биомы НЕ загружаются здесь, а загружаются через BiomeDB.
 /// 
-/// NOTE:
-/// Sub-biomes are NO LONGER LOADED from JSON.
-/// They are fully handled by TileGenerator:
-///   - biome influence
-///   - mask-based transitions
-///   - inner blend zones
-/// 
-/// Biome visual data is now loaded by BiomeDB (not DataRegistry).
-/// 
-/// DataRegistry should NEVER contain visual data.
-/// It only contains pure DATA used by game logic.
-/// 
-/// Architecture Goal:
-/// DataRegistry = GAME DATA
-/// BiomeDB     = WORLD VISUAL / GENERATOR DATA
-/// TileGenerator / TileRenderer handle visual-generation.
+/// JSON-файлы (опциональные):
+/// Resources/WorldData/subbiomes.json
+/// Resources/WorldData/structures.json
+/// Resources/WorldData/activities.json
 /// </summary>
 public static class DataRegistry
 {
-    // GAME DATA ONLY
-    public static Dictionary<string, StructureData> Structures = new();
-    public static Dictionary<string, ActivityData> Activities = new();
+    private static bool loaded = false;
 
-    public static Dictionary<string, BiomeData> Biomes = new(); 
-    // (Optional: keep BiomeData if used elsewhere in game logic, not visuals)
+    public static readonly Dictionary<string, SubBiomeData> SubBiomes = new();
+    public static readonly Dictionary<string, StructureData> Structures = new();
+    public static readonly Dictionary<string, ActivityData> Activities = new();
 
     // ============================================================
-    // LOAD ALL JSON DATA FROM RESOURCES
+    // Public API
     // ============================================================
 
-    public static void LoadAll()
+    public static SubBiomeData GetSubBiome(string id)
+        => (id != null && SubBiomes.TryGetValue(id, out var sb)) ? sb : null;
+
+    public static StructureData GetStructure(string id)
+        => (id != null && Structures.TryGetValue(id, out var st)) ? st : null;
+
+    public static ActivityData GetActivity(string id)
+        => (id != null && Activities.TryGetValue(id, out var ac)) ? ac : null;
+
+    public static void EnsureLoaded()
     {
-        LoadBiomes();       // optional
+        if (loaded) return;
+
+        LoadSubBiomes();
         LoadStructures();
         LoadActivities();
+
+        loaded = true;
     }
 
     // ============================================================
-    // BIOMES (optional – logic only)
+    // Loaders
     // ============================================================
 
-    private static void LoadBiomes()
+    private static void LoadSubBiomes()
     {
-        var json = Resources.Load<TextAsset>("WorldData/biomes");
+        TextAsset json = Resources.Load<TextAsset>("WorldData/subbiomes");
         if (json == null)
         {
-            Debug.LogWarning("[DataRegistry] biomes.json not found.");
+            // Debug.LogWarning("[DataRegistry] subbiomes.json not found — optional.");
             return;
         }
 
-        var col = JsonUtility.FromJson<BiomeDataCollection>(json.text);
-
-        Biomes.Clear();
-        foreach (var b in col.biomes)
-            Biomes[b.id] = b;
+        try
+        {
+            var list = JsonUtility.FromJson<SubBiomeDataList>(json.text);
+            if (list?.subbiomes != null)
+            {
+                foreach (var s in list.subbiomes)
+                {
+                    if (!string.IsNullOrEmpty(s.id))
+                        SubBiomes[s.id] = s;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("[DataRegistry] subbiomes.json parse FAILED: " + e.Message);
+        }
     }
-
-    // ============================================================
-    // STRUCTURES (cities, villages, caves, ruins...)
-    // ============================================================
 
     private static void LoadStructures()
     {
-        var json = Resources.Load<TextAsset>("WorldData/structures");
+        TextAsset json = Resources.Load<TextAsset>("WorldData/structures");
         if (json == null)
         {
-            Debug.LogWarning("[DataRegistry] structures.json not found.");
+            // Debug.LogWarning("[DataRegistry] structures.json not found — optional.");
             return;
         }
 
-        var col = JsonUtility.FromJson<StructureDataCollection>(json.text);
-
-        Structures.Clear();
-        foreach (var s in col.structures)
-            Structures[s.id] = s;
+        try
+        {
+            var list = JsonUtility.FromJson<StructureDataList>(json.text);
+            if (list?.structures != null)
+            {
+                foreach (var s in list.structures)
+                {
+                    if (!string.IsNullOrEmpty(s.id))
+                        Structures[s.id] = s;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("[DataRegistry] structures.json parse FAILED: " + e.Message);
+        }
     }
-
-    // ============================================================
-    // ACTIVITIES (events, quests, interactions)
-    // ============================================================
 
     private static void LoadActivities()
     {
-        var json = Resources.Load<TextAsset>("WorldData/activities");
+        TextAsset json = Resources.Load<TextAsset>("WorldData/activities");
         if (json == null)
         {
-            Debug.LogWarning("[DataRegistry] activities.json not found.");
+            // Debug.LogWarning("[DataRegistry] activities.json not found — optional.");
             return;
         }
 
-        var col = JsonUtility.FromJson<ActivityDataCollection>(json.text);
-
-        Activities.Clear();
-        foreach (var a in col.activities)
-            Activities[a.id] = a;
+        try
+        {
+            var list = JsonUtility.FromJson<ActivityDataCollection>(json.text);
+            if (list?.activities != null)
+            {
+                foreach (var a in list.activities)
+                {
+                    if (!string.IsNullOrEmpty(a.id))
+                        Activities[a.id] = a;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("[DataRegistry] activities.json parse FAILED: " + e.Message);
+        }
     }
 }

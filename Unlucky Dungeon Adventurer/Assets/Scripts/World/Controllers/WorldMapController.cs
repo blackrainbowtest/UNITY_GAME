@@ -130,7 +130,7 @@ public class WorldMapController : MonoBehaviour
             seed = 10000;
         }
 
-        Debug.Log($"[WorldMap] Initializing world with seed = {seed}");
+        // Debug.Log($"[WorldMap] Initializing world with seed = {seed}");
 
         // 1) Create world generator
         generator = new WorldGenerator(seed);
