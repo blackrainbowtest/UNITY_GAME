@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -7,28 +8,30 @@ public class TileData
     public int x;
     public int y;
 
-    // Main
-    public string biomeId;
-    public string subBiomeId;
+    // biome & sub-biomes
+    public string biomeId;            // основной биом
+    public string biomeSpriteId;      // случайный вариант спрайта биома
 
-    // TODO: Structures (e.g. village, bandit camp, cave)
+    public List<string> subBiomeIds;  // подбиомы по уровням силы
+    public byte biomeMask;            // битовая маска соседей (0-255)
+
+    // Structures
     public string structureId;
 
-    // Геймплейные свойства
-    public float moveCost;          // How much time/energy does it take to take a step?
-    public float eventChance;     // chance of an event on a tile
-    public float goodEventChance; // chance of a good event
-    public float badEventChance;  // chance of a bad event
+    // Gameplay
+    public float moveCost;
+    public float eventChance;
+    public float goodEventChance;
+    public float badEventChance;
 
-    public Color color;           // tile color (for minimap)
-	public string spriteId;       // PNG recourse key
-
-    // Empty constructor
-    public TileData() { }
+    // Visual fallback
+    public Color color;
 
     public TileData(int x, int y)
     {
         this.x = x;
         this.y = y;
+
+        subBiomeIds = new List<string>();
     }
 }

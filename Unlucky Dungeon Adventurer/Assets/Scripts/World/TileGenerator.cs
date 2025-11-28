@@ -1,93 +1,117 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class TileGenerator
 {
-	/// <summary>
-	/// Main method: Given (x,y) and the world seed, returns a tile.
-	/// </summary>
     public static TileData GenerateTile(int x, int y, int worldSeed)
     {
         BiomeDB.EnsureLoaded();
 
-        // Deterministic randomness for a specific tile:
+        // Deterministic RNG for tile
         int hash = HashCoords(x, y, worldSeed);
         System.Random rng = new System.Random(hash);
 
-        // 1. Selecting a biome based on Perlin noise
+        // 1. Determine biome
         string biomeId = ChooseBiomeId(x, y, worldSeed);
         BiomeConfig biome = BiomeDB.GetBiome(biomeId);
 
-        // If suddenly the biome is not found, there is a backup
         if (biome == null)
         {
-            biomeId = "plains"; // default
+            biomeId = "plains";
             biome = BiomeDB.GetBiome(biomeId);
         }
 
-        // 2. Select a sub-biome (if any)
-        string subBiomeId = null;
-        SubBiomeConfig subBiome = null;
+        // 2. Create tile
+        TileData tile = new TileData(x, y);
+        tile.biomeId = biomeId;
 
-        if (biome != null && biome.subbiomes != null && biome.subbiomes.Length > 0)
+        // Select random biome sprite variant (biome_01..05)
+        int variant = rng.Next(1, 6);
+        tile.biomeSpriteId = $"{biomeId}_{variant:00}";
+
+        // Prepare sub-biomes list
+        tile.subBiomeIds = new List<string>();
+
+        // 3. Dominant neighboring biome
+        string dominant = BiomeInfluence.GetDominantNeighbor(
+            ChooseBiomeId,
+            x, y,
+            biomeId
+        );
+
+        if (dominant != null)
         {
-            int idx = rng.Next(0, biome.subbiomes.Length);
-            var candidateId = biome.subbiomes[idx];
-            var candidate = BiomeDB.GetSubBiome(candidateId);
-            // Apply sub-biome only if chance passes; otherwise keep base biome
-            float chance = Mathf.Clamp01(candidate?.spawnChance ?? 1f);
-            if ((float)rng.NextDouble() < chance)
-            {
-                subBiomeId = candidateId;
-                subBiome = candidate;
-            }
+            // Mask
+            byte mask = BiomeMaskUtils.GetMask(
+                ChooseBiomeId,
+                x, y,
+                biomeId
+            );
+
+            tile.biomeMask = mask;
+
+            // Main transition tile: sub_forest_26
+            string subId = $"sub_{dominant}_{mask}";
+            tile.subBiomeIds.Add(subId);
+
+            // Transition zone (2–3 tiles)
+            AddBlendZone(tile, x, y, biomeId, dominant, worldSeed);
         }
 
-        // 3. Fill TileData
-        TileData tile = new TileData();
-        tile.x = x;
-        tile.y = y;
-        tile.biomeId = biomeId;
-        tile.subBiomeId = subBiomeId;
-        tile.structureId = null;              // later: cities, caves, etc.
+        // 4. Structures (later)
+        tile.structureId = null;
 
-        // Basic parameters from the biome + some noise
-        float noiseFactor = 0.8f + (float)rng.NextDouble() * 0.4f; // 0.8..1.2
+        // 5. Gameplay stats
+        float noiseFactor = 0.8f + (float)rng.NextDouble() * 0.4f;
 
         tile.moveCost = (biome?.moveCost ?? 1f) * noiseFactor;
         tile.eventChance = (biome?.eventChance ?? 0.1f) * noiseFactor;
         tile.goodEventChance = biome?.goodChance ?? 0.5f;
         tile.badEventChance = biome?.badChance ?? 0.5f;
 
-        // Color for minimap: priority subbiome, otherwise biome
-        string colorHex = subBiome?.mapColor ?? biome?.mapColor ?? "#777777";
-        tile.color = HexToColor(colorHex);
-
-        // Sprite: subbiome priority, otherwise biome id
-        tile.spriteId = subBiome?.spriteId ?? biomeId;
+        // 6. Minimap color
+        tile.color = HexToColor(biome.mapColor);
 
         return tile;
     }
 
-	/// <summary>
-    /// Выбор биома по Perlin noise (очень простое правило, его легко поменять потом).
-    /// </summary>
+    private static void AddBlendZone(
+        TileData tile,
+        int x, int y,
+        string centerBiome,
+        string dominant,
+        int seed)
+    {
+        System.Random rng = new System.Random(seed * (x + 2137) * (y + 9157));
+
+        int radius = rng.Next(2, 4); // zone 2–3 tiles
+
+        for (int i = 1; i <= radius; i++)
+        {
+            float density = 1f - (i / (radius + 1f));
+
+            if (rng.NextDouble() < density)
+            {
+                string layered = $"sub_{dominant}_inner_{i}";
+                tile.subBiomeIds.Add(layered);
+            }
+        }
+    }
+
     private static string ChooseBiomeId(int x, int y, int worldSeed)
     {
-        float scale = 0.025f; // чем меньше, тем “более плавные” области
+        float scale = 0.025f;
         float nx = (x + worldSeed * 0.13f) * scale;
         float ny = (y - worldSeed * 0.07f) * scale;
 
-        float n = Mathf.PerlinNoise(nx, ny); // 0..1
+        float n = Mathf.PerlinNoise(nx, ny);
 
-        // Примитивная схема распределения
         if (n < 0.18f) return "desert";
         if (n < 0.35f) return "plains";
         if (n < 0.65f) return "forest";
         if (n < 0.82f) return "mountains";
         if (n < 0.95f) return "tundra";
-
-        // Крайние участки — шанс пещер / чего-то особенного
         return "cave";
     }
 
@@ -118,76 +142,5 @@ public static class TileGenerator
         byte b = byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
 
         return new Color32(r, g, b, 255);
-    }
-
-
-
-
-
-
-
-    // ========================================================
-    // Auxiliary methods
-    // ========================================================
-
-    // Hash to make the seed unique for each cell
-    private static int Hash(int x, int y, int seed)
-    {
-        unchecked
-        {
-            int h = seed;
-            h = h * 31 + x;
-            h = h * 31 + y;
-            return h;
-        }
-    }
-
-    private static string PickBiome(int seed)
-    {
-        var list = DataRegistry.Biomes;
-        int index = Mathf.Abs(seed) % list.Count;
-        int i = 0;
-        foreach (var kv in list)
-        {
-            if (i == index) return kv.Key;
-            i++;
-        }
-        return "Forest";
-    }
-
-    private static string PickSubBiome(string biomeId, int seed)
-    {
-        // Search for all subbiomes with parent == biomeId
-        var list = DataRegistry.SubBiomes;
-        var matches = new System.Collections.Generic.List<string>();
-
-        foreach (var sb in list.Values)
-        {
-            if (sb.parent == biomeId)
-                matches.Add(sb.id);
-        }
-
-        if (matches.Count == 0)
-            return null;
-
-        return matches[Mathf.Abs(seed) % matches.Count];
-    }
-
-    private static string PickStructure(int seed)
-    {
-        // 90% - nothing
-        if ((seed % 1000) < 900)
-            return null;
-
-        var list = DataRegistry.Structures;
-        int index = Mathf.Abs(seed) % list.Count;
-
-        int i = 0;
-        foreach (var kv in list)
-        {
-            if (i == index) return kv.Key;
-            i++;
-        }
-        return null;
     }
 }

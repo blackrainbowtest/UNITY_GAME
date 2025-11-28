@@ -1,98 +1,116 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TileRenderer : MonoBehaviour
 {
-    public SpriteRenderer sr;
+    [Header("Assigned Automatically")]
     public TileSpriteDB spriteDB;
 
-    private static Sprite _fallbackSprite;
-
-    private static Sprite GetFallbackSprite()
-    {
-        if (_fallbackSprite != null)
-            return _fallbackSprite;
-
-        // Unity already has a built-in white 1x1 texture: Texture2D.whiteTexture
-        var tex = Texture2D.whiteTexture;
-
-        // Create sprite safely (pivot center, PPU = 32)
-        _fallbackSprite = Sprite.Create(
-            tex,
-            new Rect(0, 0, 1, 1),
-            new Vector2(0.5f, 0.5f),
-            32,
-            0,
-            SpriteMeshType.FullRect
-        );
-
-        _fallbackSprite.name = "__FallbackTileSprite";
-        return _fallbackSprite;
-    }
+    [Header("Sprite Renderers (auto-created)")]
+    public SpriteRenderer biomeRenderer;         // Order 0
+    public SpriteRenderer sub1Renderer;          // Order 1
+    public SpriteRenderer sub2Renderer;          // Order 2
+    public SpriteRenderer sub3Renderer;          // Order 3
+    public SpriteRenderer structureRenderer;     // Order 4
+    public SpriteRenderer activityRenderer;      // Order 5
 
     private void Awake()
     {
-        // Auto-load spriteDB once
         if (spriteDB == null)
         {
             spriteDB = Resources.Load<TileSpriteDB>("WorldData/TileSpriteDB");
-
-            if (spriteDB == null)
-            {
-                Debug.LogWarning("[TileRenderer] TileSpriteDB not found in Resources. Using fallback rendering.");
-            }
         }
+
+        CreateLayersIfMissing();
     }
 
+    private void CreateLayersIfMissing()
+    {
+        biomeRenderer      = EnsureLayer("BiomeLayer",      0, ref biomeRenderer);
+        sub1Renderer       = EnsureLayer("SubBiomeLayer1",  1, ref sub1Renderer);
+        sub2Renderer       = EnsureLayer("SubBiomeLayer2",  2, ref sub2Renderer);
+        sub3Renderer       = EnsureLayer("SubBiomeLayer3",  3, ref sub3Renderer);
+        structureRenderer  = EnsureLayer("StructureLayer",  4, ref structureRenderer);
+        activityRenderer   = EnsureLayer("ActivityLayer",   5, ref activityRenderer);
+    }
+
+    private SpriteRenderer EnsureLayer(string name, int order, ref SpriteRenderer field)
+    {
+        if (field != null) return field;
+
+        Transform child = transform.Find(name);
+        if (child != null)
+        {
+            field = child.GetComponent<SpriteRenderer>();
+            field.sortingOrder = order;
+            return field;
+        }
+
+        // Create new
+        GameObject obj = new GameObject(name);
+        obj.transform.parent = transform;
+        obj.transform.localPosition = Vector3.zero;
+
+        SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
+        sr.sortingOrder = order;
+
+        field = sr;
+        return sr;
+    }
+
+    // ------------------------------------------
+    //               MAIN RENDER
+    // ------------------------------------------
     public void RenderTile(TileData data)
     {
-        if (sr == null)
+        if (spriteDB == null)
         {
-            Debug.LogError("[TileRenderer] SpriteRenderer not assigned.");
+            Debug.LogError("[TileRenderer] Missing spriteDB");
             return;
         }
 
-        if (spriteDB == null)
+        // BASE BIOME LAYER ----------------------
+        biomeRenderer.sprite = spriteDB.Get(data.biomeSpriteId);
+        biomeRenderer.color = Color.white;
+
+        // SUB-BIOME LAYERS ----------------------
+        SpriteRenderer[] subRenderers = {
+            sub1Renderer, sub2Renderer, sub3Renderer
+        };
+
+        for (int i = 0; i < subRenderers.Length; i++)
         {
-            // Try to auto-load from Resources (common path: Resources/WorldData/ or Resources/)
-            spriteDB = Resources.Load<TileSpriteDB>("WorldData/TileSpriteDB") ?? Resources.Load<TileSpriteDB>("TileSpriteDB");
-            if (spriteDB == null)
+            if (data.subBiomeIds != null && i < data.subBiomeIds.Count)
             {
-                Debug.LogError("[TileRenderer] spriteDB is not assigned on the TileRenderer and no TileSpriteDB found in Resources. Using existing sprite on SpriteRenderer or color fallback.");
-                if (sr.sprite == null)
-                {
-                    // keep tile visible by tinting an existing sprite if any; otherwise leave sprite null so color fallback can apply elsewhere
-                    // We do not overwrite sr.sprite here to avoid making tiles invisible; ensure prefab SpriteRenderer has a default sprite if possible.
-                }
-                sr.color = data.color;
-                return;
+                string id = data.subBiomeIds[i];
+                Sprite sp = spriteDB.Get(id);
+                subRenderers[i].sprite = sp;
+                subRenderers[i].color = Color.white;
             }
             else
             {
-                Debug.Log("[TileRenderer] Auto-loaded TileSpriteDB from Resources.");
+                subRenderers[i].sprite = null;
             }
         }
 
-        Sprite sprite = spriteDB.Get(data.spriteId);
-
-        if (sprite != null)
+        // STRUCTURE LAYER -----------------------
+        if (!string.IsNullOrEmpty(data.structureId))
         {
-            sr.sprite = sprite;
-            sr.color = Color.white;
+            structureRenderer.sprite = spriteDB.Get(data.structureId);
         }
         else
         {
-            // fallback: if the SpriteRenderer already has a sprite (e.g., from the prefab), keep it and tint it;
-            // otherwise keep sprite null and use color tint as fallback (ensure prefab has a default sprite to be visible).
-            if (sr.sprite != null)
-            {
-                sr.color = data.color;
-            }
-            else
-            {
-                sr.sprite = null; // leave null; WorldMapController may create/assign placeholder sprites
-                sr.color = data.color;
-            }
+            structureRenderer.sprite = null;
         }
-            // Debug.LogWarning($"[TileRenderer] Sprite for id '{data.spriteId}' not found in spriteDB. Using color fallback.");
+
+        // ACTIVITY LAYER ------------------------
+        if (!string.IsNullOrEmpty(data.activityId))
+        {
+            activityRenderer.sprite = spriteDB.Get(data.activityId);
+        }
+        else
+        {
+            activityRenderer.sprite = null;
+        }
     }
 }
