@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -8,25 +7,25 @@ public class TileData
     public int x;
     public int y;
 
-    // biome & sub-biomes
-    public string biomeId;            // основной биом
-    public string biomeSpriteId;      // случайный вариант спрайта биома
+    // BIOME (BASE LAYER)
+    public string biomeId;          // лес, пустыня, тундра
+    public string biomeSpriteId;    // forest_01, desert_02 (вариантность)
 
-    public List<string> subBiomeIds;  // подбиомы по уровням силы
-    public byte biomeMask;            // битовая маска соседей (0-255)
+    // TILESET EDGE (TRANSITION)
+    public string edgeBiome;        // какой биом "вторгается" (dominant)
+    public byte edgeMask;           // mask 0–255 для tileset lookup
 
-    // Structures
+    // STRUCTURE & ACTIVITY (пока не трогаем)
     public string structureId;
-    // Activity (optional overlay/icon)
     public string activityId;
 
-    // Gameplay
+    // GAMEPLAY
     public float moveCost;
     public float eventChance;
     public float goodEventChance;
     public float badEventChance;
 
-    // Visual fallback
+    // fallback minimap color
     public Color color;
 
     public TileData(int x, int y)
@@ -34,6 +33,7 @@ public class TileData
         this.x = x;
         this.y = y;
 
-        subBiomeIds = new List<string>();
+        edgeMask = 0;
+        edgeBiome = null;
     }
 }

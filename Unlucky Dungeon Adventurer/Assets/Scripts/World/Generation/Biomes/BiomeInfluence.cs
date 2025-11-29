@@ -8,19 +8,22 @@ public static class BiomeInfluence
         int x, int y,
         string centerBiome)
     {
-        Dictionary<string,int> score = new();
+        Dictionary<string, int> score = new();
 
-        // 8 направлений
+        // Только 4 стороны — идеально для tileset переходов
         int[,] dirs =
         {
-            {0,1}, {0,-1}, {-1,0}, {1,0},
-            {-1,1}, {1,1}, {-1,-1}, {1,-1}
+            { 0,  1 },   // N
+            { 0, -1 },   // S
+            { -1, 0 },   // W
+            { 1,  0 }    // E
         };
 
         for (int i = 0; i < dirs.GetLength(0); i++)
         {
-            int nx = x + dirs[i,0];
-            int ny = y + dirs[i,1];
+            int nx = x + dirs[i, 0];
+            int ny = y + dirs[i, 1];
+
             string nb = biomeGetter(nx, ny);
 
             if (nb == null || nb == centerBiome)
@@ -37,7 +40,6 @@ public static class BiomeInfluence
         if (score.Count == 0)
             return null;
 
-        // return key with max score
         string bestBiome = null;
         int bestValue = -1;
 

@@ -6,14 +6,14 @@ using TMPro;
 /// WorldMapController is responsible for:
 /// - Creating and managing world tiles around the camera.
 /// - Maintaining a cache of visible tiles to avoid redundant instantiation.
-/// - Using WorldGenerator to fetch TileData (biome, sub-biomes, structures).
+/// - Using WorldGenerator to fetch TileData (biomes, edge blending, structures).
 /// - Rendering tiles via TileRenderer (multi-layer rendering).
 /// - Updating minimap (if assigned).
 /// - Tracking player position and updating UI.
-/// 
+///
 /// This controller does NOT handle:
 /// - Tile art logic (TileGenerator + TileRenderer handle that)
-/// - Biome/SubBiome logic (BiomeInfluence, BiomeMaskUtils)
+/// - Biome blending logic (BiomeInfluence, BiomeMaskUtils)
 /// - Save/load logic (GameManager, SaveManager)
 ///
 /// Architecture goal:
@@ -32,10 +32,10 @@ public class WorldMapController : MonoBehaviour
     public TextMeshProUGUI locationText;
 
     [Header("Tile Rendering Settings")]
-    public int viewRadius = 15;          // how many tiles around camera to render
-    public GameObject tilePrefab;        // base tile prefab (must contain TileRenderer)
-    public Transform tileContainer;      // parent for tile instances
-    public float tileSize = 1f;          // world size of a tile
+    public int viewRadius = 15;
+    public GameObject tilePrefab;
+    public Transform tileContainer;
+    public float tileSize = 1f;
 
     [Header("Player Marker")]
     public PlayerMarkerController playerMarker;
@@ -47,9 +47,9 @@ public class WorldMapController : MonoBehaviour
     // Internal State
     // ============================================================
 
-    private Dictionary<Vector2Int, GameObject> visibleTiles; // active world tiles
-    private WorldGenerator generator;                        // generates TileData
-    private Vector2Int playerTilePos;                        // tile under camera
+    private Dictionary<Vector2Int, GameObject> visibleTiles;
+    private WorldGenerator generator;
+    private Vector2Int playerTilePos;
     private bool waitingForPlayer = false;
 
     private static GameObject runtimeTilePrefabTemplate = null;
@@ -61,16 +61,14 @@ public class WorldMapController : MonoBehaviour
 
     private void Start()
     {
-        // Protect from duplicate controllers
         var controllers = FindObjectsByType<WorldMapController>(FindObjectsSortMode.None);
         if (controllers.Length > 1 && controllers[0] != this)
         {
-            Debug.LogWarning($"[WorldMap] Duplicate controller found – disabling this instance.");
+            Debug.LogWarning("[WorldMap] Duplicate controller found – disabling this instance.");
             this.enabled = false;
             return;
         }
 
-        // If game not initialized yet — wait for event
         if (!GameInitializer.IsInitialized())
         {
             Debug.Log("[WorldMap] Waiting for GameInitializer...");
@@ -89,7 +87,7 @@ public class WorldMapController : MonoBehaviour
 
 
     // ============================================================
-    // Main Initialization (after GameManager & Player loaded)
+    // Main Initialization
     // ============================================================
 
     private void ContinueInitialization()
@@ -101,7 +99,6 @@ public class WorldMapController : MonoBehaviour
             return;
         }
 
-        // Wait for player data
         if (GameData.CurrentPlayer == null)
         {
             if (!waitingForPlayer)
@@ -113,7 +110,6 @@ public class WorldMapController : MonoBehaviour
             return;
         }
 
-        // If loading from autosave-in-progress
         if (TempSaveCache.pendingSave != null)
         {
             Debug.Log("[WorldMap] Applying pending save...");
@@ -122,7 +118,6 @@ public class WorldMapController : MonoBehaviour
             UIEvents.InvokePlayerLoaded();
         }
 
-        // Validate seed
         int seed = GameData.CurrentPlayer.worldSeed;
         if (seed < 10000)
         {
@@ -130,15 +125,10 @@ public class WorldMapController : MonoBehaviour
             seed = 10000;
         }
 
-        // Debug.Log($"[WorldMap] Initializing world with seed = {seed}");
-
-        // 1) Create world generator
         generator = new WorldGenerator(seed);
 
-        // 2) Prepare cache for active tiles
         visibleTiles = new Dictionary<Vector2Int, GameObject>();
 
-        // 3) Init minimap
         Vector2Int playerTile = new Vector2Int(
             Mathf.RoundToInt(GameData.CurrentPlayer.mapPosX),
             Mathf.RoundToInt(GameData.CurrentPlayer.mapPosY)
@@ -151,16 +141,11 @@ public class WorldMapController : MonoBehaviour
             minimap.OnMinimapCenterDragged += HandleMinimapDrag;
         }
 
-        // 4) Autosave
         TryAutoSaveOnEnter();
 
-        // 5) Populate world around camera
         UpdateMapAroundCamera();
-
-        // 6) Create player marker
         InitializePlayerMarker();
 
-        // 7) Initial minimap render
         RefreshMinimapTiles();
         minimap?.DrawPlayerMarker(playerTile);
     }
@@ -174,7 +159,7 @@ public class WorldMapController : MonoBehaviour
 
 
     // ============================================================
-    // Per-frame updates (camera movement)
+    // Per-frame updates
     // ============================================================
 
     private void Update()
@@ -230,7 +215,7 @@ public class WorldMapController : MonoBehaviour
 
 
     // ============================================================
-    // Main tile update logic (spawning & removing tiles)
+    // Tile update logic
     // ============================================================
 
     private void UpdateMapAroundCamera()
@@ -249,7 +234,6 @@ public class WorldMapController : MonoBehaviour
             }
         }
 
-        // Remove tiles that left the view radius
         List<Vector2Int> toRemove = new();
         foreach (var kv in visibleTiles)
         {
@@ -264,16 +248,15 @@ public class WorldMapController : MonoBehaviour
         }
     }
 
+
     // ============================================================
-    // Tile spawning (instantiating the prefab + rendering)
+    // Tile spawning
     // ============================================================
 
     private void SpawnTile(Vector2Int pos)
     {
-        // 1) Acquire tile data
         TileData data = generator.GetTile(pos.x, pos.y);
 
-        // 2) Ensure tile prefab available
         if (tilePrefab == null)
         {
             tilePrefab = Resources.Load<GameObject>("WorldData/TilePrefab") ??
@@ -283,20 +266,14 @@ public class WorldMapController : MonoBehaviour
             {
                 if (runtimeTilePrefabTemplate == null)
                 {
-                    Debug.LogWarning("[WorldMap] No tilePrefab assigned. Creating runtime prefab template.");
                     runtimeTilePrefabTemplate = new GameObject("TilePrefabRuntime");
-
-                    // Add TileRenderer only; it will auto-create internal render layers
                     runtimeTilePrefabTemplate.AddComponent<TileRenderer>();
-
                     runtimeTilePrefabTemplate.SetActive(false);
                 }
-
                 tilePrefab = runtimeTilePrefabTemplate;
             }
         }
 
-        // 3) Instantiate tile
         Transform parent = tileContainer != null ? tileContainer : this.transform;
         GameObject obj = Instantiate(tilePrefab, parent);
 
@@ -304,7 +281,6 @@ public class WorldMapController : MonoBehaviour
         obj.transform.localScale = new Vector3(tileSize, tileSize, 1f);
         obj.SetActive(true);
 
-        // 4) Render using new multi-layer TileRenderer
         TileRenderer tr = obj.GetComponent<TileRenderer>();
         if (tr == null)
         {
@@ -315,7 +291,6 @@ public class WorldMapController : MonoBehaviour
             tr.RenderTile(data);
         }
 
-        // 5) Update minimap tile color
         minimap?.UpdateTile(pos, data.color);
 
         visibleTiles[pos] = obj;
@@ -359,18 +334,17 @@ public class WorldMapController : MonoBehaviour
 
         TileData tile = generator.GetTile(coords.x, coords.y);
 
-        // Get localized biome name
         LanguageManager.LoadLanguage("biomes_" + LanguageManager.CurrentLanguage);
         string biomeName = LanguageManager.Get(tile.biomeId);
 
-        // Determine dominant sub-biome (if any)
-        string subBiome = "";
-        if (tile.subBiomeIds != null && tile.subBiomeIds.Count > 0)
+        string transition = "";
+        if (tile.edgeMask != 0 && !string.IsNullOrEmpty(tile.edgeBiome))
         {
-            subBiome = LanguageManager.Get(tile.subBiomeIds[0]);
+            string edgeName = LanguageManager.Get(tile.edgeBiome);
+            transition = $" → {edgeName}";
         }
 
-        locationText.text = $"{biomeName} {subBiome}\n(X: {coords.x}, Y: {coords.y})";
+        locationText.text = $"{biomeName}{transition}\n(X: {coords.x}, Y: {coords.y})";
     }
 
 
@@ -457,31 +431,23 @@ public class WorldMapController : MonoBehaviour
         }
     }
 
-    // NEW: плавное перетаскивание миникарты
     private void HandleMinimapDrag(Vector2 worldCenter)
     {
         if (Camera.main == null)
             return;
 
-        // worldCenter — координаты центра карты в тайлах (могут быть дробные)
-        float tx = worldCenter.x;
-        float ty = worldCenter.y;
-
-        // конвертация тайлов → мировые координаты
         Vector3 target = new Vector3(
-            tx * tileSize,
-            ty * tileSize,
+            worldCenter.x * tileSize,
+            worldCenter.y * tileSize,
             Camera.main.transform.position.z
         );
 
-        // Плавное перемещение камеры к точке
         Camera.main.transform.position = Vector3.Lerp(
             Camera.main.transform.position,
             target,
-            0.15f   // степень плавности
+            0.15f
         );
 
-        // Обновление логики карты вокруг камеры
         Vector2Int newTilePos = new(
             Mathf.FloorToInt(Camera.main.transform.position.x / tileSize),
             Mathf.FloorToInt(Camera.main.transform.position.y / tileSize)

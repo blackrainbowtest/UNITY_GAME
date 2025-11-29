@@ -2,35 +2,37 @@ using System;
 
 public static class BiomeMaskUtils
 {
-    // Битовые значения по 8 направлениям
-    private const byte TOP = 2;
-    private const byte BOTTOM = 8;
-    private const byte LEFT = 16;
-    private const byte RIGHT = 32;
-    private const byte TOP_LEFT = 1;
-    private const byte TOP_RIGHT = 4;
-    private const byte BOT_LEFT = 64;
-    private const byte BOT_RIGHT = 128;
+    // Bit flags for 8-direction autotiling
+    private const byte N  = 1;    // y+1
+    private const byte S  = 2;    // y-1
+    private const byte W  = 4;    // x-1
+    private const byte E  = 8;    // x+1
 
-    public static byte GetMask(Func<int, int, string> biomeGetter, int x, int y, string centerBiome)
+    private const byte NW = 16;   // x-1, y+1
+    private const byte NE = 32;   // x+1, y+1
+    private const byte SW = 64;   // x-1, y-1
+    private const byte SE = 128;  // x+1, y-1
+
+    public static byte GetMask(Func<int,int,string> biomeGetter, int x, int y, string centerBiome)
     {
         byte mask = 0;
 
-        void Check(int dx, int dy, byte value)
+        bool Diff(int dx, int dy)
         {
-            string b = biomeGetter(x + dx, y + dy);
-            if (b != centerBiome && b != null) mask |= value;
+            return biomeGetter(x + dx, y + dy) != centerBiome;
         }
 
-        Check(0, 1, TOP);
-        Check(0, -1, BOTTOM);
-        Check(-1, 0, LEFT);
-        Check(1, 0, RIGHT);
+        // Cardinal
+        if (Diff(0, 1))  mask |= N;
+        if (Diff(0, -1)) mask |= S;
+        if (Diff(-1, 0)) mask |= W;
+        if (Diff(1, 0))  mask |= E;
 
-        Check(-1, 1, TOP_LEFT);
-        Check(1, 1, TOP_RIGHT);
-        Check(-1, -1, BOT_LEFT);
-        Check(1, -1, BOT_RIGHT);
+        // Diagonals
+        if (Diff(-1, 1))  mask |= NW;
+        if (Diff(1, 1))   mask |= NE;
+        if (Diff(-1, -1)) mask |= SW;
+        if (Diff(1, -1))  mask |= SE;
 
         return mask;
     }

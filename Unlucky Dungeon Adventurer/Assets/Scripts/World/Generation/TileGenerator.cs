@@ -5,16 +5,17 @@ using UnityEngine;
 public static class TileGenerator
 {
     private static TileSpriteDB _spriteDB;
-    private static readonly Dictionary<string, List<string>> _variantCache = new Dictionary<string, List<string>>();
+    private static readonly Dictionary<string, List<string>> _variantCache = new();
+
     public static TileData GenerateTile(int x, int y, int worldSeed)
     {
         BiomeDB.EnsureLoaded();
 
-        // Deterministic RNG for tile
+        // Deterministic RNG for variants
         int hash = HashCoords(x, y, worldSeed);
-        System.Random rng = new System.Random(hash);
+        System.Random rng = new(hash);
 
-        // 1. Determine biome
+        // 1) Base biome
         string biomeId = ChooseBiomeId(x, y, worldSeed);
         BiomeConfig biome = BiomeDB.GetBiome(biomeId);
 
@@ -24,75 +25,49 @@ public static class TileGenerator
             biome = BiomeDB.GetBiome(biomeId);
         }
 
-        // 2. Create tile
-        TileData tile = new TileData(x, y);
-        tile.biomeId = biomeId;
+        // Create tile
+        TileData tile = new TileData(x, y)
+        {
+            biomeId = biomeId
+        };
 
-        // Select biome sprite variant based on available entries in TileSpriteDB
+        // 2) Biome sprite variant (forest_01, _02 ...)
         tile.biomeSpriteId = PickBiomeVariantSpriteId(biomeId, rng);
 
-        // Prepare sub-biomes list
-        tile.subBiomeIds = new List<string>();
+        // 3) Edge detection (tileset transitions)
+        Func<int, int, string> biomeGetter = (ix, iy) => ChooseBiomeId(ix, iy, worldSeed);
 
-        // 3. Dominant neighboring biome
-        // Wrap ChooseBiomeId (нужен worldSeed) в лямбду без третьего аргумента
-        Func<int,int,string> biomeGetter = (ix, iy) => ChooseBiomeId(ix, iy, worldSeed);
-        string dominant = BiomeInfluence.GetDominantNeighbor(
-            biomeGetter,
-            x, y,
-            biomeId
-        );
+        string dominant = BiomeInfluence.GetDominantNeighbor(biomeGetter, x, y, biomeId);
 
-        if (dominant != null)
+        if (dominant != null && dominant != biomeId)
         {
             byte mask = BiomeMaskUtils.GetMask(biomeGetter, x, y, biomeId);
 
             if (mask != 0)
             {
-                string subId = $"sub_{dominant}_{mask}";
-                tile.subBiomeIds.Add(subId);
+                tile.edgeBiome = dominant; // чей tileset использовать
+                tile.edgeMask = mask;       // какой кусок tileset нужен
             }
         }
 
-        // 4. Structures (later)
+        // 4) Structures
         tile.structureId = null;
 
-        // 5. Gameplay stats
+        // 5) Gameplay stats
         float noiseFactor = 0.8f + (float)rng.NextDouble() * 0.4f;
 
-        tile.moveCost = (biome?.moveCost ?? 1f) * noiseFactor;
-        tile.eventChance = (biome?.eventChance ?? 0.1f) * noiseFactor;
+        tile.moveCost        = (biome?.moveCost ?? 1f)      * noiseFactor;
+        tile.eventChance     = (biome?.eventChance ?? 0.1f) * noiseFactor;
         tile.goodEventChance = biome?.goodChance ?? 0.5f;
-        tile.badEventChance = biome?.badChance ?? 0.5f;
+        tile.badEventChance  = biome?.badChance ?? 0.5f;
 
-        // 6. Minimap color
+        // Minimap color
         tile.color = HexToColor(biome.mapColor);
 
         return tile;
     }
 
-    private static void AddBlendZone(
-        TileData tile,
-        int x, int y,
-        string centerBiome,
-        string dominant,
-        int seed)
-    {
-        System.Random rng = new System.Random(seed * (x + 2137) * (y + 9157));
-
-        int radius = rng.Next(1, 1); // zone 2–3 tiles
-
-        for (int i = 1; i <= radius; i++)
-        {
-            float density = 1f - (i / (radius + 1f));
-
-            if (rng.NextDouble() < density)
-            {
-                string layered = $"sub_{dominant}_inner_{i}";
-                tile.subBiomeIds.Add(layered);
-            }
-        }
-    }
+    // ------------------------- Helpers -----------------------------
 
     private static string ChooseBiomeId(int x, int y, int worldSeed)
     {
@@ -110,25 +85,14 @@ public static class TileGenerator
         return "cave";
     }
 
-    private static void EnsureSpriteDB()
-    {
-        if (_spriteDB == null)
-        {
-            _spriteDB = Resources.Load<TileSpriteDB>("WorldData/TileSpriteDB");
-        }
-    }
-
     private static string PickBiomeVariantSpriteId(string biomeId, System.Random rng)
     {
-        // If there are explicitly provided variants like forest_01, forest_02
-        // choose among them; otherwise fallback to base biome id
         EnsureSpriteDB();
         if (_spriteDB == null)
             return biomeId;
 
         if (!_variantCache.TryGetValue(biomeId, out var list))
         {
-            // Expect variant ids to start with "{biomeId}_"
             list = _spriteDB.GetVariants(biomeId + "_");
             _variantCache[biomeId] = list ?? new List<string>();
         }
@@ -139,8 +103,13 @@ public static class TileGenerator
             return list[idx];
         }
 
-        // No dedicated variants found — use base biome id (TileSpriteDB.Get will fallback appropriately)
         return biomeId;
+    }
+
+    private static void EnsureSpriteDB()
+    {
+        if (_spriteDB == null)
+            _spriteDB = Resources.Load<TileSpriteDB>("WorldData/TileSpriteDB");
     }
 
     private static int HashCoords(int x, int y, int seed)

@@ -1,132 +1,71 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class TileRenderer : MonoBehaviour
 {
-    [Header("Assigned Automatically")]
-    public TileSpriteDB spriteDB;
+    [Header("Renderer layers")]
+    [SerializeField] private SpriteRenderer biomeRenderer; 
+    [SerializeField] private SpriteRenderer edgeRenderer;  
 
-    [Header("Sprite Renderers (auto-created)")]
-    public SpriteRenderer biomeRenderer;         // Order 0
-    public SpriteRenderer sub1Renderer;          // Order 1
-    public SpriteRenderer sub2Renderer;          // Order 2
-    public SpriteRenderer sub3Renderer;          // Order 3
-    public SpriteRenderer structureRenderer;     // Order 4
-    public SpriteRenderer activityRenderer;      // Order 5
+    [Header("Tileset Mapping")]
+    public Dictionary<string, TileSet> biomeTilesets;  // биом → tileset
+
+    private TileSet activeTileSet;
 
     private void Awake()
     {
-        if (spriteDB == null)
+        // Если мешает отсутствующий рендерер — создаём автоматически
+        if (biomeRenderer == null)
         {
-            spriteDB = Resources.Load<TileSpriteDB>("WorldData/TileSpriteDB");
+            GameObject obj = new GameObject("BiomeRenderer");
+            obj.transform.SetParent(transform);
+            biomeRenderer = obj.AddComponent<SpriteRenderer>();
+            biomeRenderer.sortingOrder = 0;
         }
 
-        CreateLayersIfMissing();
+        if (edgeRenderer == null)
+        {
+            GameObject obj = new GameObject("EdgeRenderer");
+            obj.transform.SetParent(transform);
+            edgeRenderer = obj.AddComponent<SpriteRenderer>();
+            edgeRenderer.sortingOrder = 1;
+        }
     }
 
-    private void CreateLayersIfMissing()
+    public void RenderTile(TileData tile)
     {
-        biomeRenderer      = EnsureLayer("BiomeLayer",      0, ref biomeRenderer);
-        sub1Renderer       = EnsureLayer("SubBiomeLayer1",  1, ref sub1Renderer);
-        sub2Renderer       = EnsureLayer("SubBiomeLayer2",  2, ref sub2Renderer);
-        sub3Renderer       = EnsureLayer("SubBiomeLayer3",  3, ref sub3Renderer);
-        structureRenderer  = EnsureLayer("StructureLayer",  4, ref structureRenderer);
-        activityRenderer   = EnsureLayer("ActivityLayer",   5, ref activityRenderer);
-    }
-
-    private SpriteRenderer EnsureLayer(string name, int order, ref SpriteRenderer field)
-    {
-        if (field != null) return field;
-
-        Transform child = transform.Find(name);
-        if (child != null)
+        // 1️⃣ --- РЕНДЕР ОСНОВНОГО БИОМА ---
+        Sprite biomeSprite = TileSpriteDB.Get(tile.biomeSpriteId);
+        if (biomeSprite == null)
         {
-            field = child.GetComponent<SpriteRenderer>();
-            field.sortingOrder = order;
-            return field;
+            Debug.LogWarning($"[TileRenderer] Missing biome sprite: {tile.biomeSpriteId}");
         }
+        biomeRenderer.sprite = biomeSprite;
 
-        // Create new
-        GameObject obj = new GameObject(name);
-        obj.transform.parent = transform;
-        obj.transform.localPosition = Vector3.zero;
-
-        SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
-        sr.sortingOrder = order;
-
-        field = sr;
-        return sr;
-    }
-
-    // ------------------------------------------
-    //               MAIN RENDER
-    // ------------------------------------------
-    public void RenderTile(TileData data)
-    {
-        if (spriteDB == null)
+        // 2️⃣ --- РЕНДЕР ПЕРЕХОДА (EDGEMASK) ---
+        if (tile.edgeMask != 0 && tile.edgeBiome != null)
         {
-            Debug.LogError("[TileRenderer] Missing spriteDB");
-            return;
-        }
-
-        // BASE BIOME LAYER ----------------------
-        Sprite biomeSprite = spriteDB.Get(data.biomeSpriteId);
-        if (biomeSprite != null)
-        {
-            biomeRenderer.sprite = biomeSprite;
-            biomeRenderer.color = Color.white;
-        }
-        else
-        {
-            biomeRenderer.sprite = null;
-        }
-
-        // SUB-BIOME LAYERS ----------------------
-        SpriteRenderer[] subRenderers = {
-            sub1Renderer, sub2Renderer, sub3Renderer
-        };
-
-        for (int i = 0; i < subRenderers.Length; i++)
-        {
-            if (data.subBiomeIds != null && i < data.subBiomeIds.Count)
+            if (!biomeTilesets.TryGetValue(tile.edgeBiome, out activeTileSet))
             {
-                string id = data.subBiomeIds[i];
-                Sprite sp = spriteDB.Get(id);
-                
-                if (sp != null)
-                {
-                    subRenderers[i].sprite = sp;
-                    subRenderers[i].color = Color.white;
-                }
-                else
-                {
-                    subRenderers[i].sprite = null;
-                }
+                Debug.LogWarning($"[TileRenderer] No tileset for biome {tile.edgeBiome}");
+                edgeRenderer.sprite = null;
+                return;
             }
-            else
+
+            int index = activeTileSet.GetIndexForMask(tile.edgeMask);
+            if (index < 0 || index >= activeTileSet.tiles.Length)
             {
-                subRenderers[i].sprite = null;
+                Debug.LogWarning($"[TileRenderer] Tileset index out of range: {index}");
+                edgeRenderer.sprite = null;
+                return;
             }
-        }
 
-        // STRUCTURE LAYER -----------------------
-        if (!string.IsNullOrEmpty(data.structureId))
-        {
-            structureRenderer.sprite = spriteDB.Get(data.structureId);
+            edgeRenderer.sprite = activeTileSet.tiles[index];
         }
         else
         {
-            structureRenderer.sprite = null;
-        }
-
-        // ACTIVITY LAYER ------------------------
-        if (!string.IsNullOrEmpty(data.activityId))
-        {
-            activityRenderer.sprite = spriteDB.Get(data.activityId);
-        }
-        else
-        {
-            activityRenderer.sprite = null;
+            // Нет перехода
+            edgeRenderer.sprite = null;
         }
     }
 }
