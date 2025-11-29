@@ -16,6 +16,53 @@ cave
 plains
 
 # ===================
+# BIOME VARIANTS (randomized base tiles)
+# ===================
+# Add PNGs named exactly as IDs below to enable variety
+
+# Forest variants
+forest_01
+forest_02
+forest_03
+forest_04
+forest_05
+
+# Desert variants
+desert_01
+desert_02
+desert_03
+desert_04
+desert_05
+
+# Tundra variants
+tundra_01
+tundra_02
+tundra_03
+tundra_04
+tundra_05
+
+# Mountains variants
+mountains_01
+mountains_02
+mountains_03
+mountains_04
+mountains_05
+
+# Cave variants
+cave_01
+cave_02
+cave_03
+cave_04
+cave_05
+
+# Plains variants
+plains_01
+plains_02
+plains_03
+plains_04
+plains_05
+
+# ===================
 # FORCE-DEFINED SUB-BIOMES (your PNG tiles)
 # ===================
 
