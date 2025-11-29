@@ -68,10 +68,26 @@ public static class TileSpriteDBTools
             return;
         }
 
+        // Collect required IDs (distinct, skip blanks/comments)
         var requiredIds = ParseIds(idsAsset.text);
         var spritesByName = FindAllSpritesByName();
 
-        var map = db.entries.ToDictionary(e => e.id, e => e);
+        // Build map defensively: de-duplicate existing entries by ID, prefer entries that already have a sprite
+        var map = new Dictionary<string, TileSpriteDB.Entry>();
+        foreach (var e in db.entries)
+        {
+            if (string.IsNullOrEmpty(e.id)) continue;
+            if (map.TryGetValue(e.id, out var existing))
+            {
+                // Prefer the one that has a sprite assigned
+                if (existing.sprite == null && e.sprite != null)
+                    map[e.id] = e;
+            }
+            else
+            {
+                map[e.id] = e;
+            }
+        }
         int added = 0, linked = 0, missing = 0;
 
         foreach (var id in requiredIds)
@@ -157,7 +173,7 @@ public static class TileSpriteDBTools
 
     private static List<string> ParseIds(string text)
     {
-        var result = new List<string>();
+        var set = new HashSet<string>(StringComparer.Ordinal);
         using (var sr = new StringReader(text))
         {
             string line;
@@ -166,10 +182,10 @@ public static class TileSpriteDBTools
                 line = line.Trim();
                 if (string.IsNullOrEmpty(line)) continue;
                 if (line.StartsWith("#")) continue;
-                result.Add(line);
+                set.Add(line);
             }
         }
-        return result;
+        return set.ToList();
     }
 }
 #endif

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 89c14c07ecd82f144a5e3d2a644a2c0b, type: 3}
-  m_Name: TileSpriteDB
+  m_Name: TileSpriteDB.backup
   m_EditorClassIdentifier: Assembly-CSharp::TileSpriteDB
   entries:
   - id: cave
@@ -105,6 +105,8 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - id: plains_green
     sprite: {fileID: 0}
+  - id: sub_cave_0
+    sprite: {fileID: 0}
   - id: sub_cave_10
     sprite: {fileID: 0}
   - id: sub_cave_127
@@ -117,7 +119,11 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - id: sub_cave_18
     sprite: {fileID: 0}
+  - id: sub_cave_2
+    sprite: {fileID: 0}
   - id: sub_cave_24
+    sprite: {fileID: 0}
+  - id: sub_cave_255
     sprite: {fileID: 0}
   - id: sub_cave_26
     sprite: {fileID: 0}
@@ -143,11 +149,15 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - id: sub_cave_7
     sprite: {fileID: 0}
+  - id: sub_cave_8
+    sprite: {fileID: 0}
   - id: sub_cave_inner_1
     sprite: {fileID: 0}
   - id: sub_cave_inner_2
     sprite: {fileID: 0}
   - id: sub_cave_inner_3
+    sprite: {fileID: 0}
+  - id: sub_desert_0
     sprite: {fileID: 0}
   - id: sub_desert_1
     sprite: {fileID: 0}
@@ -167,7 +177,11 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - id: sub_desert_18
     sprite: {fileID: 0}
+  - id: sub_desert_2
+    sprite: {fileID: 0}
   - id: sub_desert_24
+    sprite: {fileID: 0}
+  - id: sub_desert_255
     sprite: {fileID: 0}
   - id: sub_desert_26
     sprite: {fileID: 0}
@@ -187,6 +201,8 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - id: sub_desert_48
     sprite: {fileID: 0}
+  - id: sub_desert_5
+    sprite: {fileID: 0}
   - id: sub_desert_56
     sprite: {fileID: 0}
   - id: sub_desert_6
@@ -205,109 +221,230 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - id: sub_desert_inner_3
     sprite: {fileID: 0}
+  - id: sub_forest_0
+    sprite: {fileID: 7482667652216324306, guid: 2c0f0cd15121a2e41b50c739acb37455, type: 3}
   - id: sub_forest_1
     sprite: {fileID: 21300000, guid: 9cb3e0e6cc0e8e34294879c854322646, type: 3}
+  - id: "sub_forest_1    # TOP_LEFT \u0442\u043E\u043B\u044C\u043A\u043E"
+    sprite: {fileID: 0}
   - id: sub_forest_10
+    sprite: {fileID: 0}
+  - id: sub_forest_10   # TOP + BOTTOM (2+8)
     sprite: {fileID: 0}
   - id: sub_forest_11
     sprite: {fileID: 0}
+  - id: sub_forest_11   # TOP + TOP_LEFT + BOTTOM (2+1+8)
+    sprite: {fileID: 0}
   - id: sub_forest_111
+    sprite: {fileID: 0}
+  - id: "sub_forest_111  # \u0432\u0441\u0435 \u043A\u0440\u043E\u043C\u0435 LEFT
+      + BL (1+2+4+8+32+64 = 111)"
     sprite: {fileID: 0}
   - id: sub_forest_12
     sprite: {fileID: 0}
+  - id: sub_forest_12   # BOTTOM + TOP_RIGHT (8+4)
+    sprite: {fileID: 0}
   - id: sub_forest_127
+    sprite: {fileID: 7482667652216324306, guid: 2c0f0cd15121a2e41b50c739acb37455, type: 3}
+  - id: "sub_forest_127  # \u0432\u0441\u0435 \u043A\u0440\u043E\u043C\u0435 BR (\u0432\u0441\u0435
+      7 \u0438\u0437 8)"
     sprite: {fileID: 0}
   - id: sub_forest_128
     sprite: {fileID: 0}
+  - id: "sub_forest_128  # BOT_RIGHT \u0442\u043E\u043B\u044C\u043A\u043E"
+    sprite: {fileID: 0}
   - id: sub_forest_14
     sprite: {fileID: 0}
+  - id: sub_forest_14   # TOP + TOP_RIGHT + BOTTOM (2+4+8)
+    sprite: {fileID: 0}
   - id: sub_forest_15
+    sprite: {fileID: 7482667652216324306, guid: 2c0f0cd15121a2e41b50c739acb37455, type: 3}
+  - id: sub_forest_15   # TOP + TOP_LEFT + TOP_RIGHT + BOTTOM (2+1+4+8)
     sprite: {fileID: 0}
   - id: sub_forest_16
     sprite: {fileID: 21300000, guid: 353e2e83866ffce4c956a8c987b6cada, type: 3}
+  - id: "sub_forest_16   # LEFT \u0442\u043E\u043B\u044C\u043A\u043E"
+    sprite: {fileID: 0}
   - id: sub_forest_18
+    sprite: {fileID: 0}
+  - id: sub_forest_18   # TOP + LEFT (2+16)
+    sprite: {fileID: 0}
+  - id: sub_forest_19   # TOP + TOP_LEFT + LEFT (2+1+16)
     sprite: {fileID: 0}
   - id: sub_forest_191
     sprite: {fileID: 0}
+  - id: "sub_forest_191  # \u0432\u0441\u0435 \u043A\u0440\u043E\u043C\u0435 BL (\u0432\u0441\u0435
+      7 \u0438\u0437 8)"
+    sprite: {fileID: 0}
   - id: sub_forest_2
+    sprite: {fileID: 7482667652216324306, guid: 2c0f0cd15121a2e41b50c739acb37455, type: 3}
+  - id: "sub_forest_2    # TOP \u0442\u043E\u043B\u044C\u043A\u043E"
     sprite: {fileID: 0}
   - id: sub_forest_22
     sprite: {fileID: 0}
+  - id: sub_forest_22   # TOP + TOP_RIGHT + LEFT (2+4+16)
+    sprite: {fileID: 0}
   - id: sub_forest_223
+    sprite: {fileID: 0}
+  - id: "sub_forest_223  # \u0432\u0441\u0435 \u043A\u0440\u043E\u043C\u0435 RIGHT
+      (\u0432\u0441\u0435 7 \u0438\u0437 8)"
     sprite: {fileID: 0}
   - id: sub_forest_239
     sprite: {fileID: 0}
+  - id: "sub_forest_239  # \u0432\u0441\u0435 \u043A\u0440\u043E\u043C\u0435 LEFT
+      (\u0432\u0441\u0435 7 \u0438\u0437 8)"
+    sprite: {fileID: 0}
   - id: sub_forest_24
+    sprite: {fileID: 0}
+  - id: sub_forest_24   # BOTTOM + LEFT (8+16)
     sprite: {fileID: 0}
   - id: sub_forest_247
     sprite: {fileID: 0}
+  - id: "sub_forest_247  # \u0432\u0441\u0435 \u043A\u0440\u043E\u043C\u0435 BOTTOM
+      (\u0432\u0441\u0435 7 \u0438\u0437 8)"
+    sprite: {fileID: 0}
   - id: sub_forest_251
+    sprite: {fileID: 0}
+  - id: "sub_forest_251  # \u0432\u0441\u0435 \u043A\u0440\u043E\u043C\u0435 TOP_RIGHT
+      (\u0432\u0441\u0435 7 \u0438\u0437 8)"
     sprite: {fileID: 0}
   - id: sub_forest_253
     sprite: {fileID: 0}
+  - id: "sub_forest_253  # \u0432\u0441\u0435 \u043A\u0440\u043E\u043C\u0435 TOP
+      (\u0432\u0441\u0435 7 \u0438\u0437 8)"
+    sprite: {fileID: 0}
   - id: sub_forest_254
     sprite: {fileID: 0}
+  - id: "sub_forest_254  # \u0432\u0441\u0435 \u043A\u0440\u043E\u043C\u0435 TOP_LEFT
+      (\u0432\u0441\u0435 7 \u0438\u0437 8)"
+    sprite: {fileID: 0}
   - id: sub_forest_255
+    sprite: {fileID: 7482667652216324306, guid: 2c0f0cd15121a2e41b50c739acb37455, type: 3}
+  - id: "sub_forest_255  # \u0432\u0441\u0435 8 \u043D\u0430\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0439"
     sprite: {fileID: 0}
   - id: sub_forest_26
     sprite: {fileID: 0}
+  - id: sub_forest_26   # TOP + BOTTOM + LEFT (2+8+16)
+    sprite: {fileID: 0}
   - id: sub_forest_27
     sprite: {fileID: 0}
+  - id: sub_forest_27   # TOP + TOP_LEFT + BOTTOM + LEFT (2+1+8+16)
+    sprite: {fileID: 0}
   - id: sub_forest_3
+    sprite: {fileID: 7482667652216324306, guid: 2c0f0cd15121a2e41b50c739acb37455, type: 3}
+  - id: sub_forest_3    # TOP + TOP_LEFT (1+2)
     sprite: {fileID: 0}
   - id: sub_forest_30
     sprite: {fileID: 0}
+  - id: sub_forest_30   # TOP + TOP_RIGHT + BOTTOM + LEFT (2+4+8+16)
+    sprite: {fileID: 0}
   - id: sub_forest_31
+    sprite: {fileID: 7482667652216324306, guid: 2c0f0cd15121a2e41b50c739acb37455, type: 3}
+  - id: "sub_forest_31   # TOP + \u0432\u0441\u0435 \u0432\u0435\u0440\u0445\u043D\u0438\u0435
+      + BOTTOM + LEFT (2+1+4+8+16)"
     sprite: {fileID: 0}
   - id: sub_forest_32
     sprite: {fileID: 0}
+  - id: "sub_forest_32   # RIGHT \u0442\u043E\u043B\u044C\u043A\u043E"
+    sprite: {fileID: 0}
   - id: sub_forest_34
+    sprite: {fileID: 0}
+  - id: sub_forest_34   # TOP + RIGHT (2+32)
     sprite: {fileID: 0}
   - id: sub_forest_35
     sprite: {fileID: 0}
+  - id: sub_forest_35   # TOP + TOP_LEFT + RIGHT (2+1+32)
+    sprite: {fileID: 0}
   - id: sub_forest_38
+    sprite: {fileID: 0}
+  - id: sub_forest_38   # TOP + TOP_RIGHT + RIGHT (2+4+32)
     sprite: {fileID: 0}
   - id: sub_forest_4
     sprite: {fileID: 21300000, guid: adb3e2e6c190d7f46a0b0f473cfeb5a6, type: 3}
+  - id: "sub_forest_4    # TOP_RIGHT \u0442\u043E\u043B\u044C\u043A\u043E"
+    sprite: {fileID: 0}
   - id: sub_forest_40
+    sprite: {fileID: 0}
+  - id: sub_forest_40   # BOTTOM + RIGHT (8+32)
     sprite: {fileID: 0}
   - id: sub_forest_42
     sprite: {fileID: 0}
+  - id: sub_forest_42   # TOP + BOTTOM + RIGHT (2+8+32)
+    sprite: {fileID: 0}
   - id: sub_forest_43
+    sprite: {fileID: 0}
+  - id: sub_forest_43   # TOP + TOP_LEFT + BOTTOM + RIGHT (2+1+8+32)
     sprite: {fileID: 0}
   - id: sub_forest_46
     sprite: {fileID: 0}
+  - id: sub_forest_46   # TOP + TOP_RIGHT + BOTTOM + RIGHT (2+4+8+32)
+    sprite: {fileID: 0}
   - id: sub_forest_47
+    sprite: {fileID: 0}
+  - id: "sub_forest_47   # TOP + \u0432\u0441\u0435 \u0432\u0435\u0440\u0445\u043D\u0438\u0435
+      + BOTTOM + RIGHT (2+1+4+8+32)"
     sprite: {fileID: 0}
   - id: sub_forest_48
     sprite: {fileID: 0}
+  - id: sub_forest_48   # LEFT + RIGHT (16+32)
+    sprite: {fileID: 0}
+  - id: sub_forest_5
+    sprite: {fileID: 7482667652216324306, guid: 2c0f0cd15121a2e41b50c739acb37455, type: 3}
   - id: sub_forest_50
+    sprite: {fileID: 0}
+  - id: sub_forest_50   # TOP + LEFT + RIGHT (2+16+32)
     sprite: {fileID: 0}
   - id: sub_forest_51
     sprite: {fileID: 0}
+  - id: sub_forest_51   # TOP + TOP_LEFT + LEFT + RIGHT (2+1+16+32)
+    sprite: {fileID: 0}
   - id: sub_forest_54
+    sprite: {fileID: 0}
+  - id: sub_forest_54   # TOP + TOP_RIGHT + LEFT + RIGHT (2+4+16+32)
     sprite: {fileID: 0}
   - id: sub_forest_56
     sprite: {fileID: 0}
+  - id: sub_forest_56   # BOTTOM + LEFT + RIGHT (8+16+32)
+    sprite: {fileID: 0}
   - id: sub_forest_58
     sprite: {fileID: 0}
+  - id: sub_forest_58   # TOP + BOTTOM + LEFT + RIGHT (2+8+16+32)
+    sprite: {fileID: 0}
   - id: sub_forest_6
+    sprite: {fileID: 7482667652216324306, guid: 2c0f0cd15121a2e41b50c739acb37455, type: 3}
+  - id: sub_forest_6    # TOP + TOP_RIGHT (2+4)
     sprite: {fileID: 0}
   - id: sub_forest_62
     sprite: {fileID: 0}
+  - id: sub_forest_62   # TOP + TOP_RIGHT + BOTTOM + LEFT + RIGHT (2+4+8+16+32)
+    sprite: {fileID: 0}
   - id: sub_forest_63
+    sprite: {fileID: 7482667652216324306, guid: 2c0f0cd15121a2e41b50c739acb37455, type: 3}
+  - id: "sub_forest_63   # \u0432\u0441\u0435 \u043A\u0440\u043E\u043C\u0435 BR (2+1+4+8+16+32
+      = 63)"
     sprite: {fileID: 0}
   - id: sub_forest_64
     sprite: {fileID: 21300000, guid: 25c4e67aed487624fb647ac06812a858, type: 3}
+  - id: "sub_forest_64   # BOT_LEFT \u0442\u043E\u043B\u044C\u043A\u043E"
+    sprite: {fileID: 0}
   - id: sub_forest_7
+    sprite: {fileID: 7482667652216324306, guid: 2c0f0cd15121a2e41b50c739acb37455, type: 3}
+  - id: sub_forest_7    # TOP + TOP_LEFT + TOP_RIGHT (2+1+4)
     sprite: {fileID: 0}
   - id: sub_forest_8
+    sprite: {fileID: 0}
+  - id: "sub_forest_8    # BOTTOM \u0442\u043E\u043B\u044C\u043A\u043E"
+    sprite: {fileID: 0}
+  - id: "sub_forest_95   # \u0432\u0441\u0435 \u043A\u0440\u043E\u043C\u0435 RIGHT
+      + BR (1+2+4+8+16+64 = 95)"
     sprite: {fileID: 0}
   - id: sub_forest_inner_1
     sprite: {fileID: 0}
   - id: sub_forest_inner_2
     sprite: {fileID: 0}
   - id: sub_forest_inner_3
+    sprite: {fileID: 0}
+  - id: sub_mountains_0
     sprite: {fileID: 0}
   - id: sub_mountains_1
     sprite: {fileID: 0}
@@ -321,11 +458,15 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - id: sub_mountains_15
     sprite: {fileID: 0}
+  - id: sub_mountains_16
+    sprite: {fileID: 0}
   - id: sub_mountains_18
     sprite: {fileID: 0}
   - id: sub_mountains_2
     sprite: {fileID: 0}
   - id: sub_mountains_24
+    sprite: {fileID: 0}
+  - id: sub_mountains_255
     sprite: {fileID: 0}
   - id: sub_mountains_26
     sprite: {fileID: 0}
@@ -363,6 +504,8 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - id: sub_mountains_inner_3
     sprite: {fileID: 0}
+  - id: sub_plains_0
+    sprite: {fileID: 0}
   - id: sub_plains_1
     sprite: {fileID: 0}
   - id: sub_plains_10
@@ -379,13 +522,19 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - id: sub_plains_18
     sprite: {fileID: 0}
+  - id: sub_plains_2
+    sprite: {fileID: 0}
   - id: sub_plains_24
+    sprite: {fileID: 0}
+  - id: sub_plains_255
     sprite: {fileID: 0}
   - id: sub_plains_26
     sprite: {fileID: 0}
   - id: sub_plains_3
     sprite: {fileID: 0}
   - id: sub_plains_31
+    sprite: {fileID: 0}
+  - id: sub_plains_32
     sprite: {fileID: 0}
   - id: sub_plains_34
     sprite: {fileID: 0}
@@ -415,6 +564,8 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - id: sub_plains_inner_3
     sprite: {fileID: 0}
+  - id: sub_tundra_0
+    sprite: {fileID: 0}
   - id: sub_tundra_1
     sprite: {fileID: 0}
   - id: sub_tundra_10
@@ -434,6 +585,8 @@ MonoBehaviour:
   - id: sub_tundra_2
     sprite: {fileID: 0}
   - id: sub_tundra_24
+    sprite: {fileID: 0}
+  - id: sub_tundra_255
     sprite: {fileID: 0}
   - id: sub_tundra_26
     sprite: {fileID: 0}
@@ -462,6 +615,8 @@ MonoBehaviour:
   - id: sub_tundra_64
     sprite: {fileID: 0}
   - id: sub_tundra_7
+    sprite: {fileID: 0}
+  - id: sub_tundra_8
     sprite: {fileID: 0}
   - id: sub_tundra_inner_1
     sprite: {fileID: 0}

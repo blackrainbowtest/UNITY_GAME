@@ -104,77 +104,257 @@ cave_dark
 
 # Blend masks around biome borders
 # Format: sub_{biome}_{mask}
-# mask is byte 0–255 (we include common mask values only)
-sub_forest_0
-sub_forest_1
+# Mask bit values: TL=1, T=2, TR=4, B=8, L=16, R=32, BL=64, BR=128
+
+# === FOREST ===
+# TOP
 sub_forest_2
 sub_forest_3
-sub_forest_4
-sub_forest_5
 sub_forest_6
 sub_forest_7
+sub_forest_11
+sub_forest_14
 sub_forest_15
 sub_forest_31
+sub_forest_50
+sub_forest_62
+
+# BOTTOM
+sub_forest_8
+sub_forest_12
+sub_forest_24
+sub_forest_40
+sub_forest_42
+sub_forest_56
+sub_forest_58
+
+# LEFT/RIGHT
+sub_forest_16
+sub_forest_32
+sub_forest_48
+sub_forest_51
+sub_forest_54
+
+# DIAGONALS
+sub_forest_1
+sub_forest_4
+sub_forest_64
+sub_forest_128
+
+# COMPLEX
+sub_forest_10
+sub_forest_18
+sub_forest_22
+sub_forest_26
+sub_forest_34
+sub_forest_35
+sub_forest_38
+sub_forest_43
+sub_forest_46
+sub_forest_47
+sub_forest_27
+sub_forest_30
 sub_forest_63
+sub_forest_111
 sub_forest_127
+sub_forest_191
+sub_forest_223
+sub_forest_239
+sub_forest_247
+sub_forest_251
+sub_forest_253
+sub_forest_254
 sub_forest_255
 
-sub_desert_0
-sub_desert_1
-sub_desert_2
+# === DESERT ===
+# === DESERT ===
+# TOP
+sub_desert_8
 sub_desert_3
-sub_desert_4
-sub_desert_5
+sub_desert_6
+sub_desert_7
+sub_desert_14
 sub_desert_15
 sub_desert_31
+
+# BOTTOM
+sub_desert_16
+sub_desert_56
+
+# LEFT/RIGHT
+sub_desert_32
+sub_desert_1
+sub_desert_48
+
+# DIAGONALS
+sub_desert_4
+sub_desert_64
+sub_desert_128
+sub_desert_3
+ 
+# COMPLEX
+sub_desert_10
+sub_desert_12
+sub_desert_18
+sub_desert_24
+sub_desert_34
+sub_desert_40
+sub_desert_42
+sub_desert_26
 sub_desert_63
 sub_desert_127
-sub_desert_255
-
-sub_tundra_0
-sub_tundra_1
+# === TUNDRA ===
 sub_tundra_2
+# === TUNDRA ===
+# TOP
+sub_tundra_16
 sub_tundra_3
-sub_tundra_4
+sub_tundra_6
 sub_tundra_7
+sub_tundra_14
 sub_tundra_15
 sub_tundra_31
+
+# BOTTOM
+sub_tundra_32
+sub_tundra_56
+
+# LEFT/RIGHT
+sub_tundra_1
+sub_tundra_4
+sub_tundra_48
+
+# DIAGONALS
+sub_tundra_64
+sub_tundra_128
+sub_tundra_3
+sub_tundra_6
+
+# COMPLEX
+sub_tundra_10
+sub_tundra_18
+sub_tundra_24
+sub_tundra_34
+sub_tundra_40
+sub_tundra_42
+sub_tundra_26
 sub_tundra_63
 sub_tundra_127
-sub_tundra_255
-
-sub_mountains_0
-sub_mountains_1
 sub_mountains_2
+sub_mountains_8
+# === MOUNTAINS ===
+# TOP
+sub_mountains_32
 sub_mountains_3
+sub_mountains_6
 sub_mountains_7
+sub_mountains_14
 sub_mountains_15
 sub_mountains_31
+
+# BOTTOM
+sub_mountains_1
+sub_mountains_56
+
+# LEFT/RIGHT
+sub_mountains_4
+sub_mountains_64
+sub_mountains_48
+
+# DIAGONALS
+sub_mountains_128
+sub_mountains_3
+sub_mountains_6
+sub_mountains_10
+
+# COMPLEX
+sub_mountains_10
+sub_mountains_18
+sub_mountains_24
+sub_mountains_34
+sub_mountains_40
+sub_mountains_42
+sub_mountains_26
 sub_mountains_63
 sub_mountains_127
-sub_mountains_255
-
-sub_plains_0
+sub_plains_8
+sub_plains_16
+# === PLAINS ===
+# TOP
 sub_plains_1
-sub_plains_2
 sub_plains_3
+sub_plains_6
 sub_plains_7
+sub_plains_14
 sub_plains_15
 sub_plains_31
+
+# BOTTOM
+sub_plains_4
+sub_plains_56
+
+# LEFT/RIGHT
+sub_plains_64
+sub_plains_128
+sub_plains_48
+
+# DIAGONALS
+sub_plains_3
+sub_plains_6
+sub_plains_10
+sub_plains_18
+
+# COMPLEX
+sub_plains_10
+sub_plains_18
+sub_plains_24
+sub_plains_34
+sub_plains_40
+sub_plains_42
+sub_plains_26
 sub_plains_63
 sub_plains_127
-sub_plains_255
+sub_cave_16
+sub_cave_32
+# === CAVE ===
+# TOP
+sub_cave_6
+sub_cave_3
+sub_cave_6
+sub_cave_7
+sub_cave_14
+sub_cave_15
+sub_cave_31
 
-sub_cave_0
+# BOTTOM
+sub_cave_10
+sub_cave_56
+
+# LEFT/RIGHT
+sub_cave_18
+sub_cave_24
+sub_cave_48
+
+# DIAGONALS
+sub_cave_34
+sub_cave_40
+sub_cave_48
+sub_cave_7
+sub_cave_14
+sub_cave_26
+sub_cave_42
+sub_cave_56
+
+# COMPLEX
+sub_cave_7
+sub_cave_14
+sub_cave_26
+sub_cave_42
+sub_cave_56
+sub_cave_15
 sub_cave_31
 sub_cave_63
 sub_cave_127
-sub_cave_255
-
-# =============================
-# INNER-LAYERS (smooth 2–3 tile blending zones)
-# Formats:
-# sub_{biome}_inner_1
 # sub_{biome}_inner_2
 # sub_{biome}_inner_3
 # =============================

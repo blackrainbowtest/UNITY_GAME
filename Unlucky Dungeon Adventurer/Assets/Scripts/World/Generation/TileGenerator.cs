@@ -45,21 +45,27 @@ public static class TileGenerator
 
         if (dominant != null)
         {
-            // Mask
-            byte mask = BiomeMaskUtils.GetMask(
-                biomeGetter,
-                x, y,
-                biomeId
-            );
+            byte mask = BiomeMaskUtils.GetMask(biomeGetter, x, y, biomeId);
 
-            tile.biomeMask = mask;
+            if (mask != 0)
+            {
+                // Проверка кардинальных соседей: суб-биом появляется ТОЛЬКО на границе
+                // (минимум один кардинальный сосед = dominant)
+                string up    = biomeGetter(x, y + 1);
+                string down  = biomeGetter(x, y - 1);
+                string left  = biomeGetter(x - 1, y);
+                string right = biomeGetter(x + 1, y);
 
-            // Main transition tile: sub_forest_26
-            string subId = $"sub_{dominant}_{mask}";
-            tile.subBiomeIds.Add(subId);
+                bool hasCardinalDominant =
+                    (up == dominant) || (down == dominant) ||
+                    (left == dominant) || (right == dominant);
 
-            // Transition zone (2–3 tiles)
-            AddBlendZone(tile, x, y, biomeId, dominant, worldSeed);
+                if (hasCardinalDominant)
+                {
+                    string subId = $"sub_{dominant}_{mask}";
+                    tile.subBiomeIds.Add(subId);
+                }
+            }
         }
 
         // 4. Structures (later)
@@ -88,7 +94,7 @@ public static class TileGenerator
     {
         System.Random rng = new System.Random(seed * (x + 2137) * (y + 9157));
 
-        int radius = rng.Next(2, 4); // zone 2–3 tiles
+        int radius = rng.Next(1, 1); // zone 2–3 tiles
 
         for (int i = 1; i <= radius; i++)
         {
