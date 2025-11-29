@@ -4,6 +4,8 @@ using UnityEngine;
 
 public static class TileGenerator
 {
+    private static TileSpriteDB _spriteDB;
+    private static readonly Dictionary<string, List<string>> _variantCache = new Dictionary<string, List<string>>();
     public static TileData GenerateTile(int x, int y, int worldSeed)
     {
         BiomeDB.EnsureLoaded();
@@ -26,9 +28,8 @@ public static class TileGenerator
         TileData tile = new TileData(x, y);
         tile.biomeId = biomeId;
 
-        // Select random biome sprite variant (biome_01..05)
-        int variant = rng.Next(1, 6);
-        tile.biomeSpriteId = $"{biomeId}_{variant:00}";
+        // Select biome sprite variant based on available entries in TileSpriteDB
+        tile.biomeSpriteId = PickBiomeVariantSpriteId(biomeId, rng);
 
         // Prepare sub-biomes list
         tile.subBiomeIds = new List<string>();
@@ -115,6 +116,39 @@ public static class TileGenerator
         if (n < 0.82f) return "mountains";
         if (n < 0.95f) return "tundra";
         return "cave";
+    }
+
+    private static void EnsureSpriteDB()
+    {
+        if (_spriteDB == null)
+        {
+            _spriteDB = Resources.Load<TileSpriteDB>("WorldData/TileSpriteDB");
+        }
+    }
+
+    private static string PickBiomeVariantSpriteId(string biomeId, System.Random rng)
+    {
+        // If there are explicitly provided variants like forest_01, forest_02
+        // choose among them; otherwise fallback to base biome id
+        EnsureSpriteDB();
+        if (_spriteDB == null)
+            return biomeId;
+
+        if (!_variantCache.TryGetValue(biomeId, out var list))
+        {
+            // Expect variant ids to start with "{biomeId}_"
+            list = _spriteDB.GetVariants(biomeId + "_");
+            _variantCache[biomeId] = list ?? new List<string>();
+        }
+
+        if (list != null && list.Count > 0)
+        {
+            int idx = rng.Next(0, list.Count);
+            return list[idx];
+        }
+
+        // No dedicated variants found — use base biome id (TileSpriteDB.Get will fallback appropriately)
+        return biomeId;
     }
 
     private static int HashCoords(int x, int y, int seed)

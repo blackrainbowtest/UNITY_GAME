@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -96,6 +97,32 @@ public class TileSpriteDB : ScriptableObject
     {
         EnsureMap();
         return dict.ContainsKey(id);
+    }
+
+    public List<string> GetAllVariants(string prefix)
+    {
+        List<string> result = new List<string>();
+
+        foreach (var e in entries)
+        {
+            if (e.id.StartsWith(prefix, System.StringComparison.OrdinalIgnoreCase))
+                result.Add(e.id);
+        }
+
+        return result;
+    }
+
+    public List<string> GetVariants(string baseId)
+    {
+        List<string> list = new List<string>();
+
+        foreach (var e in entries)
+        {
+            if (e.id.StartsWith(baseId, StringComparison.OrdinalIgnoreCase))
+                list.Add(e.id);
+        }
+
+        return list;
     }
 
 

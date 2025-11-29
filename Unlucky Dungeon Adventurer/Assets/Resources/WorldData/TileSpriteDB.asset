@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TileSpriteDB
   entries:
   - id: forest
-    sprite: {fileID: 21300000, guid: d894c4766ce7eca4f99d0f11fa0201cc, type: 3}
+    sprite: {fileID: 21300000, guid: 3dae7d8a4d69ae34b874b214b9ed071b, type: 3}
   - id: desert
     sprite: {fileID: 21300000, guid: 10ee691555d10ee4abc0ff9d090eb2ee, type: 3}
   - id: tundra
@@ -25,6 +25,66 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: c021363de442d724891b830caff55337, type: 3}
   - id: plains
     sprite: {fileID: 21300000, guid: f06fa13bb8a309d4491bb521e94073c0, type: 3}
+  - id: forest_01
+    sprite: {fileID: 21300000, guid: 3dae7d8a4d69ae34b874b214b9ed071b, type: 3}
+  - id: forest_02
+    sprite: {fileID: 4238831426715475275, guid: 071101cd354a21a47848068fcf7c4ceb, type: 3}
+  - id: forest_03
+    sprite: {fileID: -8392404212986688218, guid: b4c3ab750007f014e8d5160696d5e256, type: 3}
+  - id: forest_04
+    sprite: {fileID: 0}
+  - id: forest_05
+    sprite: {fileID: 0}
+  - id: desert_01
+    sprite: {fileID: 0}
+  - id: desert_02
+    sprite: {fileID: 0}
+  - id: desert_03
+    sprite: {fileID: 0}
+  - id: desert_04
+    sprite: {fileID: 0}
+  - id: desert_05
+    sprite: {fileID: 0}
+  - id: tundra_01
+    sprite: {fileID: 0}
+  - id: tundra_02
+    sprite: {fileID: 0}
+  - id: tundra_03
+    sprite: {fileID: 0}
+  - id: tundra_04
+    sprite: {fileID: 0}
+  - id: tundra_05
+    sprite: {fileID: 0}
+  - id: mountains_01
+    sprite: {fileID: 0}
+  - id: mountains_02
+    sprite: {fileID: 0}
+  - id: mountains_03
+    sprite: {fileID: 0}
+  - id: mountains_04
+    sprite: {fileID: 0}
+  - id: mountains_05
+    sprite: {fileID: 0}
+  - id: cave_01
+    sprite: {fileID: 0}
+  - id: cave_02
+    sprite: {fileID: 0}
+  - id: cave_03
+    sprite: {fileID: 0}
+  - id: cave_04
+    sprite: {fileID: 0}
+  - id: cave_05
+    sprite: {fileID: 0}
+  - id: plains_01
+    sprite: {fileID: 0}
+  - id: plains_02
+    sprite: {fileID: 0}
+  - id: plains_03
+    sprite: {fileID: 0}
+  - id: plains_04
+    sprite: {fileID: 0}
+  - id: plains_05
+    sprite: {fileID: 0}
   - id: forest_pine
     sprite: {fileID: 0}
   - id: forest_tropical

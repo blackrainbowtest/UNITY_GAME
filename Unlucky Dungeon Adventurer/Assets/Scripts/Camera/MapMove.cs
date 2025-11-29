@@ -51,10 +51,12 @@ public class MapMove : MonoBehaviour
 		if (Input.GetMouseButton(0))
 		{
 			Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
-			Vector3 move = new Vector3(pos.x * moveSpeed, pos.y * moveSpeed, 0);
+			// Make movement frame-rate independent and scale by zoom
+			float scale = moveSpeed * Time.deltaTime * Camera.main.orthographicSize;
+			Vector3 move = new Vector3(pos.x * scale, pos.y * scale, 0);
 			transform.Translate(move, Space.World);
-			// Scale velocity to simulate inertia
-			velocity = move * 50f;
+			// Scale velocity to simulate inertia (independent of FPS)
+			velocity = move * 1000f; // larger to compensate for deltaTime scaling
 			dragOrigin = Input.mousePosition;
 		}
 
