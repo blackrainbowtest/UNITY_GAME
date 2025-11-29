@@ -70,8 +70,16 @@ public class TileRenderer : MonoBehaviour
         }
 
         // BASE BIOME LAYER ----------------------
-        biomeRenderer.sprite = spriteDB.Get(data.biomeSpriteId);
-        biomeRenderer.color = Color.white;
+        Sprite biomeSprite = spriteDB.Get(data.biomeSpriteId);
+        if (biomeSprite != null)
+        {
+            biomeRenderer.sprite = biomeSprite;
+            biomeRenderer.color = Color.white;
+        }
+        else
+        {
+            biomeRenderer.sprite = null;
+        }
 
         // SUB-BIOME LAYERS ----------------------
         SpriteRenderer[] subRenderers = {
@@ -84,8 +92,16 @@ public class TileRenderer : MonoBehaviour
             {
                 string id = data.subBiomeIds[i];
                 Sprite sp = spriteDB.Get(id);
-                subRenderers[i].sprite = sp;
-                subRenderers[i].color = Color.white;
+                
+                if (sp != null)
+                {
+                    subRenderers[i].sprite = sp;
+                    subRenderers[i].color = Color.white;
+                }
+                else
+                {
+                    subRenderers[i].sprite = null;
+                }
             }
             else
             {

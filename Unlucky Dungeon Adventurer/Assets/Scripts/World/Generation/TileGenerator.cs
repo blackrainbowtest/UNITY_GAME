@@ -49,22 +49,8 @@ public static class TileGenerator
 
             if (mask != 0)
             {
-                // Проверка кардинальных соседей: суб-биом появляется ТОЛЬКО на границе
-                // (минимум один кардинальный сосед = dominant)
-                string up    = biomeGetter(x, y + 1);
-                string down  = biomeGetter(x, y - 1);
-                string left  = biomeGetter(x - 1, y);
-                string right = biomeGetter(x + 1, y);
-
-                bool hasCardinalDominant =
-                    (up == dominant) || (down == dominant) ||
-                    (left == dominant) || (right == dominant);
-
-                if (hasCardinalDominant)
-                {
-                    string subId = $"sub_{dominant}_{mask}";
-                    tile.subBiomeIds.Add(subId);
-                }
+                string subId = $"sub_{dominant}_{mask}";
+                tile.subBiomeIds.Add(subId);
             }
         }
 
