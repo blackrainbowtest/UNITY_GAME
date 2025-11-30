@@ -142,4 +142,29 @@ public static class TileGenerator
 
         return new Color32(r, g, b, 255);
     }
+
+    // ============================================================
+    // Pathfinding Support
+    // ============================================================
+
+    /// <summary>
+    /// Returns the movement cost for a tile at (x, y).
+    /// Used by Pathfinding.FindPath to calculate g-cost.
+    /// Returns 0 if tile is not accessible or world is not initialized.
+    /// </summary>
+    public static float GetTileMoveCost(int x, int y)
+    {
+        if (WorldMapController.Instance == null)
+            return 0f;
+
+        WorldGenerator gen = WorldMapController.Instance.GetWorldGenerator();
+        if (gen == null)
+            return 0f;
+
+        TileData tile = gen.GetTile(x, y);
+        if (tile == null)
+            return 0f;
+
+        return tile.moveCost;
+    }
 }

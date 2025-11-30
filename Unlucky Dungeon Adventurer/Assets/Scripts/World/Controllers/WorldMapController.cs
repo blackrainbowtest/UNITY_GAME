@@ -25,6 +25,12 @@ using TMPro;
 public class WorldMapController : MonoBehaviour
 {
     // ============================================================
+    // Singleton Instance
+    // ============================================================
+
+    public static WorldMapController Instance { get; private set; }
+
+    // ============================================================
     // UI & References
     // ============================================================
 
@@ -54,6 +60,11 @@ public class WorldMapController : MonoBehaviour
 
     private static GameObject runtimeTilePrefabTemplate = null;
 
+    // ============================================================
+    // Public Accessors
+    // ============================================================
+
+    public WorldGenerator GetWorldGenerator() => generator;
 
     // ============================================================
     // Initialization
@@ -61,6 +72,8 @@ public class WorldMapController : MonoBehaviour
 
     private void Start()
     {
+        Instance = this;
+
         var controllers = FindObjectsByType<WorldMapController>(FindObjectsSortMode.None);
         if (controllers.Length > 1 && controllers[0] != this)
         {
