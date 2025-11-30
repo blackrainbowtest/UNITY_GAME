@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using TMPro;
 
 /// <summary>
@@ -35,9 +36,7 @@ public class WorldMapController : MonoBehaviour
     // ============================================================
 
     [Header("UI")]
-    public TextMeshProUGUI locationText;
-    public TextMeshProUGUI LocationText; // InfoBar text for clicked tile info
-    public TextMeshProUGUI LocationText; // InfoBar text for clicked tile info
+    public TextMeshProUGUI LocationText; // InfoBar text for tile info
 
     [Header("Tile Rendering Settings")]
     public int viewRadius = 15;
@@ -163,6 +162,11 @@ public class WorldMapController : MonoBehaviour
 
         RefreshMinimapTiles();
         minimap?.DrawPlayerMarker(playerTile);
+
+        // Initialize InfoBar with player's starting tile
+        TileData startTile = generator.GetTile(playerTile.x, playerTile.y);
+        if (startTile != null)
+            InfoBar_Update(startTile, playerTile);
     }
 
     private void OnPlayerLoaded()
@@ -181,8 +185,8 @@ public class WorldMapController : MonoBehaviour
     {
         if (generator == null) return;
 
-        // Handle tile click
-        if (Input.GetMouseButtonDown(0))
+        // Handle tile click (only if not clicking on UI)
+        if (Input.GetMouseButtonDown(0) && !IsPointerOverUI() && !MinimapController.InputCaptured)
             HandleTileClick();
 
         Vector3 camPos = Camera.main.transform.position;
@@ -210,9 +214,9 @@ public class WorldMapController : MonoBehaviour
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorld.z = 0;
 
-        // мир → тайл
-        int tx = Mathf.FloorToInt(mouseWorld.x / tileSize);
-        int ty = Mathf.FloorToInt(mouseWorld.y / tileSize);
+        // мир → тайл (RoundToInt для клика в центр тайла)
+        int tx = Mathf.RoundToInt(mouseWorld.x / tileSize);
+        int ty = Mathf.RoundToInt(mouseWorld.y / tileSize);
 
         TileData tile = generator.GetTile(tx, ty);
 
@@ -222,19 +226,34 @@ public class WorldMapController : MonoBehaviour
             return;
         }
 
+        Debug.Log($"Clicked tile ({tx}, {ty}): {tile.biomeId}, moveCost={tile.moveCost}");
+
         // Обновляем InfoBar
         InfoBar_Update(tile, new Vector2Int(tx, ty));
+    }
+
+    private bool IsPointerOverUI()
+    {
+        return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
     }
 
     private void InfoBar_Update(TileData tile, Vector2Int coords)
     {
         if (LocationText == null)
+        {
+            Debug.LogError("LocationText is NULL — не привязан в инспекторе!");
             return;
+        }
+
+        // Use biomeId (canonical field in TileData)
+        string biome = tile.biomeId;
 
         LocationText.text =
-            $"Biome: {tile.biomeId}\n" +
+            $"Biome: {biome}\n" +
             $"Coords: ({coords.x}, {coords.y})\n" +
             $"Move Cost: {tile.moveCost:F1}";
+
+        Debug.Log("INFOBAR UPDATED: " + LocationText.text);
     }
 
 
@@ -373,7 +392,7 @@ public class WorldMapController : MonoBehaviour
 
     private void UpdatePlayerLocationInfo()
     {
-        if (locationText == null || generator == null)
+        if (LocationText == null || generator == null)
             return;
 
         var p = GameData.CurrentPlayer;
@@ -396,7 +415,7 @@ public class WorldMapController : MonoBehaviour
             transition = $" → {edgeName}";
         }
 
-        locationText.text = $"{biomeName}{transition}\n(X: {coords.x}, Y: {coords.y})";
+        LocationText.text = $"{biomeName}{transition}\n(X: {coords.x}, Y: {coords.y})";
     }
 
 
