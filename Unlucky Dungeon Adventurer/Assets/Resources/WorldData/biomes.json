@@ -3,7 +3,7 @@
     {
       "id": "forest",
       "subbiomes": ["forest_pine", "forest_tropical"],
-      "moveCost": 1.0,
+      "moveCost": 10.0,
       "eventChance": 0.12,
       "goodChance": 0.45,
       "badChance": 0.55,
@@ -12,7 +12,7 @@
     {
       "id": "desert",
       "subbiomes": ["desert_sand", "desert_rocky"],
-      "moveCost": 1.3,
+      "moveCost": 5,
       "eventChance": 0.10,
       "goodChance": 0.25,
       "badChance": 0.75,
@@ -21,7 +21,7 @@
     {
       "id": "tundra",
       "subbiomes": ["tundra_snow", "tundra_rock"],
-      "moveCost": 1.5,
+      "moveCost": 10,
       "eventChance": 0.08,
       "goodChance": 0.15,
       "badChance": 0.85,
@@ -30,7 +30,7 @@
     {
       "id": "mountains",
       "subbiomes": ["mountain_high", "mountain_low"],
-      "moveCost": 2.0,
+      "moveCost": 20.0,
       "eventChance": 0.09,
       "goodChance": 0.10,
       "badChance": 0.90,
@@ -39,7 +39,7 @@
     {
       "id": "cave",
       "subbiomes": ["cave_default", "cave_lava"],
-      "moveCost": 1.8,
+      "moveCost": 18,
       "eventChance": 0.20,
       "goodChance": 0.10,
       "badChance": 0.90,
@@ -48,7 +48,7 @@
     {
       "id": "plains",
       "subbiomes": ["plains_green", "plains_flowers"],
-      "moveCost": 0.9,
+      "moveCost": 1,
       "eventChance": 0.14,
       "goodChance": 0.60,
       "badChance": 0.40,
