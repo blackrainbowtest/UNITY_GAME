@@ -36,6 +36,8 @@ public class WorldMapController : MonoBehaviour
 
     [Header("UI")]
     public TextMeshProUGUI locationText;
+    public TextMeshProUGUI LocationText; // InfoBar text for clicked tile info
+    public TextMeshProUGUI LocationText; // InfoBar text for clicked tile info
 
     [Header("Tile Rendering Settings")]
     public int viewRadius = 15;
@@ -179,6 +181,10 @@ public class WorldMapController : MonoBehaviour
     {
         if (generator == null) return;
 
+        // Handle tile click
+        if (Input.GetMouseButtonDown(0))
+            HandleTileClick();
+
         Vector3 camPos = Camera.main.transform.position;
 
         Vector2Int newPos = new Vector2Int(
@@ -196,6 +202,39 @@ public class WorldMapController : MonoBehaviour
         }
 
         UpdateMinimapDisplay();
+    }
+
+    private void HandleTileClick()
+    {
+        // экран → мир
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorld.z = 0;
+
+        // мир → тайл
+        int tx = Mathf.FloorToInt(mouseWorld.x / tileSize);
+        int ty = Mathf.FloorToInt(mouseWorld.y / tileSize);
+
+        TileData tile = generator.GetTile(tx, ty);
+
+        if (tile == null)
+        {
+            Debug.Log("Tile not found at: " + tx + ", " + ty);
+            return;
+        }
+
+        // Обновляем InfoBar
+        InfoBar_Update(tile, new Vector2Int(tx, ty));
+    }
+
+    private void InfoBar_Update(TileData tile, Vector2Int coords)
+    {
+        if (LocationText == null)
+            return;
+
+        LocationText.text =
+            $"Biome: {tile.biomeId}\n" +
+            $"Coords: ({coords.x}, {coords.y})\n" +
+            $"Move Cost: {tile.moveCost:F1}";
     }
 
 
