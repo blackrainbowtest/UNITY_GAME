@@ -41,7 +41,9 @@ public static class TileGenerator
 
         if (dominant != null && dominant != biomeId)
         {
-            byte mask = BiomeMaskUtils.GetMask(biomeGetter, x, y, biomeId);
+            // Маска показывает где ДОМИНАНТНЫЙ биом присутствует вокруг этого тайла
+            // (бит=1 означает "там dominant биом", бит=0 означает "там другой биом")
+            byte mask = BiomeMaskUtils.GetMask(biomeGetter, x, y, dominant);
 
             if (mask != 0)
             {

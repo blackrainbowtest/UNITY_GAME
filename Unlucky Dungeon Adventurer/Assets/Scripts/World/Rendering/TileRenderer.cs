@@ -3,69 +3,62 @@ using System.Collections.Generic;
 
 public class TileRenderer : MonoBehaviour
 {
-    [Header("Renderer layers")]
-    [SerializeField] private SpriteRenderer biomeRenderer; 
-    [SerializeField] private SpriteRenderer edgeRenderer;  
+    [Header("Base biome sprite")]
+    public SpriteRenderer biomeRenderer;
 
-    [Header("Tileset Mapping")]
-    public Dictionary<string, TileSet> biomeTilesets;  // биом → tileset
+    [Header("Base Biome Sprites (TileSpriteDB)")]
+    [SerializeField] private TileSpriteDB spriteDB;
 
-    private TileSet activeTileSet;
+    [Header("Edge transition renderer")]
+    public SpriteRenderer edgeRenderer;
+
+    [Header("Biomes → Tilesets")]
+    public List<BiomeTilesetEntry47> tilesets47;
+
+    private Dictionary<string, TileSet47> dict;
 
     private void Awake()
     {
-        // Если мешает отсутствующий рендерер — создаём автоматически
-        if (biomeRenderer == null)
-        {
-            GameObject obj = new GameObject("BiomeRenderer");
-            obj.transform.SetParent(transform);
-            biomeRenderer = obj.AddComponent<SpriteRenderer>();
-            biomeRenderer.sortingOrder = 0;
-        }
+        dict = new();
 
-        if (edgeRenderer == null)
-        {
-            GameObject obj = new GameObject("EdgeRenderer");
-            obj.transform.SetParent(transform);
-            edgeRenderer = obj.AddComponent<SpriteRenderer>();
-            edgeRenderer.sortingOrder = 1;
-        }
+        foreach (var e in tilesets47)
+            if (!string.IsNullOrEmpty(e.biomeId) && e.tileset != null)
+                dict[e.biomeId] = e.tileset;
     }
 
     public void RenderTile(TileData tile)
     {
-        // 1️⃣ --- РЕНДЕР ОСНОВНОГО БИОМА ---
-        Sprite biomeSprite = TileSpriteDB.Get(tile.biomeSpriteId);
-        if (biomeSprite == null)
-        {
-            Debug.LogWarning($"[TileRenderer] Missing biome sprite: {tile.biomeSpriteId}");
-        }
-        biomeRenderer.sprite = biomeSprite;
+        biomeRenderer.sprite = spriteDB != null 
+            ? spriteDB.Get(tile.biomeSpriteId)
+            : null;
 
-        // 2️⃣ --- РЕНДЕР ПЕРЕХОДА (EDGEMASK) ---
-        if (tile.edgeMask != 0 && tile.edgeBiome != null)
+        if (tile.edgeMask == 0 || string.IsNullOrEmpty(tile.edgeBiome))
         {
-            if (!biomeTilesets.TryGetValue(tile.edgeBiome, out activeTileSet))
-            {
-                Debug.LogWarning($"[TileRenderer] No tileset for biome {tile.edgeBiome}");
-                edgeRenderer.sprite = null;
-                return;
-            }
-
-            int index = activeTileSet.GetIndexForMask(tile.edgeMask);
-            if (index < 0 || index >= activeTileSet.tiles.Length)
-            {
-                Debug.LogWarning($"[TileRenderer] Tileset index out of range: {index}");
-                edgeRenderer.sprite = null;
-                return;
-            }
-
-            edgeRenderer.sprite = activeTileSet.tiles[index];
-        }
-        else
-        {
-            // Нет перехода
             edgeRenderer.sprite = null;
+            return;
         }
+
+        if (!dict.TryGetValue(tile.edgeBiome, out var set))
+        {
+            edgeRenderer.sprite = null;
+            return;
+        }
+
+        int index = set.GetTileIndex(tile.edgeMask);
+
+        if (index < 0 || index >= set.tiles.Length)
+        {
+            edgeRenderer.sprite = null;
+            return;
+        }
+
+        edgeRenderer.sprite = set.tiles[index];
     }
+}
+
+[System.Serializable]
+public class BiomeTilesetEntry47
+{
+    public string biomeId;
+    public TileSet47 tileset;
 }

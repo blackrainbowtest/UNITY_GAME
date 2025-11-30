@@ -50,13 +50,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 363fcd2364de0f74488141baedc5872f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TileRenderer
-  spriteDB: {fileID: 11400000, guid: cb4f768e352248e4a846b5420eefcbbe, type: 2}
   biomeRenderer: {fileID: 4622116480011666744}
-  sub1Renderer: {fileID: 6864893506177052243}
-  sub2Renderer: {fileID: 3507904224960593363}
-  sub3Renderer: {fileID: 7689998977491622246}
-  structureRenderer: {fileID: 4430171302183318789}
-  activityRenderer: {fileID: 127327816282856030}
+  spriteDB: {fileID: 11400000, guid: cb4f768e352248e4a846b5420eefcbbe, type: 2}
+  edgeRenderer: {fileID: 6864893506177052243}
+  tilesets47:
+  - biomeId: forest
+    tileset: {fileID: 11400000, guid: 95b75670f4a6c774e8a02520c1a39fea, type: 2}
 --- !u!1 &386550721719811872
 GameObject:
   m_ObjectHideFlags: 0

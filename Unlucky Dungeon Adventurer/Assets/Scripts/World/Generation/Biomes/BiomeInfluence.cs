@@ -10,26 +10,31 @@ public static class BiomeInfluence
     {
         Dictionary<string, int> score = new();
 
-        // Только 4 стороны — идеально для tileset переходов
-        int[,] dirs =
+        // 8 направлений: 4 кардинальных (полный вес) + 4 диагонали (меньший вес)
+        // Формат: dx, dy, weight
+        (int dx, int dy, int weight)[] dirs =
         {
-            { 0,  1 },   // N
-            { 0, -1 },   // S
-            { -1, 0 },   // W
-            { 1,  0 }    // E
+            ( 0,  1, 10),   // N  (UP)
+            ( 0, -1, 10),   // S  (DOWN)
+            (-1,  0, 10),   // W  (LEFT)
+            ( 1,  0, 10),   // E  (RIGHT)
+            (-1,  1,  5),   // NW (UP_LEFT)
+            ( 1,  1,  5),   // NE (UP_RIGHT)
+            (-1, -1,  5),   // SW (DOWN_LEFT)
+            ( 1, -1,  5)    // SE (DOWN_RIGHT)
         };
 
-        for (int i = 0; i < dirs.GetLength(0); i++)
+        foreach (var (dx, dy, weight) in dirs)
         {
-            int nx = x + dirs[i, 0];
-            int ny = y + dirs[i, 1];
+            int nx = x + dx;
+            int ny = y + dy;
 
             string nb = biomeGetter(nx, ny);
 
             if (nb == null || nb == centerBiome)
                 continue;
 
-            int power = BiomePower.GetPower(nb);
+            int power = BiomePower.GetPower(nb) * weight;
 
             if (!score.ContainsKey(nb))
                 score[nb] = 0;

@@ -2,37 +2,41 @@ using System;
 
 public static class BiomeMaskUtils
 {
-    // Bit flags for 8-direction autotiling
-    private const byte N  = 1;    // y+1
-    private const byte S  = 2;    // y-1
-    private const byte W  = 4;    // x-1
-    private const byte E  = 8;    // x+1
+    private const byte UP    = 1;
+    private const byte RIGHT = 2;
+    private const byte DOWN  = 4;
+    private const byte LEFT  = 8;
 
-    private const byte NW = 16;   // x-1, y+1
-    private const byte NE = 32;   // x+1, y+1
-    private const byte SW = 64;   // x-1, y-1
-    private const byte SE = 128;  // x+1, y-1
+    private const byte UP_LEFT    = 16;
+    private const byte UP_RIGHT   = 32;
+    private const byte DOWN_LEFT  = 64;
+    private const byte DOWN_RIGHT = 128;
 
-    public static byte GetMask(Func<int,int,string> biomeGetter, int x, int y, string centerBiome)
+    /// <summary>
+    /// Вычисляет маску для autotile системы.
+    /// Бит = 1 означает что в этом направлении такой же биом (союзник).
+    /// Бит = 0 означает что там другой биом (враг).
+    /// 
+    /// targetBiome - биом, для которого рисуем tileset (обычно edgeBiome/dominant)
+    /// </summary>
+    public static byte GetMask(Func<int,int,string> biomeGetter, int x, int y, string targetBiome)
     {
         byte mask = 0;
 
-        bool Diff(int dx, int dy)
-        {
-            return biomeGetter(x + dx, y + dy) != centerBiome;
-        }
+        // Same = true если в этом направлении такой же биом как targetBiome
+        bool Same(int dx, int dy) =>
+            biomeGetter(x + dx, y + dy) == targetBiome;
 
-        // Cardinal
-        if (Diff(0, 1))  mask |= N;
-        if (Diff(0, -1)) mask |= S;
-        if (Diff(-1, 0)) mask |= W;
-        if (Diff(1, 0))  mask |= E;
+        // Устанавливаем биты ТАМ ГДЕ СОЮЗНИКИ (одинаковый биом)
+        if (Same(0, 1))   mask |= UP;          // Сверху такой же биом
+        if (Same(1, 0))   mask |= RIGHT;       // Справа такой же биом
+        if (Same(0, -1))  mask |= DOWN;        // Снизу такой же биом
+        if (Same(-1, 0))  mask |= LEFT;        // Слева такой же биом
 
-        // Diagonals
-        if (Diff(-1, 1))  mask |= NW;
-        if (Diff(1, 1))   mask |= NE;
-        if (Diff(-1, -1)) mask |= SW;
-        if (Diff(1, -1))  mask |= SE;
+        if (Same(-1, 1))  mask |= UP_LEFT;     // Сверху-слева такой же биом
+        if (Same(1, 1))   mask |= UP_RIGHT;    // Сверху-справа такой же биом
+        if (Same(-1, -1)) mask |= DOWN_LEFT;   // Снизу-слева такой же биом
+        if (Same(1, -1))  mask |= DOWN_RIGHT;  // Снизу-справа такой же биом
 
         return mask;
     }
