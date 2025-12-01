@@ -1,0 +1,89 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                                            */
+/*   InventoryController.cs                               /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/01 13:32:26 by UDA                                      */
+/*   Updated: 2025/12/01 13:32:26 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
+using System.Collections.Generic;
+using UnityEngine;
+
+public class InventoryController : MonoBehaviour
+{
+    public static InventoryController Instance;
+
+    private SaveData Save => GameManager.Instance.GetCurrentGameData();
+    private PlayerSaveData Player => Save.player;
+
+    public int baseCapacity = 16;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    public List<ItemInstance> Items => Player.inventoryItems;
+
+    public int GetCapacity()
+    {
+        int bonus = 0;
+
+        foreach (var it in Items)
+        {
+            var def = it.Def;
+            if (def.type == "bag")
+                bonus += def.capacityBonus;
+        }
+
+        return baseCapacity + bonus;
+    }
+
+    public bool AddItem(string id, int amount = 1)
+    {
+        var def = ItemDatabase.Instance.Get(id);
+
+        // 1 — Добавление в существующий стак
+        if (def.maxStack > 1)
+        {
+            foreach (var inst in Items)
+            {
+                if (inst.id == id && inst.quantity < def.maxStack)
+                {
+                    int canAdd = def.maxStack - inst.quantity;
+                    int add = Mathf.Min(canAdd, amount);
+
+                    inst.quantity += add;
+                    amount -= add;
+
+                    if (amount <= 0)
+                        return true;
+                }
+            }
+        }
+
+        // 2 — Добавление новых стаков
+        while (amount > 0)
+        {
+            if (Items.Count >= GetCapacity())
+                return false;
+
+            int stackSize = Mathf.Min(def.maxStack, amount);
+            Items.Add(new ItemInstance { id = id, quantity = stackSize });
+            amount -= stackSize;
+        }
+
+        return true;
+    }
+
+    public void RemoveItem(ItemInstance inst, int amount)
+    {
+        inst.quantity -= amount;
+        if (inst.quantity <= 0)
+            Items.Remove(inst);
+    }
+}

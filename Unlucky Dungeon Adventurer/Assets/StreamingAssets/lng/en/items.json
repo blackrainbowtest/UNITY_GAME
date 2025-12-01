@@ -1,0 +1,16 @@
+{
+  "items": {
+    "bread": {
+      "name": "Bread",
+      "description": "A simple loaf of bread. Restores HP and stamina."
+    },
+    "tent_basic": {
+      "name": "Basic Tent",
+      "description": "Allows comfortable rest anywhere."
+    },
+    "bag_small": {
+      "name": "Small Bag",
+      "description": "Adds 12 inventory slots."
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "items": [
+    {
+      "id": "bread",
+      "type": "consumable",
+      "maxStack": 20,
+      "effects": { "hp": 50, "stamina": 100 }
+    },
+    {
+      "id": "tent_basic",
+      "type": "camp",
+      "maxStack": 1
+    },
+    {
+      "id": "bag_small",
+      "type": "bag",
+      "capacityBonus": 12
+    },
+    {
+      "id": "sword_basic",
+      "type": "weapon",
+      "maxStack": 1,
+      "effects": { "attack": 5 }
+    },
+    {
+      "id": "dagger_basic",
+      "type": "weapon",
+      "maxStack": 1,
+      "effects": { "attack": 3, "agility": 1 }
+    },
+    {
+      "id": "spear_basic",
+      "type": "weapon",
+      "maxStack": 1,
+      "effects": { "attack": 4 }
+    },
+    {
+      "id": "bow_basic",
+      "type": "weapon",
+      "maxStack": 1,
+      "effects": { "attack": 4, "agility": 2 }
+    },
+    {
+      "id": "club_basic",
+      "type": "weapon",
+      "maxStack": 1,
+      "effects": { "attack": 2, "stunChance": 10 }
+    },
+    {
+      "id": "armor_knight",
+      "type": "armor",
+      "maxStack": 1,
+      "effects": { "defense": 5 }
+    },
+    {
+      "id": "armor_rogue",
+      "type": "armor",
+      "maxStack": 1,
+      "effects": { "agility": 3, "defense": 2 }
+    },
+    {
+      "id": "armor_mage",
+      "type": "armor",
+      "maxStack": 1,
+      "effects": { "mana": 50 }
+    },
+    {
+      "id": "armor_hermit",
+      "type": "armor",
+      "maxStack": 1,
+      "effects": { "stamina": 20 }
+    }
+  ]
+}
