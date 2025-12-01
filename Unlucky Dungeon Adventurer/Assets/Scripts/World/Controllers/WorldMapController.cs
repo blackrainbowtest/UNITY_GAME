@@ -31,6 +31,8 @@ public class WorldMapController : MonoBehaviour
 
     public static WorldMapController Instance { get; private set; }
 
+    public PlayerMovementController movementController;
+
     // ============================================================
     // UI & References
     // ============================================================
@@ -210,26 +212,21 @@ public class WorldMapController : MonoBehaviour
 
     private void HandleTileClick()
     {
-        // экран → мир
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorld.z = 0;
+        mouseWorld.z = 0f;
 
-        // мир → тайл (RoundToInt для клика в центр тайла)
-        int tx = Mathf.RoundToInt(mouseWorld.x / tileSize);
-        int ty = Mathf.RoundToInt(mouseWorld.y / tileSize);
-
-        TileData tile = generator.GetTile(tx, ty);
-
+        int tx = Mathf.FloorToInt(mouseWorld.x / tileSize);
+        int ty = Mathf.FloorToInt(mouseWorld.y / tileSize);
+        TileData tile = WorldGenerator.GetTile(tx, ty);
         if (tile == null)
         {
-            Debug.Log("Tile not found at: " + tx + ", " + ty);
+            Debug.Log($"[Click] Tile not found at {tx}, {ty}");
             return;
         }
-
-        Debug.Log($"Clicked tile ({tx}, {ty}): {tile.biomeId}, moveCost={tile.moveCost}");
-
-        // Обновляем InfoBar
-        InfoBar_Update(tile, new Vector2Int(tx, ty));
+        Vector2Int coords = new Vector2Int(tx, ty);
+        InfoBar_Update(tile, coords);
+        if (movementController != null)
+            movementController.PreparePathTo(coords);
     }
 
     private bool IsPointerOverUI()

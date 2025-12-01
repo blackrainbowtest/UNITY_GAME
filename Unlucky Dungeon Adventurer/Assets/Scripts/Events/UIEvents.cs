@@ -11,6 +11,14 @@ public static class UIEvents
     // Вызывается, когда меняются статы игрока (здоровье, голд, опыт и т.п.)
     public static event Action OnPlayerStatsChanged;
 
+    /// <summary>
+    /// Вызывается при выборе пути по клику.
+    /// staminaCost - сколько стамины нужно.
+    /// timeMinutes - сколько минут займёт путь.
+    /// hasEnoughStamina - хватает ли сейчас стамины.
+    /// </summary>
+    public static Action<int, int, bool> OnPathPreview;
+
     // Методы для вызова событий
     public static void InvokeGameInitialized()
     {
@@ -26,4 +34,19 @@ public static class UIEvents
     {
         OnPlayerStatsChanged?.Invoke();
     }
+
+    /// <summary>
+    /// Движение по пути началось.
+    /// </summary>
+    public static Action OnMovementStarted;
+
+    /// <summary>
+    /// Движение по пути закончено (успешно или прервано).
+    /// </summary>
+    public static Action OnMovementEnded;
+
+    /// <summary>
+    /// Можно ли сейчас показывать кнопку отдыха.
+    /// </summary>
+    public static Action<bool> OnRestAvailable;
 }

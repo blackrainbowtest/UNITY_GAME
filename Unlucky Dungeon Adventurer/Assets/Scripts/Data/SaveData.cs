@@ -63,6 +63,16 @@ public class WorldSaveData
     // � �������: �������� ����������, ������ � �.�.
     // public List<Vector2Int> discoveredDungeons = new List<Vector2Int>();
     // public List<Vector2Int> discoveredCities = new List<Vector2Int>();
+    public void AddMinutes(int minutes)
+    {
+        float totalMinutes = timeOfDay * 60f + minutes;
+        int minutesPerDay = 24 * 60;
+
+        currentDay += totalMinutes >= minutesPerDay ? (int)(totalMinutes / minutesPerDay) : 0;
+        totalMinutes %= minutesPerDay;
+
+        timeOfDay = totalMinutes / 60f;
+    }
 }
 
 // -------------------- ��������� --------------------

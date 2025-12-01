@@ -1,59 +1,66 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
-/// <summary>
-/// Renders a visual path on the map using ball prefabs.
-/// Each path node is represented by a PathBall with pulse animation.
-/// </summary>
 public class PathRenderer : MonoBehaviour
 {
-    [Header("Path Visualization")]
-    public GameObject ballPrefab; // Drag PathBall prefab here
+    public static PathRenderer Instance;
 
-    [Header("Settings")]
-    public Transform pathContainer; // Optional: parent for organizing path balls
+    public GameObject ballPrefab;
+    public Transform ballParent;
+    public float tileSize = 10f;
 
-    private List<GameObject> activeBalls = new List<GameObject>();
+    private readonly List<GameObject> _balls = new List<GameObject>();
 
-    /// <summary>
-    /// Displays the path by instantiating ball prefabs at each node position.
-    /// </summary>
-    /// <param name="path">List of tile positions representing the path</param>
-    public void ShowPath(List<Vector2Int> path)
+    private void Awake()
     {
-        ClearPath();
+        Instance = this;
+    }
 
-        if (path == null || path.Count == 0 || ballPrefab == null)
-            return;
+    public static void Show(List<Vector2Int> path)
+    {
+        if (Instance == null) return;
+        Instance.Render(path);
+    }
 
-        foreach (var tilePos in path)
+    public static void ClearAll()
+    {
+        if (Instance == null) return;
+        Instance.ClearBalls();
+    }
+
+    public static void ConsumeFirst()
+    {
+        if (Instance == null) return;
+        Instance.Consume();
+    }
+
+    private void Render(List<Vector2Int> path)
+    {
+        ClearBalls();
+
+        // не ставим шарик на стартовом тайле (i = 1)
+        for (int i = 1; i < path.Count; i++)
         {
-            Vector3 worldPos = new Vector3(tilePos.x, tilePos.y, 0f);
-            GameObject ball = Instantiate(ballPrefab, worldPos, Quaternion.identity);
-            
-            if (pathContainer != null)
-                ball.transform.SetParent(pathContainer);
-
-            activeBalls.Add(ball);
+            Vector2Int p = path[i];
+            Vector3 pos = new Vector3(p.x * tileSize, p.y * tileSize, 0f);
+            GameObject ball = Instantiate(ballPrefab, pos, Quaternion.identity, ballParent);
+            _balls.Add(ball);
         }
     }
 
-    /// <summary>
-    /// Removes all active path balls from the scene.
-    /// </summary>
-    public void ClearPath()
+    private void ClearBalls()
     {
-        foreach (var ball in activeBalls)
-        {
-            if (ball != null)
-                Destroy(ball);
-        }
-
-        activeBalls.Clear();
+        foreach (var b in _balls)
+            if (b != null) Destroy(b);
+        _balls.Clear();
     }
 
-    private void OnDestroy()
+    private void Consume()
     {
-        ClearPath();
+        if (_balls.Count == 0) return;
+
+        GameObject first = _balls[0];
+        _balls.RemoveAt(0);
+        if (first != null) Destroy(first);
     }
 }
