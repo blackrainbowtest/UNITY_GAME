@@ -27,6 +27,13 @@ public class InventoryUIController : MonoBehaviour
         Instance = this;
     }
 
+    public void SortByName() => InventoryController.Instance.SortInventory(InventorySort.SortMode.Name);
+    public void SortByType() => InventoryController.Instance.SortInventory(InventorySort.SortMode.Type);
+    public void SortByRarity() => InventoryController.Instance.SortInventory(InventorySort.SortMode.Rarity);
+    public void SortByPrice() => InventoryController.Instance.SortInventory(InventorySort.SortMode.Price);
+    public void SortById() => InventoryController.Instance.SortInventory(InventorySort.SortMode.Id);
+
+
     public void Open()
     {
         panel.SetActive(true);

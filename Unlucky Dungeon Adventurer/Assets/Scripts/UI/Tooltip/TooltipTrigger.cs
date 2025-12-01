@@ -32,6 +32,12 @@ public class TooltipTrigger : MonoBehaviour, IPointerClickHandler
         _isOpen = false;
     }
 
+	public void HideImmediate()
+	{
+		TooltipController.Instance.Hide();
+		_isOpen = false;
+	}
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (_item == null)

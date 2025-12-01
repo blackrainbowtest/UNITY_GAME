@@ -4,71 +4,96 @@
       "id": "bread",
       "type": "consumable",
       "maxStack": 20,
+      "price": 5,
+      "rarity": 0,
       "effects": { "hp": 50, "stamina": 100 }
     },
     {
       "id": "tent_basic",
       "type": "camp",
-      "maxStack": 1
+      "maxStack": 1,
+      "price": 20,
+      "rarity": 0
     },
     {
       "id": "bag_small",
       "type": "bag",
-      "capacityBonus": 12
+      "capacityBonus": 12,
+      "maxStack": 1,
+      "price": 15,
+      "rarity": 1
     },
     {
       "id": "sword_basic",
       "type": "weapon",
-      "maxStack": 1,
-      "effects": { "attack": 5 }
+      "weaponDamage": 5,
+      "rarity": 1,
+      "price": 25,
+      "tags": ["sharp", "steel"]
     },
     {
       "id": "dagger_basic",
       "type": "weapon",
-      "maxStack": 1,
-      "effects": { "attack": 3, "agility": 1 }
+      "weaponDamage": 3,
+      "price": 12,
+      "rarity": 1,
+      "tags": ["light", "sharp"]
     },
     {
       "id": "spear_basic",
       "type": "weapon",
-      "maxStack": 1,
-      "effects": { "attack": 4 }
+      "weaponDamage": 4,
+      "price": 20,
+      "rarity": 1,
+      "tags": ["long", "piercing"]
     },
     {
       "id": "bow_basic",
       "type": "weapon",
-      "maxStack": 1,
-      "effects": { "attack": 4, "agility": 2 }
+      "weaponDamage": 4,
+      "price": 30,
+      "rarity": 2,
+      "tags": ["ranged"]
     },
     {
       "id": "club_basic",
       "type": "weapon",
-      "maxStack": 1,
-      "effects": { "attack": 2, "stunChance": 10 }
+      "weaponDamage": 2,
+      "price": 8,
+      "rarity": 0,
+      "tags": ["blunt"]
     },
     {
       "id": "armor_knight",
       "type": "armor",
-      "maxStack": 1,
-      "effects": { "defense": 5 }
+      "armorValue": 5,
+      "price": 40,
+      "rarity": 2,
+      "tags": ["heavy"]
     },
     {
       "id": "armor_rogue",
       "type": "armor",
-      "maxStack": 1,
-      "effects": { "agility": 3, "defense": 2 }
+      "armorValue": 2,
+      "price": 28,
+      "rarity": 1,
+      "tags": ["light", "leather"]
     },
     {
       "id": "armor_mage",
       "type": "armor",
-      "maxStack": 1,
-      "effects": { "mana": 50 }
+      "armorValue": 1,
+      "price": 35,
+      "rarity": 2,
+      "tags": ["magic"]
     },
     {
       "id": "armor_hermit",
       "type": "armor",
-      "maxStack": 1,
-      "effects": { "stamina": 20 }
+      "armorValue": 1,
+      "price": 10,
+      "rarity": 0,
+      "tags": ["cloth"]
     }
   ]
 }

@@ -80,6 +80,15 @@ public class InventoryController : MonoBehaviour
         return true;
     }
 
+    public void SortInventory(InventorySort.SortMode mode)
+    {
+        var sorted = InventorySort.Sort(Player.inventoryItems, mode);
+
+        Player.inventoryItems = sorted;
+
+        InventoryUIController.Instance.Refresh();
+    }
+
     public void RemoveItem(ItemInstance inst, int amount)
     {
         inst.quantity -= amount;

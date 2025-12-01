@@ -15,12 +15,26 @@ using System;
 [Serializable]
 public class ItemDefinition
 {
-    public string id;              // Уникальный ID предмета
-    public string type;            // consumable, bag, camp, weapon, armor, etc.
+    public string id;               // ID предмета
+    public string type;             // weapon, armor, consumable, bag, camp, misc
     public int maxStack = 1;
 
-    public int capacityBonus;      // Только для сумок
-    public ItemEffects effects;    // Для consumable
+    // Новые поля:
+    public int rarity = 0;          // 0=common, 1=uncommon, 2=rare, 3=epic, 4=legendary, 5=mythic
+    public int price = 0;           // цена предмета в золоте
+
+    // Боевая логика:
+    public int weaponDamage = 0;    // если оружие
+    public int armorValue = 0;      // если броня
+
+    // Доп. свойства:
+    public string[] tags;           // "sharp", "magic", "heavy" и т.п.
+
+    // Потребляемые предметы:
+    public ItemEffects effects;
+
+    // Для сумок
+    public int capacityBonus;
 }
 
 [Serializable]
