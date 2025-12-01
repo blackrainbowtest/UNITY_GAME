@@ -2,7 +2,7 @@
   "items": {
     "bread": {
       "name": "Bread",
-      "description": "A simple loaf of bread. Restores HP and stamina."
+      "description": "Simple bread restoring health and stamina."
     },
     "tent_basic": {
       "name": "Basic Tent",
@@ -10,7 +10,43 @@
     },
     "bag_small": {
       "name": "Small Bag",
-      "description": "Adds 12 inventory slots."
+      "description": "Increases inventory capacity by 12."
+    },
+    "sword_basic": {
+      "name": "Basic Sword",
+      "description": "A steel sword. Simple but reliable."
+    },
+    "dagger_basic": {
+      "name": "Dagger",
+      "description": "Light weapon favored by rogues. Increases agility."
+    },
+    "spear_basic": {
+      "name": "Spear",
+      "description": "A long spear with good piercing ability."
+    },
+    "bow_basic": {
+      "name": "Bow",
+      "description": "A simple hunting bow. Requires agility."
+    },
+    "club_basic": {
+      "name": "Club",
+      "description": "A heavy wooden club. Can stun enemies."
+    },
+    "armor_knight": {
+      "name": "Knight Armor",
+      "description": "Heavy steel armor offering great protection."
+    },
+    "armor_rogue": {
+      "name": "Rogue Leather Armor",
+      "description": "Light armor increasing mobility."
+    },
+    "armor_mage": {
+      "name": "Mage Robe",
+      "description": "A robe infused with magical energy."
+    },
+    "armor_hermit": {
+      "name": "Hermit Clothes",
+      "description": "Simple clothing helping preserve stamina."
     }
   }
 }

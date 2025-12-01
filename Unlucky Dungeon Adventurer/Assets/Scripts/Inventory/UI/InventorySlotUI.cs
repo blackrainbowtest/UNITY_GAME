@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 
@@ -22,28 +23,32 @@ public class InventorySlotUI : MonoBehaviour
     private ItemInstance _item;
     public ItemInstance Item => _item;
 
+    private TooltipTrigger _tooltip;
+
+    private void Awake()
+    {
+        _tooltip = GetComponent<TooltipTrigger>();
+    }
+
     public void SetItem(ItemInstance inst)
     {
         _item = inst;
 
         icon.enabled = true;
-        icon.sprite = ItemIconDatabase.Get(inst.id); // мы добавим позже
-
-        // локализация работает:
-        GetComponent<TooltipTrigger>().SetText(
-            inst.Loc.name,
-            inst.Loc.description
-        );
+        icon.sprite = ItemIconDatabase.Get(inst.id);
 
         quantityText.text = inst.quantity > 1 ? inst.quantity.ToString() : "";
+
+        _tooltip.SetItem(inst);
     }
 
     public void Clear()
     {
         _item = null;
+
         icon.enabled = false;
         quantityText.text = "";
 
-        GetComponent<TooltipTrigger>().Clear();
+        _tooltip.Clear();
     }
 }
