@@ -20,6 +20,13 @@ public class TooltipTrigger : MonoBehaviour, IPointerClickHandler
     // чтобы знать, открыт tooltip или нет
     private bool _isOpen = false;
 
+	public void OnClick()
+	{
+		if (_item == null) return;
+
+		ItemActionWindow.Instance.Open(_item, GetComponent<InventorySlotUI>());
+	}
+
     public void SetItem(ItemInstance item)
     {
         _item = item;

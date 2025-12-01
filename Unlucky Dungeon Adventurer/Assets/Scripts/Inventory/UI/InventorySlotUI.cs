@@ -17,6 +17,9 @@ using TMPro;
 
 public class InventorySlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
 {
+    [Header("UI Elements")]
+    public Image border;
+    public Image glow;
     public Image icon;
     public TextMeshProUGUI quantityText;
 
@@ -30,6 +33,7 @@ public class InventorySlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     private void Awake()
     {
         _tooltip = GetComponent<TooltipTrigger>();
+        glow.gameObject.SetActive(false);
     }
 
     public ItemInstance Item => _item;
@@ -38,10 +42,20 @@ public class InventorySlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     {
         _item = inst;
 
+        if (inst == null)
+        {
+            Clear();
+            return;
+        }
         icon.enabled = inst != null;
         quantityText.text = inst != null && inst.quantity > 1 ? inst.quantity.ToString() : "";
 
         _tooltip.SetItem(inst);
+        border.color = RarityColors.Get(inst.Def.rarity);
+        bool showGlow = inst.Def.rarity >= 3;
+        glow.gameObject.SetActive(showGlow);
+        if (showGlow)
+            glow.color = RarityColors.Get(inst.Def.rarity);
         if (inst != null)
             icon.sprite = ItemIconDatabase.Get(inst.id);
     }
@@ -52,6 +66,8 @@ public class InventorySlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         icon.enabled = false;
         quantityText.text = "";
         _tooltip.Clear();
+        border.color = RarityColors.Common;
+        glow.gameObject.SetActive(false);
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -89,8 +105,7 @@ public class InventorySlotUI : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             return;
         }
 
-        // обычный клик → tooltip
         if (_item != null)
-            _tooltip.OnClick();
+            ItemActionWindow.Instance.Open(_item, this);
     }
 }
