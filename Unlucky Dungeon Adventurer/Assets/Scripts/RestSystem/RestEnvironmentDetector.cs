@@ -19,19 +19,25 @@ public static class RestEnvironmentDetector
     /// </summary>
     public static RestEnvironment GetEnvironment(Vector2Int tilePos)
     {
-        TileData tile = WorldGenerator.GetTile(tilePos.x, tilePos.y);
-
+        // Получаем генератор мира
+        var gen = WorldMapController.Instance?.GetWorldGenerator();
+        TileData tile = gen != null ? gen.GetTile(tilePos.x, tilePos.y) : null;
         if (tile == null)
             return RestEnvironment.Field;
 
-        // 🔥 Когда появится генерация деревень/городов — добавим:
-        if (tile.hasCity)
-            return RestEnvironment.City;
+        // Временная логика: используем structureId, если начнём помечать структуры
+        // Например: structureId == "city" → City, "village" → Village
+        if (!string.IsNullOrEmpty(tile.structureId))
+        {
+            switch (tile.structureId)
+            {
+                case "city": return RestEnvironment.City;
+                case "village": return RestEnvironment.Village;
+                case "camp": return RestEnvironment.Tent; // лагерь / палатка
+            }
+        }
 
-        if (tile.hasVillage)
-            return RestEnvironment.Village;
-
-        // 🔥 Палатка игрока (в будущем: размещение палатки)
+        // Позже: проверка размещённых объектов игрока (палатка и т.п.)
         if (PlayerHasTentOnTile(tilePos))
             return RestEnvironment.Tent;
 

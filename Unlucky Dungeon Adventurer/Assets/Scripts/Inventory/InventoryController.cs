@@ -25,6 +25,8 @@ public class InventoryController : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        if (Player.inventoryItems == null)
+            Player.inventoryItems = new List<ItemInstance>();
     }
 
     public List<ItemInstance> Items => Player.inventoryItems;
@@ -94,5 +96,35 @@ public class InventoryController : MonoBehaviour
         inst.quantity -= amount;
         if (inst.quantity <= 0)
             Items.Remove(inst);
+    }
+
+    public bool UseItem(ItemInstance inst)
+    {
+        if (inst == null) return false;
+        var def = inst.Def;
+        if (def == null) return false;
+        if (def.type != "consumable")
+        {
+            Debug.LogWarning($"[Inventory] Попытка использовать не consumable: {def.id}");
+            return false;
+        }
+
+        // Применяем эффекты
+        var effects = def.effects;
+        if (effects != null)
+        {
+            if (effects.hp != 0) PlayerStatsController.Instance.ModifyHP(effects.hp);
+            if (effects.stamina != 0) PlayerStatsController.Instance.ModifyStamina(effects.stamina);
+            if (effects.mana != 0) PlayerStatsController.Instance.ModifyMP(effects.mana);
+        }
+
+        // Уменьшаем количество
+        RemoveItem(inst, 1);
+
+        // Обновляем UI инвентаря если открыт
+        if (InventoryUIController.Instance != null)
+            InventoryUIController.Instance.Refresh();
+
+        return true;
     }
 }

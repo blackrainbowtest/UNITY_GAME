@@ -96,7 +96,9 @@ public class ItemActionWindow : MonoBehaviour
 
     private void DropItem()
     {
-        InventoryController.Instance.RemoveItem(_item);
+        // Удаляем один предмет из стака (или весь, если нестакаемый)
+        int amountToRemove = _item.IsStackable ? 1 : _item.quantity;
+        InventoryController.Instance.RemoveItem(_item, amountToRemove);
         Close();
     }
 

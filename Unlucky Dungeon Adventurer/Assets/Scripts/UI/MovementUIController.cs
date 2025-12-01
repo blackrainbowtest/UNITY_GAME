@@ -78,6 +78,17 @@ public class MovementUIController : MonoBehaviour
 
     private void OnRestClicked()
     {
-        movementController.StartRest();
+        var player = GameData.CurrentPlayer;
+        if (player == null) return;
+
+        Vector2Int coords = new Vector2Int(
+            Mathf.RoundToInt(player.mapPosX),
+            Mathf.RoundToInt(player.mapPosY)
+        );
+
+        RestEnvironment env = RestEnvironmentDetector.GetEnvironment(coords);
+
+        if (RestUIController.Instance != null)
+            RestUIController.Instance.Open(env);
     }
 }

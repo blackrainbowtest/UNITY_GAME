@@ -217,7 +217,13 @@ public class WorldMapController : MonoBehaviour
 
         int tx = Mathf.FloorToInt(mouseWorld.x / tileSize);
         int ty = Mathf.FloorToInt(mouseWorld.y / tileSize);
-        TileData tile = WorldGenerator.GetTile(tx, ty);
+        // Use instance generator (WorldGenerator has no static GetTile)
+        if (generator == null)
+        {
+            Debug.LogWarning("[WorldMap] Generator not initialized yet.");
+            return;
+        }
+        TileData tile = generator.GetTile(tx, ty);
         if (tile == null)
         {
             Debug.Log($"[Click] Tile not found at {tx}, {ty}");

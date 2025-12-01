@@ -50,6 +50,10 @@ public class PlayerSaveData
     // позиция игрока на карте
     public float mapPosX;
     public float mapPosY;
+
+    // 🔹 Инвентарь игрока (мигрировано из InventorySaveData.items)
+    // Используем ItemInstance для прямого доступа к данным предмета.
+    public List<ItemInstance> inventoryItems = new List<ItemInstance>();
 }
 
 // -------------------- ��� --------------------

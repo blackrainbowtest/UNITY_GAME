@@ -25,7 +25,7 @@ public class PlayerStatsController : MonoBehaviour
         if (Player.currentHP > Player.baseMaxHP)
             Player.currentHP = Player.baseMaxHP;
 
-        UIEvents.OnPlayerStatsChanged?.Invoke();
+        UIEvents.InvokePlayerStatsChanged();
 
         Debug.Log($"[HP] HP changed by {amount}, now {Player.currentHP}/{Player.baseMaxHP}");
     }
@@ -43,7 +43,7 @@ public class PlayerStatsController : MonoBehaviour
         if (Player.currentMP > Player.baseMaxMP)
             Player.currentMP = Player.baseMaxMP;
 
-        UIEvents.OnPlayerStatsChanged?.Invoke();
+        UIEvents.InvokePlayerStatsChanged();
 
         Debug.Log($"[MP] MP changed by {amount}, now {Player.currentMP}/{Player.baseMaxMP}");
     }
@@ -61,7 +61,7 @@ public class PlayerStatsController : MonoBehaviour
         if (Player.currentStamina > Player.baseMaxStamina)
             Player.currentStamina = Player.baseMaxStamina;
 
-        UIEvents.OnPlayerStatsChanged?.Invoke();
+        UIEvents.InvokePlayerStatsChanged();
 
         Debug.Log($"[Stamina] Stamina changed by {amount}, now {Player.currentStamina}/{Player.baseMaxStamina}");
     }

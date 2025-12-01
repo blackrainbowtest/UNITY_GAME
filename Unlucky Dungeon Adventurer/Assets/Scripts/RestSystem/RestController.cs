@@ -38,7 +38,7 @@ public class RestController : MonoBehaviour
             World.AddMinutes(minutes);
             RestCalculator.ApplyRest(Player, type, env);
 
-            UIEvents.OnPlayerStatsChanged?.Invoke();
+            UIEvents.InvokePlayerStatsChanged();
             Debug.Log("[Rest] Спокойный отдых без событий.");
             return;
         }
@@ -49,6 +49,7 @@ public class RestController : MonoBehaviour
             World.AddMinutes(penalizedMinutes);
             RestCalculator.ApplyRest(Player, type, env);
 
+            UIEvents.InvokePlayerStatsChanged();
             Debug.Log("[Rest] Шум! Отдых с штрафом.");
             return;
         }

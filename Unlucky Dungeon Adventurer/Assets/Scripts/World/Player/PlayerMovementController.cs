@@ -93,7 +93,7 @@ public class PlayerMovementController : MonoBehaviour
         _isMoving = false;
 
         UIEvents.OnMovementEnded?.Invoke();
-        UIEvents.OnPlayerStatsChanged?.Invoke();
+        UIEvents.InvokePlayerStatsChanged();
         UIEvents.OnRestAvailable?.Invoke(Player.currentStamina < Player.baseMaxStamina);
     }
 
