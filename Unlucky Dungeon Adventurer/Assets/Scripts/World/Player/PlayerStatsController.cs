@@ -4,12 +4,36 @@ public class PlayerStatsController : MonoBehaviour
 {
     public static PlayerStatsController Instance;
 
-    private SaveData Save => GameManager.Instance.GetCurrentGameData();
-    private PlayerSaveData Player => Save.player;
+    // Work directly with GameData.CurrentPlayer instead of temporary SaveData
+    private PlayerData Player => GameData.CurrentPlayer;
+
+    /// <summary>
+    /// Ensure a PlayerStatsController exists in the scene.
+    /// Called automatically before scene loads.
+    /// </summary>
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    public static void EnsureExists()
+    {
+        if (Instance == null)
+        {
+            var obj = new GameObject("PlayerStatsController");
+            obj.AddComponent<PlayerStatsController>();
+            Debug.Log("[PlayerStatsController] Created automatically");
+        }
+    }
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            Debug.Log("[PlayerStatsController] Singleton initialized");
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     // ============================
@@ -64,5 +88,16 @@ public class PlayerStatsController : MonoBehaviour
         UIEvents.InvokePlayerStatsChanged();
 
         Debug.Log($"[Stamina] Stamina changed by {amount}, now {Player.currentStamina}/{Player.baseMaxStamina}");
+    }
+
+    // ============================
+    //        MAP POSITION
+    // ============================
+    public void UpdateMapPosition(int x, int y)
+    {
+        Player.mapPosX = x;
+        Player.mapPosY = y;
+
+        Debug.Log($"[Position] Player moved to ({x}, {y})");
     }
 }

@@ -39,17 +39,34 @@ public class GameUIController : MonoBehaviour
         if (p == null)
             return;
 
+        // Check if UI elements are still valid before updating
+        if (hpFill == null || mpFill == null || staFill == null)
+        {
+            Debug.LogWarning("[GameUIController] UI elements are null or destroyed. Unsubscribing from events.");
+            UIEvents.OnPlayerStatsChanged -= UpdateUI;
+            return;
+        }
+
         // HP
-        hpFill.fillAmount = (float)p.currentHP / p.finalMaxHP;
-        hpText.text = $"{p.currentHP}/{p.finalMaxHP}";
+        if (hpFill != null && hpText != null)
+        {
+            hpFill.fillAmount = (float)p.currentHP / p.finalMaxHP;
+            hpText.text = $"{p.currentHP}/{p.finalMaxHP}";
+        }
 
         // MP
-        mpFill.fillAmount = (float)p.currentMP / p.finalMaxMP;
-        mpText.text = $"{p.currentMP}/{p.finalMaxMP}";
+        if (mpFill != null && mpText != null)
+        {
+            mpFill.fillAmount = (float)p.currentMP / p.finalMaxMP;
+            mpText.text = $"{p.currentMP}/{p.finalMaxMP}";
+        }
 
         // Stamina
-        staFill.fillAmount = (float)p.currentStamina / p.finalMaxStamina;
-        staText.text = $"{p.currentStamina}/{p.finalMaxStamina}";
+        if (staFill != null && staText != null)
+        {
+            staFill.fillAmount = (float)p.currentStamina / p.finalMaxStamina;
+            staText.text = $"{p.currentStamina}/{p.finalMaxStamina}";
+        }
     }
 
     private void OnEnable()

@@ -27,8 +27,11 @@ public class PlayerMovementController : MonoBehaviour
     {
         if (_isMoving) return;
 
-        Vector2Int start = new Vector2Int(Mathf.RoundToInt(Player.mapPosX),
-                                          Mathf.RoundToInt(Player.mapPosY));
+        // Use actual transform position instead of Player.mapPosX/Y for accurate pathfinding
+        Vector2Int start = new Vector2Int(
+            Mathf.RoundToInt(transform.position.x / tileSize),
+            Mathf.RoundToInt(transform.position.y / tileSize)
+        );
 
         var path = Pathfinding.FindPath(start, targetTile);
         if (path == null || path.Count <= 1)
@@ -86,14 +89,23 @@ public class PlayerMovementController : MonoBehaviour
                 if (Player.currentStamina < 0) Player.currentStamina = 0;
             }
 
+            // Update player coordinates BEFORE moving (for save consistency)
+            if (PlayerStatsController.Instance != null)
+            {
+                PlayerStatsController.Instance.UpdateMapPosition(tile.x, tile.y);
+            }
+            else
+            {
+                // Fallback if controller not available
+                Player.mapPosX = tile.x;
+                Player.mapPosY = tile.y;
+            }
+
             MovementTimeController.ApplyTime(World, minutesPerTile);
             MovementEventResolver.ProcessTileEvent(tile);
 
             Vector3 target = new Vector3(tile.x * tileSize, tile.y * tileSize, 0f);
             yield return MoveTo(target);
-
-            Player.mapPosX = tile.x;
-            Player.mapPosY = tile.y;
 
             PathRenderer.ConsumeFirst();
         }
