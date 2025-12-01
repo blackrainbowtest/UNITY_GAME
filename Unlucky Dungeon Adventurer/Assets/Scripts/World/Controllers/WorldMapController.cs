@@ -215,8 +215,9 @@ public class WorldMapController : MonoBehaviour
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorld.z = 0f;
 
-        int tx = Mathf.FloorToInt(mouseWorld.x / tileSize);
-        int ty = Mathf.FloorToInt(mouseWorld.y / tileSize);
+        // Tiles are centered at pos*tileSize; use RoundToInt to map correctly
+        int tx = Mathf.RoundToInt(mouseWorld.x / tileSize);
+        int ty = Mathf.RoundToInt(mouseWorld.y / tileSize);
         // Use instance generator (WorldGenerator has no static GetTile)
         if (generator == null)
         {
