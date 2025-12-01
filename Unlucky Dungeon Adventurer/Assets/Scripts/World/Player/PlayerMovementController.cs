@@ -74,7 +74,18 @@ public class PlayerMovementController : MonoBehaviour
             if (Player.currentStamina < staminaCost)
                 break;
 
-            PlayerStatsController.Instance.ModifyStamina(-staminaCost);
+            // Null-safe stamina modification
+            if (PlayerStatsController.Instance != null)
+            {
+                PlayerStatsController.Instance.ModifyStamina(-staminaCost);
+            }
+            else
+            {
+                Debug.LogWarning("[Movement] PlayerStatsController.Instance is null! Using direct modification.");
+                Player.currentStamina -= staminaCost;
+                if (Player.currentStamina < 0) Player.currentStamina = 0;
+            }
+
             MovementTimeController.ApplyTime(World, minutesPerTile);
             MovementEventResolver.ProcessTileEvent(tile);
 
