@@ -48,6 +48,11 @@ namespace WorldLogic
 			var mgr = FindObjectOfType<UniqueLocationManager>();
 			if (mgr != null)
 				managers.Add(mgr);
+			var uniqueLocMgr = FindObjectOfType<UniqueLocationManager>();
+			if (uniqueLocMgr != null)
+				managers.Add(uniqueLocMgr);
+			else
+				Debug.LogWarning("[WorldLogic] UniqueLocationManager not found in scene!");
 			// Сюда мы добавим ссылки на акторов, события, фракции
         }
 

@@ -19,25 +19,23 @@ namespace WorldLogic
     {
         private static readonly int TARGET_COUNT = 50;
 
-        // Здесь будет храниться всё, что сгенерировали
+        // Все 50 уникальных локаций после генерации
         public static List<UniqueLocationInstance> Instances { get; private set; }
 
-        // Вспомогательный список дефов
+        // Все дефы
         private List<UniqueLocationDef> defs;
 
         public void Generate(int seed, WorldGenerator worldGen)
         {
-            Random.InitState(seed + 777777); // смещение, чтобы не совпадало с биомами
-
             LoadAllDefs();
             PrepareDefOrder();
-            GenerateInstances(worldGen);
+            GenerateInstances(worldGen, seed);
 
-            Debug.Log($"[UniqueLocationsGenerator] Generated {Instances.Count} unique locations.");
+            Debug.Log($"[UniqueLocationsGenerator] Generated {Instances.Count} unique locations (deterministic).");
         }
 
         // ============================================================
-        // 1) Загрузка всех дефов из Resources
+        // 1) Загружаем дефы из Resources
         // ============================================================
 
         private void LoadAllDefs()
@@ -51,8 +49,7 @@ namespace WorldLogic
         }
 
         // ============================================================
-        // 2) Сортировка по rarity (вес распределения)
-        // чтобы более редкие появлялись реже
+        // 2) Сортировка дефов по rarity
         // ============================================================
 
         private void PrepareDefOrder()
@@ -61,89 +58,122 @@ namespace WorldLogic
         }
 
         // ============================================================
-        // 3) Генерация 50 локаций
+        // 3) Генерация 50 локаций (детерминированно)
         // ============================================================
 
-        private void GenerateInstances(WorldGenerator worldGen)
+        private void GenerateInstances(WorldGenerator worldGen, int seed)
         {
             Instances = new List<UniqueLocationInstance>();
 
-            int generatedCount = 0;
-            int defsIndex = 0;
+            int index = 0;
 
-            while (generatedCount < TARGET_COUNT)
+            foreach (var def in defs)
             {
-                if (defsIndex >= defs.Count)
-                {
-                    Debug.LogWarning("[UniqueLocationsGenerator] Not enough defs, repeating list.");
-                    defsIndex = 0;
-                }
-
-                var def = defs[defsIndex];
-                defsIndex++;
-
-                WorldTilePos pos = FindValidTileFor(worldGen, def);
+                WorldTilePos pos = FindValidTileFor(def, worldGen, seed, ref index);
 
                 var state = new UniqueLocationState(def.id, pos);
                 var instance = new UniqueLocationInstance(def, state);
 
                 Instances.Add(instance);
-                generatedCount++;
+
+                if (Instances.Count >= TARGET_COUNT)
+                    break;
             }
         }
 
         // ============================================================
-        // 4) Подбор корректного тайла под локацию
+        // 4) Поиск подходящего тайла
         // ============================================================
 
-        private WorldTilePos FindValidTileFor(WorldGenerator gen, UniqueLocationDef def)
+        private WorldTilePos FindValidTileFor(
+            UniqueLocationDef def,
+            WorldGenerator worldGen,
+            int seed,
+            ref int index)
         {
-            // Сильно ограничивать не будем – мир большой, найдём
-            for (int i = 0; i < def.spawnAttempts; i++)
+            while (true)
             {
-                int x = Random.Range(0, 200);
-                int y = Random.Range(0, 200);
+                // Генерируем детерминированную координату
+                WorldTilePos pos = GetDeterministicCoord(seed, index);
+                index++;
 
-                var tile = gen.GetTile(x, y);
-                if (tile == null)
-                    continue;
+                if (TileIsValid(def, worldGen, pos))
+                    return pos;
 
-                // 1) Проверка биома
-                if (!string.IsNullOrEmpty(def.requiredBiome))
+                // fallback: смотрим окрестность
+                WorldTilePos? near = TryFindNearbyValidTile(def, worldGen, pos);
+                if (near.HasValue)
+                    return near.Value;
+
+                // иначе продолжаем поиск
+            }
+        }
+
+        // Проверка, подходит ли тайл
+        private bool TileIsValid(UniqueLocationDef def, WorldGenerator gen, WorldTilePos pos)
+        {
+            var tile = gen.GetTile(pos.X, pos.Y);
+            if (tile == null)
+                return false;
+
+            // Базовый биом
+            if (!string.IsNullOrEmpty(def.requiredBiome))
+                if (tile.biomeId != def.requiredBiome)
+                    return false;
+
+            // Доп. условия
+            if (def.nearMountains && !IsNearBiome(gen, pos, "mountain"))
+                return false;
+
+            if (def.nearWater && !IsNearBiome(gen, pos, "water"))
+                return false;
+
+            return true;
+        }
+
+        // Поиск подходящего тайла поблизости
+        private WorldTilePos? TryFindNearbyValidTile(
+            UniqueLocationDef def,
+            WorldGenerator gen,
+            WorldTilePos pos)
+        {
+            const int R = 3;
+
+            for (int dx = -R; dx <= R; dx++)
+                for (int dy = -R; dy <= R; dy++)
                 {
-                    if (tile.biomeId != def.requiredBiome)
-                        continue;
+                    var p = new WorldTilePos(pos.X + dx, pos.Y + dy);
+                    if (TileIsValid(def, gen, p))
+                        return p;
                 }
 
-                // 2) Доп. правила
-                if (def.nearMountains && !IsNearBiome(gen, x, y, "mountain")) continue;
-                if (def.nearWater     && !IsNearBiome(gen, x, y, "water")) continue;
-
-                // 3) Можно добавить проверку "farFromCities", когда будут города
-                // 4) TODO: проверка минимальной дистанции между другими уникалками
-
-                return new WorldTilePos(x, y);
-            }
-
-            Debug.LogWarning($"[UniqueLocationsGenerator] FAILED to place {def.id}, using fallback.");
-            return new WorldTilePos(100, 100); // безопасный центр
+            return null;
         }
 
-        // ============================================================
-        // 5) Вспомогательная проверка биома вокруг
-        // ============================================================
-
-        private bool IsNearBiome(WorldGenerator gen, int x, int y, string biome)
+        // Проверка биома вокруг (для nearMountains и nearWater)
+        private bool IsNearBiome(WorldGenerator gen, WorldTilePos pos, string biome)
         {
             for (int dx = -defSpawnCheckRange; dx <= defSpawnCheckRange; dx++)
                 for (int dy = -defSpawnCheckRange; dy <= defSpawnCheckRange; dy++)
                 {
-                    var t = gen.GetTile(x + dx, y + dy);
-                    if (t != null && t.biomeId == biome)
+                    var tile = gen.GetTile(pos.X + dx, pos.Y + dy);
+                    if (tile != null && tile.biomeId == biome)
                         return true;
                 }
 
             return false;
+        }
+
+        // ============================================================
+        // 5) Minecraft-style детерминированная координата
+        // ============================================================
+
+        private WorldTilePos GetDeterministicCoord(int seed, int index)
+        {
+            int x = DeterministicHash.Hash(seed, index * 17) % 200;
+            int y = DeterministicHash.Hash(seed, index * 31) % 200;
+
+            return new WorldTilePos(x, y);
         }
 
         private const int defSpawnCheckRange = 2;
