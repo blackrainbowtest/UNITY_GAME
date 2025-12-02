@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*   File: Assets/Scripts/Camera/MapMove.cs                                   */
+/*                                                        /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/02 09:35:54 by UDA                                      */
+/*   Updated: 2025/12/02 09:35:54 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
 using UnityEngine;
 
 public class MapMove : MonoBehaviour
