@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*   File: Assets/Scripts/CameraSystem/CameraAutoCenter.cs                    */
+/*   File: Assets/Scripts/CameraSystem/Modules/CameraAutoCenter.cs            */
 /*                                                        /\_/\               */
 /*                                                       ( •.• )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
 /*   Created: 2025/12/02 10:30:39 by UDA                                      */
-/*   Updated: 2025/12/02 10:30:39 by UDA                                      */
+/*   Updated: 2025/12/02 11:44:16 by UDA                                      */
 /*                                                                            */
 /* ************************************************************************** */
 
