@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*   File: Assets/Scripts/World/CameraPan.cs                                  */
+/*                                                        /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/02 09:42:23 by UDA                                      */
+/*   Updated: 2025/12/02 09:42:23 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
 using UnityEngine;
 
 public class CameraPan : MonoBehaviour
@@ -5,7 +17,7 @@ public class CameraPan : MonoBehaviour
     public float dragSpeed = 0.005f;
     public float inertiaDamp = 0.9f;
     public float minInertia = 0.001f;
-    // Дискретные уровни масштаба (size): 10, 12, 14, 16, 18, 20
+    // Дискретные уровни масштаба (size): 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30
     public int[] zoomSteps = new int[] { 10, 12, 14, 16, 18, 20 };
     public int zoomIndex = 0; // текущий индекс в zoomSteps
     public float pinchThreshold = 10f; // чувствительность для смены шага на мобильном

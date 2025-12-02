@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*   File: Assets/Scripts/World/Controllers/WorldMapController.cs             */
+/*                                                        /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/02 09:47:31 by UDA                                      */
+/*   Updated: 2025/12/02 09:47:31 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*   File: Assets/Scripts/World/Player/PlayerMarkerController.cs              */
+/*                                                        /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/02 09:48:32 by UDA                                      */
+/*   Updated: 2025/12/02 09:48:32 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 

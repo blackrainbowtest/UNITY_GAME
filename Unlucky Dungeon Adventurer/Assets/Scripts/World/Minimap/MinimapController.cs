@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*   File: Assets/Scripts/World/Minimap/MinimapController.cs                  */
+/*                                                        /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/02 09:48:06 by UDA                                      */
+/*   Updated: 2025/12/02 09:48:06 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
 using System;
 using UnityEngine;
 using UnityEngine.UI;
