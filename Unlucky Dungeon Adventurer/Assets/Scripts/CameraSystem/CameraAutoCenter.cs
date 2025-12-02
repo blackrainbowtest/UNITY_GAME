@@ -19,18 +19,19 @@ public class CameraAutoCenter
 	private bool active = false;
 	private Vector3 target;
 
-	// speed units per second
-	private float moveSpeed = 22f;
+	private float moveSpeed;
+	private float stopDistance;
 
-	// at what distance do we consider we have reached
-	private float stopDistance = 0.05f;
+	public bool IsActive => active;
 
-	public CameraAutoCenter(Camera camera)
+	public CameraAutoCenter(Camera camera, float speed, float stopDist)
 	{
 		cam = camera;
+		moveSpeed = speed;
+		stopDistance = stopDist;
 	}
 
-	public void StartAutoCenter(Vector3 worldPos)
+	public void StartMove(Vector3 worldPos)
 	{
 		target = new Vector3(worldPos.x, worldPos.y, cam.transform.position.z);
 		active = true;
@@ -41,13 +42,11 @@ public class CameraAutoCenter
 		active = false;
 	}
 
-	public bool IsActive => active;
-
-	public void Update()
+	public void UpdateAutoCenter()
 	{
 		if (!active) return;
 
-		// If the player starts clicking with a finger/mouse, CANCEL
+		// If the player tries to interact, cancel the autoflight
 		if (Input.GetMouseButtonDown(0) || Input.touchCount > 0)
 		{
 			active = false;
@@ -56,18 +55,17 @@ public class CameraAutoCenter
 
 		Vector3 current = cam.transform.position;
 
-		// fixed speed movement
 		cam.transform.position = Vector3.MoveTowards(
 			current,
 			target,
 			moveSpeed * Time.deltaTime
 		);
 
-		// We're checking to see if they arrived.
-		if (Vector3.Distance(cam.transform.position, target) < stopDistance)
+		if (Vector3.Distance(cam.transform.position, target) <= stopDistance)
 		{
 			cam.transform.position = target;
 			active = false;
 		}
 	}
 }
+
