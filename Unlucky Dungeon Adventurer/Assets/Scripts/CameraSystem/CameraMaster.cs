@@ -94,13 +94,28 @@ public class CameraMaster : MonoBehaviour
 		var p = GameData.CurrentPlayer;
 		if (p == null) return;
 
-		Vector3 target = new Vector3(
-			Mathf.Round(p.mapPosX),
-			Mathf.Round(p.mapPosY),
-			cam.transform.position.z
-		);
-
-		CenterToWorldPos(target);
+		// Find the player GameObject to get its actual world position
+		var playerObj = GameObject.FindGameObjectWithTag("Player");
+		if (playerObj != null)
+		{
+			Vector3 target = new Vector3(
+				playerObj.transform.position.x,
+				playerObj.transform.position.y,
+				cam.transform.position.z
+			);
+			CenterToWorldPos(target);
+		}
+		else
+		{
+			// Fallback: assume tileSize of 10 (standard in this project)
+			const float tileSize = 10f;
+			Vector3 target = new Vector3(
+				p.mapPosX * tileSize,
+				p.mapPosY * tileSize,
+				cam.transform.position.z
+			);
+			CenterToWorldPos(target);
+		}
 	}
 
 	public void CenterToTile(Vector2Int tile)
