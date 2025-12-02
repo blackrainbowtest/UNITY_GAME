@@ -51,6 +51,13 @@ public class CharacterCreatorUI : MonoBehaviour
     {
         string name = inputName.text;
 
+        // If name is empty or whitespace, use default name "Airin"
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            name = "Airin";
+            Debug.Log("[CREATE] Имя пустое, используется имя по умолчанию: Airin");
+        }
+
         int index = dropdownBackground.value;
 
         if (index < 0 || index >= classOptions.Length)
