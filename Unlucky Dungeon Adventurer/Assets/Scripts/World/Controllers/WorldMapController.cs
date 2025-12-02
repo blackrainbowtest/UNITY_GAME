@@ -187,6 +187,12 @@ public class WorldMapController : MonoBehaviour
         TileData startTile = generator.GetTile(playerTile.x, playerTile.y);
         if (startTile != null)
             InfoBar_Update(startTile, playerTile);
+
+        // Instantly teleport camera to player at game start (no animation)
+        if (CameraMaster.Instance != null)
+        {
+            CameraMaster.Instance.TeleportToPlayer();
+        }
     }
 
     private void OnPlayerLoaded()

@@ -118,6 +118,39 @@ public class CameraMaster : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Instantly teleport camera to player without animation (for game start)
+	/// </summary>
+	public void TeleportToPlayer()
+	{
+		var p = GameData.CurrentPlayer;
+		if (p == null) return;
+
+		// Find the player GameObject to get its actual world position
+		var playerObj = GameObject.FindGameObjectWithTag("Player");
+		if (playerObj != null)
+		{
+			cam.transform.position = new Vector3(
+				playerObj.transform.position.x,
+				playerObj.transform.position.y,
+				cam.transform.position.z
+			);
+		}
+		else
+		{
+			// Fallback: assume tileSize of 10 (standard in this project)
+			const float tileSize = 10f;
+			cam.transform.position = new Vector3(
+				p.mapPosX * tileSize,
+				p.mapPosY * tileSize,
+				cam.transform.position.z
+			);
+		}
+
+		pan.CancelInertia();
+		autoCenter.Cancel();
+	}
+
 	public void CenterToTile(Vector2Int tile)
 	{
 		Vector3 pos = new Vector3(tile.x, tile.y, cam.transform.position.z);
