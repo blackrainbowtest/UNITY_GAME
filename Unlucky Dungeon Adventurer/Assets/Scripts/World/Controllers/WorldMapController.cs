@@ -154,6 +154,9 @@ public class WorldMapController : MonoBehaviour
         }
 
         generator = new WorldGenerator(seed);
+        WorldLogicDirector logic = FindObjectOfType<WorldLogicDirector>();
+        if (logic != null)
+            logic.Initialize(seed, generator);
 
         visibleTiles = new Dictionary<Vector2Int, GameObject>();
 

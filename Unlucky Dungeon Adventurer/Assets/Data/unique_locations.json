@@ -1,0 +1,20 @@
+[
+  {
+    "id": "dragon_lair",
+    "name": "Логово дракона",
+    "icon": "icon_dragon_lair",
+    "biome": "mountain",
+    "rarity": 10,
+    "mustBeNearMountains": true,
+    "lore": "Здесь спит древний красный дракон."
+  },
+  {
+    "id": "lich_crypt",
+    "name": "Склеп Лича",
+    "icon": "icon_lich_crypt",
+    "biome": "swamp",
+    "rarity": 8,
+    "mustBeNearWater": false,
+    "lore": "Тёмное место, где вечность и смерть обрели дружбу."
+  }
+]

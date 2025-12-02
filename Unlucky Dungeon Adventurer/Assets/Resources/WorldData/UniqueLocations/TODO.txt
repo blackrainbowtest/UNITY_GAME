@@ -1,0 +1,29 @@
+В ней создаёшь SO-файлы:
+
+Dragon_Lair.asset
+
+Lich_Crypt.asset
+
+Titan_Nest.asset
+
+Crystal_Labyrinth.asset
+
+Phoenix_Temple.asset
+
+…
+
+В каждом:
+
+id: "dragon_lair"
+
+displayName: "Логово Дракона"
+
+icon: соответствующий спрайт
+
+requiredBiome: "mountain"
+
+rarity: 5
+
+mustBeNearMountains: true
+
+loreDescription: описание
