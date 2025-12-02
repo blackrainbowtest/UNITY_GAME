@@ -60,8 +60,10 @@ public class MovementUIController : MonoBehaviour
 
     private void OnMovementStarted()
     {
-        walkButton.gameObject.SetActive(false);
-        // можно временно прятать restButton
+        // Keep walk button visible but disable interaction during movement
+        walkButton.gameObject.SetActive(true);
+        walkButton.interactable = false;
+        // Optionally hide restButton while moving
     }
 
     private void OnMovementEnded()
