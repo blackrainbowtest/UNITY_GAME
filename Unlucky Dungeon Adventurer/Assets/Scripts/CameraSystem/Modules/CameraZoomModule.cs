@@ -21,9 +21,9 @@ public class CameraZoomModule
 	private float currentVelocity;     // smooth damp velocity
 
 	// --- settings ---
-	private float zoomSmooth = 0.15f;  // smoothing time (lower = faster)
+	private float zoomSmooth = 0.1f;   // smoothing time (lower = faster, less jitter)
 	private float pinchSensitivity = 0.005f;
-	private float wheelSensitivity = 3f;
+	private float wheelSensitivity = 2f;   // reduced for smoother zoom
 
 	private float minZoom;
 	private float maxZoom;
@@ -42,20 +42,23 @@ public class CameraZoomModule
 	}
 
 	// =============================================================
-	// Update every frame
+	// Update every frame (call from LateUpdate for smooth rendering)
 	// =============================================================
 	public void UpdateZoom()
 	{
 		ProcessMouseWheel();
 		ProcessPinch();
 
-		// Smooth damp zoom
-		cam.orthographicSize = Mathf.SmoothDamp(
+		// Smooth damp zoom - clamp to prevent overshooting
+		float newSize = Mathf.SmoothDamp(
 			cam.orthographicSize,
 			targetZoom,
 			ref currentVelocity,
 			zoomSmooth
 		);
+
+		// Additional clamping to prevent jitter at boundaries
+		cam.orthographicSize = Mathf.Clamp(newSize, minZoom, maxZoom);
 	}
 
 	// =============================================================

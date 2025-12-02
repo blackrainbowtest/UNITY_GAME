@@ -3915,7 +3915,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a736fb1c08d2b048996baa93de646ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMarkerController
-  playerSprite: {fileID: 21300000, guid: 6ccda816fad1f4846812d764c64eefb9, type: 3}
+  playerSprite: {fileID: 6779142422883010030, guid: 6ccda816fad1f4846812d764c64eefb9, type: 3}
   longPressThreshold: 0.35
   mapCoords: {x: 0, y: 0}
 --- !u!114 &1539624591
@@ -5038,17 +5038,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2030141237}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3579321d0b49c6c49a1a50497632746c, type: 3}
+  m_Script: {fileID: 11500000, guid: ced1bba481b02c04da69bd9fecb3208a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraPan
-  dragSpeed: 0.02
-  inertiaDamp: 0.9
-  minInertia: 0.001
-  zoomSteps: 0a0000000c0000000e00000010000000120000001400000016000000180000001a0000001c0000001e000000
-  zoomIndex: 0
-  pinchThreshold: 10
-  autoSpeed: 100
-  autoStopDistance: 0.05
+  m_EditorClassIdentifier: Assembly-CSharp::CameraMaster
+  autoCenterSpeed: 150
+  autoCenterStopRadius: 0.05
+  minZoom: 6
+  maxZoom: 24
+  zoomSmooth: 0.15
 --- !u!1 &2112944100
 GameObject:
   m_ObjectHideFlags: 0

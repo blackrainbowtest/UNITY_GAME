@@ -60,8 +60,9 @@ public class CameraMovement
 			}
 			else if (t.phase == TouchPhase.Moved)
 			{
-				delta = t.position - dragOrigin;
-				dragOrigin = t.position;
+				// Cast Vector2 (touch position) to Vector3 for consistent math
+				delta = (Vector3)t.position - dragOrigin;
+				dragOrigin = (Vector3)t.position;
 				dragging = true;
 
 				MoveCamera(delta);
@@ -85,8 +86,9 @@ public class CameraMovement
 
 	private void MoveCamera(Vector3 pixelDelta)
 	{
+		// Ensure z=0 for ScreenToWorldPoint delta to avoid unintended z shifts
 		Vector3 worldDelta =
-			cam.ScreenToWorldPoint(pixelDelta) -
+			cam.ScreenToWorldPoint(new Vector3(pixelDelta.x, pixelDelta.y, 0f)) -
 			cam.ScreenToWorldPoint(Vector3.zero);
 
 		cam.transform.position -= worldDelta;

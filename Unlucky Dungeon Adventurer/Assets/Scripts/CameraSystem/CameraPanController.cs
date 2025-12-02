@@ -25,15 +25,9 @@ public class CameraPanController
 	private Vector3 lastScreenPos;
 	private bool dragging = false;
 
-	// --- ZOOM SETTINGS ---
-	private int[] zoomSteps = new int[] { 6, 8, 10, 12, 14, 16, 18 };
-	private int zoomIndex = 2;
-	private float pinchLastDistance;
-
 	public CameraPanController(Camera c)
 	{
 		cam = c;
-		cam.orthographicSize = zoomSteps[zoomIndex];
 	}
 
 	// =====================================================================
@@ -44,8 +38,7 @@ public class CameraPanController
 	{
 		HandleMousePan();
 		HandleTouchPan();
-		HandleMouseZoom();
-		HandlePinchZoom();
+		// Zoom removed - handled by CameraZoomModule in CameraMaster
 		ApplyInertia();
 	}
 
@@ -106,8 +99,9 @@ public class CameraPanController
 		}
 		else if (t.phase == TouchPhase.Moved)
 		{
-			Vector3 delta = t.position - lastScreenPos;
-			lastScreenPos = t.position;
+			// Explicitly cast Vector2 to Vector3 to avoid ambiguous operator
+			Vector3 delta = (Vector3)t.position - lastScreenPos;
+			lastScreenPos = (Vector3)t.position;
 
 			Vector3 worldDelta =
 				cam.ScreenToWorldPoint(delta) -
@@ -120,55 +114,6 @@ public class CameraPanController
 		{
 			dragging = false;
 		}
-	}
-
-	// =====================================================================
-	//                           PC: ZOOM WHEEL
-	// =====================================================================
-
-	private void HandleMouseZoom()
-	{
-		float scroll = Input.mouseScrollDelta.y;
-		if (Mathf.Abs(scroll) < 0.01f) return;
-
-		if (scroll > 0 && zoomIndex > 0)
-			zoomIndex--;
-		else if (scroll < 0 && zoomIndex < zoomSteps.Length - 1)
-			zoomIndex++;
-
-		cam.orthographicSize = zoomSteps[zoomIndex];
-	}
-
-	// =====================================================================
-	//                           MOBILE: PINCH-ZOOM
-	// =====================================================================
-
-	private void HandlePinchZoom()
-	{
-		if (Input.touchCount < 2) return;
-
-		Touch t0 = Input.GetTouch(0);
-		Touch t1 = Input.GetTouch(1);
-
-		float curDist = Vector2.Distance(t0.position, t1.position);
-
-		if (t0.phase == TouchPhase.Began || t1.phase == TouchPhase.Began)
-		{
-			pinchLastDistance = curDist;
-			return;
-		}
-
-		float delta = curDist - pinchLastDistance;
-		pinchLastDistance = curDist;
-
-		if (Mathf.Abs(delta) < 6f) return; 		// bounce protection
-
-		if (delta > 0 && zoomIndex > 0)
-			zoomIndex--;
-		else if (delta < 0 && zoomIndex < zoomSteps.Length - 1)
-			zoomIndex++;
-
-		cam.orthographicSize = zoomSteps[zoomIndex];
 	}
 
 	// =====================================================================

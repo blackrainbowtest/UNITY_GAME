@@ -12,8 +12,15 @@ public class MapUIController : MonoBehaviour
             Camera.main.transform.position.z
         );
 
-        CameraPan cp = Camera.main.GetComponent<CameraPan>();
-        if (cp != null)
-            cp.CenterToPlayer(playerWorld);
+        // Use new camera system API
+        if (CameraMaster.Instance != null)
+        {
+            CameraMaster.Instance.CenterToPlayer();
+        }
+        else
+        {
+            // Fallback: directly position camera
+            Camera.main.transform.position = playerWorld;
+        }
     }
 }

@@ -154,9 +154,8 @@ public class WorldMapController : MonoBehaviour
         }
 
         generator = new WorldGenerator(seed);
-        WorldLogicDirector logic = FindObjectOfType<WorldLogicDirector>();
-        if (logic != null)
-            logic.Initialize(seed, generator);
+        // Removed WorldLogicDirector integration (type missing). If reintroduced,
+        // ensure the class exists and add a safe initialization hook here.
 
         visibleTiles = new Dictionary<Vector2Int, GameObject>();
 

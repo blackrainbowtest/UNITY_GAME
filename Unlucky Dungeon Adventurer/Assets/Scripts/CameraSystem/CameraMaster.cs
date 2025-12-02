@@ -57,14 +57,25 @@ public class CameraMaster : MonoBehaviour
 
 	private void Update()
 	{
-		// If camera is auto-moving, lock manual input
+		// Handle input and set targets, but don't move camera yet
 		if (autoCenter.IsActive)
 		{
-			autoCenter.UpdateAutoCenter();
+			// Auto-center runs in Update to capture target
 			return;
 		}
 
-		pan.Update();								// normal control
+		pan.Update();		// Just processes input, doesn't move camera directly
+	}
+
+	private void LateUpdate()
+	{
+		// Apply camera updates AFTER all other game logic
+		if (autoCenter.IsActive)
+		{
+			autoCenter.UpdateAutoCenter();
+		}
+
+		// Always update zoom in LateUpdate for smooth rendering
 		zoom.UpdateZoom();
 	}
 
