@@ -35,8 +35,12 @@ public class MovementUIController : MonoBehaviour
         walkButton.onClick.AddListener(OnWalkClicked);
         restButton.onClick.AddListener(OnRestClicked);
 
-        walkButton.gameObject.SetActive(false);
+        // Make buttons visible but disabled by default
+        walkButton.gameObject.SetActive(true);
+        walkButton.interactable = false;
+        
         restButton.gameObject.SetActive(false);
+        
         if (pathInfoText != null)
             pathInfoText.text = "";
     }

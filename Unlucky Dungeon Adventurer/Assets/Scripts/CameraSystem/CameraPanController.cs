@@ -17,13 +17,18 @@ public class CameraPanController
 	private Camera cam;
 
 	// --- PAN SETTINGS ---
-	private float dragSpeed = 0.005f;			// sensitivity (PC)
+	private float dragSpeed = 16f;				// reduced sensitivity (was 50)
 	private float touchDragSpeed = 0.002f;		// sensitivity (mobile)
 	private float inertiaDamping = 6f;
 	private Vector3 inertia = Vector3.zero;
 
 	private Vector3 lastScreenPos;
 	private bool dragging = false;
+	
+	// Track if this was a drag or a click
+	private Vector3 dragStartPos;
+	private const float dragThreshold = 5f;  // pixels
+	public bool IsDragging => dragging && Vector3.Distance(Input.mousePosition, dragStartPos) > dragThreshold;
 
 	public CameraPanController(Camera c)
 	{
@@ -58,6 +63,7 @@ public class CameraPanController
 		if (Input.GetMouseButtonDown(0))
 		{
 			dragging = true;
+			dragStartPos = Input.mousePosition;
 			lastScreenPos = Input.mousePosition;
 			inertia = Vector3.zero;
 		}
@@ -68,12 +74,11 @@ public class CameraPanController
 			Vector3 delta = cur - lastScreenPos;
 			lastScreenPos = cur;
 
-			Vector3 worldDelta =
-				cam.ScreenToWorldPoint(delta) -
-				cam.ScreenToWorldPoint(Vector3.zero);
-
-			cam.transform.position -= worldDelta * dragSpeed;
-			inertia = worldDelta * 50f; 
+			// Move camera directly in screen space
+			Vector3 move = new Vector3(-delta.x, -delta.y, 0) * dragSpeed * Time.deltaTime;
+			cam.transform.position += cam.transform.TransformDirection(move);
+			
+			inertia = delta * 0.1f;
 		}
 
 		if (Input.GetMouseButtonUp(0))

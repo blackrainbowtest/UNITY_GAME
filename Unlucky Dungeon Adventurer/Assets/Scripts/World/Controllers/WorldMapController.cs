@@ -73,6 +73,10 @@ public class WorldMapController : MonoBehaviour
     private Vector2Int playerTilePos;
     private bool waitingForPlayer = false;
 
+    // Track mouse position for detecting clicks vs drags
+    private Vector3 mouseDownPosition;
+    private const float clickThreshold = 5f; // pixels
+
     private static GameObject runtimeTilePrefabTemplate = null;
 
     // ============================================================
@@ -201,9 +205,36 @@ public class WorldMapController : MonoBehaviour
     {
         if (generator == null) return;
 
-        // Handle tile click (only if not clicking on UI)
-        if (Input.GetMouseButtonDown(0) && !IsPointerOverUI() && !MinimapController.InputCaptured)
-            HandleTileClick();
+        // Track mouse down position to distinguish clicks from drags
+        if (Input.GetMouseButtonDown(0))
+        {
+            mouseDownPosition = Input.mousePosition;
+        }
+
+        // Handle tile click ONLY if CameraMaster is not dragging
+        if (Input.GetMouseButtonUp(0) && !IsPointerOverUI() && !MinimapController.InputCaptured)
+        {
+            // Check if CameraMaster handled this as a drag
+            if (CameraMaster.Instance != null)
+            {
+                // Access pan controller to check if it's dragging
+                // For now, use simple distance check
+                float dragDistance = Vector3.Distance(Input.mousePosition, mouseDownPosition);
+                if (dragDistance < clickThreshold)
+                {
+                    HandleTileClick();
+                }
+            }
+            else
+            {
+                // Fallback if no CameraMaster
+                float dragDistance = Vector3.Distance(Input.mousePosition, mouseDownPosition);
+                if (dragDistance < clickThreshold)
+                {
+                    HandleTileClick();
+                }
+            }
+        }
 
         Vector3 camPos = Camera.main.transform.position;
 

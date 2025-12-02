@@ -9,16 +9,21 @@ public class PlayerMovementController : MonoBehaviour
 
     public GameManager gameManager;
 
-    private SaveData Save => gameManager.GetCurrentGameData();
-    private PlayerSaveData Player => Save.player;
-    private WorldSaveData World => Save.world;
+    private PlayerData Player => GameData.CurrentPlayer;
 
     private List<Vector2Int> _currentPath;
+    private Vector2Int _lastTargetTile;
     private int _staminaCost;
     private bool _isMoving;
 
     private void Start()
     {
+        if (Player == null)
+        {
+            Debug.LogError("[PlayerMovement] GameData.CurrentPlayer is null!");
+            return;
+        }
+
         Vector3 startPos = new Vector3(Player.mapPosX * tileSize, Player.mapPosY * tileSize, 0f);
         transform.position = startPos;
     }
@@ -27,7 +32,13 @@ public class PlayerMovementController : MonoBehaviour
     {
         if (_isMoving) return;
 
-        // Use actual transform position instead of Player.mapPosX/Y for accurate pathfinding
+        // Cancel if clicking same target tile
+        if (_currentPath != null && _currentPath.Count > 0 && _lastTargetTile == targetTile)
+        {
+            CancelPath();
+            return;
+        }
+
         Vector2Int start = new Vector2Int(
             Mathf.RoundToInt(transform.position.x / tileSize),
             Mathf.RoundToInt(transform.position.y / tileSize)
@@ -36,25 +47,41 @@ public class PlayerMovementController : MonoBehaviour
         var path = Pathfinding.FindPath(start, targetTile);
         if (path == null || path.Count <= 1)
         {
-            PathRenderer.ClearAll();
-            UIEvents.OnPathPreview?.Invoke(0, 0, false);
+            CancelPath();
             return;
         }
 
         _currentPath = path;
+        _lastTargetTile = targetTile;
         _staminaCost = PathCostCalculator.GetStaminaCost(path);
         int timeCost = PathCostCalculator.GetTimeCost(path, minutesPerTile);
 
-        bool enough = Player.currentStamina >= _staminaCost;
+        bool enough = Player != null && Player.currentStamina >= _staminaCost;
 
         PathRenderer.Show(path);
 
         UIEvents.OnPathPreview?.Invoke(_staminaCost, timeCost, enough);
-        UIEvents.OnRestAvailable?.Invoke(Player.currentStamina < Player.baseMaxStamina);
+        if (Player != null)
+            UIEvents.OnRestAvailable?.Invoke(Player.currentStamina < Player.finalMaxStamina);
+    }
+
+    public void CancelPath()
+    {
+        PathRenderer.ClearAll();
+        _currentPath = null;
+        _lastTargetTile = new Vector2Int(-9999, -9999);
+        _staminaCost = 0;
+        UIEvents.OnPathPreview?.Invoke(0, 0, false);
     }
 
     public void StartWalk()
     {
+        if (Player == null)
+        {
+            Debug.LogError("[PlayerMovement] Cannot start walk - Player is null!");
+            return;
+        }
+
         if (_currentPath == null || _currentPath.Count <= 1) return;
         if (Player.currentStamina < _staminaCost) return;
         if (_isMoving) return;
@@ -69,6 +96,12 @@ public class PlayerMovementController : MonoBehaviour
 
         for (int i = 1; i < _currentPath.Count; i++)
         {
+            if (Player == null)
+            {
+                Debug.LogError("[PlayerMovement] Player became null during movement!");
+                break;
+            }
+
             Vector2Int tile = _currentPath[i];
 
             float moveCost = TileGenerator.GetTileMoveCost(tile.x, tile.y);
@@ -77,7 +110,6 @@ public class PlayerMovementController : MonoBehaviour
             if (Player.currentStamina < staminaCost)
                 break;
 
-            // Null-safe stamina modification
             if (PlayerStatsController.Instance != null)
             {
                 PlayerStatsController.Instance.ModifyStamina(-staminaCost);
@@ -89,19 +121,25 @@ public class PlayerMovementController : MonoBehaviour
                 if (Player.currentStamina < 0) Player.currentStamina = 0;
             }
 
-            // Update player coordinates BEFORE moving (for save consistency)
             if (PlayerStatsController.Instance != null)
             {
                 PlayerStatsController.Instance.UpdateMapPosition(tile.x, tile.y);
             }
             else
             {
-                // Fallback if controller not available
                 Player.mapPosX = tile.x;
                 Player.mapPosY = tile.y;
             }
 
-            MovementTimeController.ApplyTime(World, minutesPerTile);
+            if (GameManager.Instance != null)
+            {
+                var worldData = GameManager.Instance.GetCurrentGameData()?.world;
+                if (worldData != null)
+                {
+                    MovementTimeController.ApplyTime(worldData, minutesPerTile);
+                }
+            }
+
             MovementEventResolver.ProcessTileEvent(tile);
 
             Vector3 target = new Vector3(tile.x * tileSize, tile.y * tileSize, 0f);
@@ -112,12 +150,14 @@ public class PlayerMovementController : MonoBehaviour
 
         PathRenderer.ClearAll();
         _currentPath = null;
+        _lastTargetTile = new Vector2Int(-9999, -9999);
         _staminaCost = 0;
         _isMoving = false;
 
         UIEvents.OnMovementEnded?.Invoke();
         UIEvents.InvokePlayerStatsChanged();
-        UIEvents.OnRestAvailable?.Invoke(Player.currentStamina < Player.baseMaxStamina);
+        if (Player != null)
+            UIEvents.OnRestAvailable?.Invoke(Player.currentStamina < Player.finalMaxStamina);
     }
 
     private IEnumerator MoveTo(Vector3 target)
@@ -126,7 +166,8 @@ public class PlayerMovementController : MonoBehaviour
         while ((transform.position - target).sqrMagnitude > 0.01f)
         {
             transform.position = Vector3.MoveTowards(
-                transform.position, target,
+                transform.position,
+                target,
                 speed * Time.deltaTime
             );
             yield return null;
