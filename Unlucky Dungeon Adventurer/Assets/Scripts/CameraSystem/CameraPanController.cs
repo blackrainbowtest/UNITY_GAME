@@ -19,7 +19,9 @@ public class CameraPanController
 	// --- PAN SETTINGS ---
 	private float dragSpeed = 16f;				// reduced sensitivity (was 50)
 	private float touchDragSpeed = 0.002f;		// sensitivity (mobile)
-	private float inertiaDamping = 6f;
+	private float inertiaDamping = 4f;			// Lower = longer inertia (was 6)
+	private float inertiaMultiplier = 0.2f;		// Stronger inertia capture
+	private float zoomScaleFactor = 0.05f;		// Scale movement with zoom level
 	private Vector3 inertia = Vector3.zero;
 
 	private Vector3 lastScreenPos;
@@ -74,11 +76,15 @@ public class CameraPanController
 			Vector3 delta = cur - lastScreenPos;
 			lastScreenPos = cur;
 
+			// Scale movement by current zoom level (orthographicSize)
+			float zoomScale = cam.orthographicSize * zoomScaleFactor;
+
 			// Move camera directly in screen space
-			Vector3 move = new Vector3(-delta.x, -delta.y, 0) * dragSpeed * Time.deltaTime;
+			Vector3 move = new Vector3(-delta.x, -delta.y, 0) * dragSpeed * Time.deltaTime * zoomScale;
 			cam.transform.position += cam.transform.TransformDirection(move);
 			
-			inertia = delta * 0.1f;
+			// Capture velocity for inertia (stronger capture), also scaled by zoom
+			inertia = delta * inertiaMultiplier * zoomScale;
 		}
 
 		if (Input.GetMouseButtonUp(0))
@@ -112,8 +118,12 @@ public class CameraPanController
 				cam.ScreenToWorldPoint(delta) -
 				cam.ScreenToWorldPoint(Vector3.zero);
 
+			// Scale by zoom level for consistent feel
+			float zoomScale = cam.orthographicSize * zoomScaleFactor;
+			
 			cam.transform.position -= worldDelta * touchDragSpeed;
-			inertia = worldDelta * 20f;
+			// Capture velocity for inertia, scaled by zoom
+			inertia = worldDelta * 30f * zoomScale;
 		}
 		else if (t.phase == TouchPhase.Ended)
 		{
