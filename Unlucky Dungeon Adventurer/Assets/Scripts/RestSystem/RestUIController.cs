@@ -36,13 +36,17 @@ public class RestUIController : MonoBehaviour
 
     private void Start()
     {
-        // Кнопки привязаны один раз
-        shortRestButton.onClick.AddListener(() => Choose(RestType.ShortRest));
-        meditationButton.onClick.AddListener(() => Choose(RestType.Meditation));
-        longSleepButton.onClick.AddListener(() => Choose(RestType.LongSleep));
+        // Check references before use
+        if (shortRestButton != null && meditationButton != null && longSleepButton != null)
+        {
+            shortRestButton.onClick.AddListener(() => Choose(RestType.ShortRest));
+            meditationButton.onClick.AddListener(() => Choose(RestType.Meditation));
+            longSleepButton.onClick.AddListener(() => Choose(RestType.LongSleep));
+        }
 
-        // Окно скрыто по умолчанию
-        panel.SetActive(false);
+        // Hide panel by default if assigned
+        if (panel != null)
+            panel.SetActive(false);
     }
 
     /// <summary>

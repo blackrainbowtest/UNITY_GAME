@@ -39,10 +39,25 @@ public class MovementUIController : MonoBehaviour
         walkButton.gameObject.SetActive(true);
         walkButton.interactable = false;
         
-        restButton.gameObject.SetActive(false);
+        // Rest button always visible, enabled based on stamina
+        restButton.gameObject.SetActive(true);
+        UpdateRestButtonState();
         
         if (pathInfoText != null)
             pathInfoText.text = "";
+    }
+
+    private void UpdateRestButtonState()
+    {
+        var player = GameData.CurrentPlayer;
+        if (player == null)
+        {
+            restButton.interactable = false;
+            return;
+        }
+
+        // Enable rest button only if stamina is not full
+        restButton.interactable = player.currentStamina < player.finalMaxStamina;
     }
 
     private void OnPathPreview(int staminaCost, int timeMinutes, bool hasEnough)
@@ -74,7 +89,9 @@ public class MovementUIController : MonoBehaviour
 
     private void OnRestAvailable(bool canRest)
     {
-        restButton.gameObject.SetActive(canRest);
+        // Keep button visible, just update interactability
+        restButton.gameObject.SetActive(true);
+        restButton.interactable = canRest;
     }
 
     private void OnWalkClicked()

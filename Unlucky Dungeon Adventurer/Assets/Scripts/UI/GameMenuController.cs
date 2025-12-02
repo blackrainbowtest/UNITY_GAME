@@ -32,6 +32,10 @@ public class GameMenuController : MonoBehaviour
         menuGroup.interactable = true;
         menuGroup.blocksRaycasts = true;
         Time.timeScale = 0;
+
+        // Disable camera controls while menu is open
+        if (CameraMaster.Instance != null)
+            CameraMaster.Instance.DisablePan();
     }
 
     public void Close()
@@ -41,6 +45,10 @@ public class GameMenuController : MonoBehaviour
         menuGroup.interactable = false;
         menuGroup.blocksRaycasts = false;
         Time.timeScale = 1;
+
+        // Re-enable camera controls when menu closes
+        if (CameraMaster.Instance != null)
+            CameraMaster.Instance.EnablePan();
     }
 
     private void HideInstant()
