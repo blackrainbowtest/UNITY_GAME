@@ -63,7 +63,7 @@ public class CameraMaster : MonoBehaviour
 	/// </summary>
 	public void CenterToWorldPos(Vector3 worldPos)
 	{
-		autoCenter.StartMove(worldPos);
+		autoCenter.StartAutoCenter(worldPos);
 		pan.CancelInertia();
 	}
 

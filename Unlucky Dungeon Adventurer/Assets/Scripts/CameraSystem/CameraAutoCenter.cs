@@ -31,7 +31,7 @@ public class CameraAutoCenter
 		stopDistance = stopDist;
 	}
 
-	public void StartMove(Vector3 worldPos)
+	public void StartAutoCenter(Vector3 worldPos)
 	{
 		target = new Vector3(worldPos.x, worldPos.y, cam.transform.position.z);
 		active = true;
