@@ -13,11 +13,11 @@
 using UnityEngine;
 
 /// <summary>
-/// The camera's central control module.
-/// What happens here:
-/// - Initialization of all camera subsystems.
-/// - Update handling.
-/// - Public methods for other parts of the game.
+/// Central camera manager.
+/// Responsibilities:
+/// - Initialize camera subsystems
+/// - Dispatch Update()
+/// - Provide public API for other systems
 /// </summary>
 public class CameraMaster : MonoBehaviour
 {
@@ -25,12 +25,18 @@ public class CameraMaster : MonoBehaviour
 
 	private CameraPanController pan;
 	private CameraAutoCenter autoCenter;
+	private CameraZoomModule zoom;
 
 	private Camera cam;
 
 	[Header("Autocenter Settings")]
 	public float autoCenterSpeed = 12f;				// camera flight speed
 	public float autoCenterStopRadius = 0.05f;
+
+	[Header("Zoom Settings")]
+	public float minZoom = 4f;
+	public float maxZoom = 22f;
+	public float zoomSmooth = 0.15f;
 
 	private void Awake()
 	{
@@ -40,11 +46,18 @@ public class CameraMaster : MonoBehaviour
 		// Create subsystems
 		pan = new CameraPanController(cam);
 		autoCenter = new CameraAutoCenter(cam, autoCenterSpeed, autoCenterStopRadius);
+
+		zoom = new CameraZoomModule(
+			cam,
+			minZoom,
+			maxZoom,
+			zoomSmooth
+		);
 	}
 
 	private void Update()
 	{
-		// If auto-centering is active, pan is disabled
+		// If camera is auto-moving, lock manual input
 		if (autoCenter.IsActive)
 		{
 			autoCenter.UpdateAutoCenter();
@@ -52,24 +65,19 @@ public class CameraMaster : MonoBehaviour
 		}
 
 		pan.Update();								// normal control
+		zoom.UpdateZoom();
 	}
 
 	// ================================================================
 	//                           PUBLIC API
 	// ================================================================
 
-	/// <summary>
-	/// Smoothly centers the camera on the tile (coordinates in world units).
-	/// </summary>
 	public void CenterToWorldPos(Vector3 worldPos)
 	{
 		autoCenter.StartAutoCenter(worldPos);
 		pan.CancelInertia();
 	}
 
-	/// <summary>
-	/// Centering the camera on the player
-	/// </summary>
 	public void CenterToPlayer()
 	{
 		var p = GameData.CurrentPlayer;
@@ -84,30 +92,33 @@ public class CameraMaster : MonoBehaviour
 		CenterToWorldPos(target);
 	}
 
-	/// <summary>
-	/// Centering the camera on a tile coordinate
-	/// </summary>
 	public void CenterToTile(Vector2Int tile)
 	{
 		Vector3 pos = new Vector3(tile.x, tile.y, cam.transform.position.z);
 		CenterToWorldPos(pos);
 	}
 
-	/// <summary>
-	/// Completely disables manual camera control
-	/// (for example, during dialogues or cutscenes)
-	/// </summary>
 	public void DisablePan()
 	{
 		pan.CancelInertia();
 		enabled = false;
 	}
 
-	/// <summary>
-	/// Returns camera control to the player
-	/// </summary>
 	public void EnablePan()
 	{
 		enabled = true;
 	}
+
+	// === Optional public zoom control for UI buttons ===
+	public void ZoomIn(float amount = 1f)
+	{
+		zoom.ZoomIn(amount);
+	}
+
+	public void ZoomOut(float amount = 1f)
+	{
+		zoom.ZoomOut(amount);
+	}
+
+	public float GetCurrentZoom() => zoom.GetZoom();
 }

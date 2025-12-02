@@ -1,0 +1,91 @@
+🧩 Шаг 6. Что надо создать в Unity
+1️⃣ Создать Canvas FXCanvas
+
+Canvas → Screen Space Overlay
+
+Добавить два Image:
+
+OverlayImage (fullscreen, цвет белый, альфа 0)
+
+TintImage (fullscreen, multiply или alpha blend)
+
+Превратить FXCanvas в Prefab.
+
+2️⃣ На FXCanvas добавить компонент FXRenderer
+
+Назначить:
+
+overlayImage = OverlayImage
+
+colorTintImage = TintImage
+
+3️⃣ Создать FXLibrary объект
+
+Empty GameObject → FXLibrary
+
+Заполнить список профилей
+
+4️⃣ Создать ScriptableObject профили
+
+В меню:
+
+Create → UDA → FX → Biome FX Profile
+
+
+Примеры:
+
+tundra.asset
+
+overlay: frost_edge.png
+
+alpha: 0.4
+
+tint: голубой
+
+particles: snow_particles
+
+desert.asset
+
+overlay: heat_edge.png
+
+tint: жёлтый
+
+particles: sand_dust
+
+forest.asset
+
+overlay: лёгкая дымка
+
+particles: falling_leaves
+
+📘 Инструкция для другого разработчика
+
+FX-система управляет атмосферными эффектами биомов.
+
+Чтобы подключить:
+
+В Canvas создайте prefab FXCanvas (OverlayImage + TintImage).
+
+На FXCanvas добавьте компонент FXRenderer.
+
+В сцене создайте объект FXLibrary и поместите туда все FXProfile.
+
+Создайте FXProfile (ScriptableObject) для каждого биома.
+
+В WorldMap сцене создайте BiomeFXController и привяжите туда FXRenderer.
+
+Никто в коде не работает с эффектами напрямую — только вызывает:
+
+BiomeFXController.Instance.OnBiomeChanged(biomeId)
+
+ինչ պետք է ստեղծել հետագայում
+
+создать готовые профили tundra/desert/forest;
+
+добавить плавные fade-out/fade-in;
+
+включить поддержку Post Processing V2 (AAA-качество);
+
+добавить температурные эффекты (heat distortion, frost jitter);
+
+создать примеры particle prefabs (листья/снег/пыль).

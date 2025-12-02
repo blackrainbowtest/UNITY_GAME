@@ -432,6 +432,7 @@ public class WorldMapController : MonoBehaviour
         }
 
         LocationText.text = $"{biomeName}{transition}\n(X: {coords.x}, Y: {coords.y})";
+        BiomeFXController.Instance?.OnBiomeChanged(tile.biomeId);
     }
 
 
