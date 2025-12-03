@@ -1144,6 +1144,7 @@ GameObject:
   - component: {fileID: 350646141}
   - component: {fileID: 350646142}
   - component: {fileID: 350646143}
+  - component: {fileID: 350646144}
   m_Layer: 5
   m_Name: GameUI
   m_TagString: Untagged
@@ -1290,6 +1291,23 @@ MonoBehaviour:
   walkButton: {fileID: 196612859}
   restButton: {fileID: 438283417}
   movementController: {fileID: 1539624591}
+--- !u!114 &350646144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 350646136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 453743a62830dfa4abd84c00d9fdff24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RestUIController
+  panel: {fileID: 0}
+  titleText: {fileID: 0}
+  shortRestButton: {fileID: 0}
+  meditationButton: {fileID: 0}
+  longSleepButton: {fileID: 0}
 --- !u!1 &384062849
 GameObject:
   m_ObjectHideFlags: 0
@@ -3548,7 +3566,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 0}
+  m_Texture: {fileID: 2800000, guid: 41a1d6256e3432d45b794f3195c6e4c5, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0

@@ -66,7 +66,7 @@ public static class SaveService
 
 		SaveManager.Save(data, slotIndex);
 
-		Debug.Log($"[SaveService] Saved slot {slotIndex} | Scene={data.meta.sceneName} | Time={data.meta.saveTime}");
+		Debug.Log($"[SaveService] Saved slot {slotIndex} | Scene={data.meta.sceneName} | Time={data.meta.lastPlayedTime}");
 	}
 
 	/// <summary>
@@ -105,7 +105,7 @@ public static class SaveService
 	{
 		data.meta.slotIndex   = slotIndex;
 		data.meta.sceneName   = SceneManager.GetActiveScene().name;
-		data.meta.saveTime    = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+		data.meta.lastPlayedTime    = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 		data.meta.saveVersion = SaveDataVersion.Current;
 
 		// Biome detection (if your world manager exists)
@@ -114,18 +114,34 @@ public static class SaveService
 
 	/// <summary>
 	/// Safely retrieves the current biome without crashing
-	/// even if WorldManager or biome system is not loaded.
+	/// even if biome system is not loaded.
+	/// TODO: Re-enable when WorldManager is available.
 	/// </summary>
 	private static string TryGetBiomeIdSafe()
 	{
-		try
-		{
-			if (WorldManager.Instance != null)
-				return WorldManager.Instance.CurrentBiomeID;
-		}
-		catch { }
+		// TODO: Implement biome detection when WorldManager exists
+		// try
+		// {
+		// 	if (WorldManager.Instance != null)
+		// 		return WorldManager.Instance.CurrentBiomeID;
+		// }
+		// catch { }
 
 		return "unknown";
+	}
+
+	/// <summary>
+	/// Creates a new game with initial save data.
+	/// </summary>
+	public static void CreateNewGame(string name, string role, int seed)
+	{
+		var data = SaveDataFactory.CreateNew(name, role, seed);
+
+		// Автосейв нового персонажа
+		SaveManager.SaveAuto(data);
+
+		// Также можно создать persistent слот 0
+		SaveManager.Save(data, 0);
 	}
 }
 

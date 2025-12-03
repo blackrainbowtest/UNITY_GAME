@@ -13,15 +13,18 @@
 using System;
 
 /// <summary>
-/// Metadata describing where, when and how the save was created.
-/// This is used by UI and by compatibility systems.
+/// Metadata used by the save slot UI and compatibility checks.
 /// </summary>
 [Serializable]
 public class MetaSaveData
 {
-    public int slotIndex;            // -1 = autosave, 0..N = manual slot
-    public string sceneName;         // Scene where player was saved
-    public string saveTime;          // Human-readable timestamp
-    public string saveVersion = SaveDataVersion.Current; // Save format version
-    public string currentBiome;      // Biome ID or world region
+    public int slotIndex;                 // -1 = autosave
+    public string sceneName;              // Scene where save was made
+    public string playerName;             // Name of character
+    public string saveVersion;            // Version of save format
+
+    public string createdTime;            // ISO timestamp of creation
+    public string lastPlayedTime;         // ISO timestamp of last load/save
+
+    public string currentBiome;           // optional: biome ID for UI
 }

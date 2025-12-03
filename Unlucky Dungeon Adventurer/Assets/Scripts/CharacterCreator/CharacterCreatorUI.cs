@@ -49,33 +49,19 @@ public class CharacterCreatorUI : MonoBehaviour
 
     public void OnCreateButton()
     {
-        string name = inputName.text;
+        string name = inputName.text.Trim();
 
-        // If name is empty or whitespace, use default name "Airin"
         if (string.IsNullOrWhiteSpace(name))
-        {
             name = "Airin";
-            Debug.Log("[CREATE] Имя пустое, используется имя по умолчанию: Airin");
-        }
 
-        int index = dropdownBackground.value;
+        string roleId = classOptions[dropdownBackground.value].internalName;
 
-        if (index < 0 || index >= classOptions.Length)
-        {
-            Debug.LogError($"[CREATE] Некорректный индекс класса: {index}");
-            return;
-        }
-
-    // Critical: use internalName as the class key, displayName for UI
-    string roleInternal = classOptions[index].internalName;
-    string roleDisplay  = classOptions[index].displayName;
-
-        Debug.Log($"[CREATE BUTTON CLICKED] Создан герой: {name}, класс: {roleDisplay} (ID: {roleInternal})");
-
-        // Create the player and pass the explicitly selected seed so SavePlayer doesn't generate one.
         int seedToUse = Mathf.Max(10000, selectedSeed);
-        GameData.SavePlayer(name, roleInternal, seedToUse);
-        Debug.Log($"[CREATE] Assigned worldSeed = {seedToUse}");
+
+        // Create first save
+        SaveService.CreateNewGame(name, roleId, seedToUse);
+
+        // Load WorldMap
         SceneLoader.LoadScene("WorldMap");
     }
 

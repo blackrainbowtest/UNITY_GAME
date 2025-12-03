@@ -89,15 +89,41 @@ public class LoadingScreen : MonoBehaviour
 	{
 		yield return new WaitForSeconds(1f);
 
-		AsyncOperation operation = SceneManager.LoadSceneAsync(SceneLoader.sceneToLoad);
+		AsyncOperation operation = null;
+		float timeout = 10f; // seconds
+		float timer = 0f;
+
+		// Проверка на пустое имя сцены
+		if (string.IsNullOrEmpty(SceneLoader.sceneToLoad))
+		{
+			Debug.LogError("[LoadingScreen] sceneToLoad не задан!");
+			hintText.text = "Ошибка загрузки: сцена не указана.";
+			yield break;
+		}
+
+		if (cubes == null || cubes.Length == 0)
+		{
+			Debug.LogWarning("[LoadingScreen] cubes array is empty — skipping animation.");
+			yield break;
+		}
+
+		operation = SceneManager.LoadSceneAsync(SceneLoader.sceneToLoad);
 		operation.allowSceneActivation = false;
 
 		while (!operation.isDone)
 		{
+			timer += Time.deltaTime;
 			if (operation.progress >= 0.9f)
 			{
 				yield return new WaitForSeconds(1f);
 				operation.allowSceneActivation = true;
+			}
+			if (timer > timeout)
+			{
+				Debug.LogError($"[LoadingScreen] Таймаут загрузки сцены: {SceneLoader.sceneToLoad}");
+				hintText.text = $"Ошибка: сцена не загружена за {timeout} сек.";
+				this.enabled = false;
+				yield break;
 			}
 			yield return null;
 		}

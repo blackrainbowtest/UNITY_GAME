@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
 
         // --- Meta ---
         data.meta.sceneName = SceneManager.GetActiveScene().name;
-        data.meta.saveTime = System.DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+        data.meta.lastPlayedTime = System.DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
         data.meta.saveVersion = "0.1.0021";
 
         // Save biome at player's current position (only for WorldMap scene)
