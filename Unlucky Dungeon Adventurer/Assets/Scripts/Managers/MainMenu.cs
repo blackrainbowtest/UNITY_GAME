@@ -23,6 +23,11 @@ public class MainMenu : MonoBehaviour
     public void CloseSaveLoadScene()
     {
         SceneManager.UnloadSceneAsync("SaveLoadScene");
+        Time.timeScale = 1;  // Возобновляем игру
+        
+        // Включаем камеру обратно, если есть
+        if (CameraMaster.Instance != null)
+            CameraMaster.Instance.EnablePan();
     }
 
     public void OpenSettings()

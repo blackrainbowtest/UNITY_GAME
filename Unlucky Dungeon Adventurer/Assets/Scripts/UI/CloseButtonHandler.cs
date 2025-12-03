@@ -14,8 +14,17 @@ public class CloseButtonHandler : MonoBehaviour
 
         var menuManager = FindFirstObjectByType<MainMenu>();
         if (menuManager != null)
+        {
             menuManager.CloseSaveLoadScene();
+        }
         else
+        {
             SceneManager.UnloadSceneAsync("SaveLoadScene");
+            Time.timeScale = 1;  // Возобновляем игру, если нет MainMenu
+            
+            // Включаем камеру обратно, если есть
+            if (CameraMaster.Instance != null)
+                CameraMaster.Instance.EnablePan();
+        }
     }
 }

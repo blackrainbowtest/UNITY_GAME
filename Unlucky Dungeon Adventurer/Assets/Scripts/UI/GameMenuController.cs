@@ -86,7 +86,7 @@ public class GameMenuController : MonoBehaviour
     {
         SaveLoadState.Mode = SaveLoadMode.Save;
         Close();
-        Time.timeScale = 1;
+        Time.timeScale = 0;  // Оставляем на паузе
         SceneManager.LoadScene("SaveLoadScene", LoadSceneMode.Additive);
     }
 
@@ -94,7 +94,7 @@ public class GameMenuController : MonoBehaviour
     {
         SaveLoadState.Mode = SaveLoadMode.Load;
         Close();
-        Time.timeScale = 1;
+        Time.timeScale = 0;  // Оставляем на паузе
         SceneManager.LoadScene("SaveLoadScene", LoadSceneMode.Additive);
     }
 

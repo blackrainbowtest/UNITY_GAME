@@ -47,8 +47,17 @@ public class SaveLoadFade : MonoBehaviour
 		// 🧩 вместо вызова CloseSaveWindow() просто закрываем сцену напрямую
 		var menu = FindFirstObjectByType<MainMenu>();
 		if (menu != null)
+		{
 			menu.CloseSaveLoadScene();
+		}
 		else
+		{
 			SceneManager.UnloadSceneAsync("SaveLoadScene");
+			Time.timeScale = 1;  // Возобновляем игру, если нет MainMenu
+			
+			// Включаем камеру обратно, если есть
+			if (CameraMaster.Instance != null)
+				CameraMaster.Instance.EnablePan();
+		}
 	}
 }
