@@ -1,4 +1,16 @@
-﻿using UnityEngine;
+﻿/* ************************************************************************** */
+/*                                                                            */
+/*   File: Assets/Scripts/Data/GameData.cs                                    */
+/*                                                        /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/03 09:21:39 by UDA                                      */
+/*   Updated: 2025/12/03 09:21:39 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
+using UnityEngine;
 using System.Collections.Generic;
 
 public static class GameData

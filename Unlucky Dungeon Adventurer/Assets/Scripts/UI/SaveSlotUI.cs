@@ -1,4 +1,16 @@
-﻿using UnityEngine;
+﻿/* ************************************************************************** */
+/*                                                                            */
+/*   File: Assets/Scripts/UI/SaveSlotUI.cs                                    */
+/*                                                        /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/03 09:26:11 by UDA                                      */
+/*   Updated: 2025/12/03 09:26:11 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
+using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.IO;

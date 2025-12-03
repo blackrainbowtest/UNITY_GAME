@@ -1,4 +1,16 @@
-﻿using System.IO;
+﻿/* ************************************************************************** */
+/*                                                                            */
+/*   File: Assets/Scripts/Managers/SaveLoadSceneManager.cs                    */
+/*                                                        /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/03 09:24:38 by UDA                                      */
+/*   Updated: 2025/12/03 09:24:38 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
+using System.IO;
 using UnityEngine;
 using TMPro;
 

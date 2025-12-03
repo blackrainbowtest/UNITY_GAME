@@ -1,4 +1,16 @@
-﻿using System;
+﻿/* ************************************************************************** */
+/*                                                                            */
+/*   File: Assets/Scripts/Managers/SaveManager.cs                             */
+/*                                                        /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/03 09:25:25 by UDA                                      */
+/*   Updated: 2025/12/03 09:25:25 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
+using System;
 using System.IO;
 using UnityEngine;
 

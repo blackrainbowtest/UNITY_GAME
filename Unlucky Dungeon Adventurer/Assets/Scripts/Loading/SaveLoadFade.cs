@@ -1,4 +1,16 @@
-﻿using UnityEngine;
+﻿/* ************************************************************************** */
+/*                                                                            */
+/*   File: Assets/Scripts/Loading/SaveLoadFade.cs                             */
+/*                                                        /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/03 09:23:31 by UDA                                      */
+/*   Updated: 2025/12/03 09:23:31 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
+using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
 

@@ -1,4 +1,16 @@
-﻿using UnityEngine;
+﻿/* ************************************************************************** */
+/*                                                                            */
+/*   File: Assets/Scripts/Loading/LoadingScreen.cs                            */
+/*                                                        /\_/\               */
+/*                                                       ( •.• )              */
+/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
+/*                                                                            */
+/*   Created: 2025/12/03 09:23:06 by UDA                                      */
+/*   Updated: 2025/12/03 09:23:06 by UDA                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
