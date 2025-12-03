@@ -13,25 +13,34 @@
 /**
  * This class is responsible for the single logic center
  */
- using System.Collections.Generic;
-using System.IO;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Central save system service.
+/// UI and controllers call this class to perform save/load/delete.
+/// All metadata preparation is handled here.
+/// </summary>
 public static class SaveService
 {
-	/// Get a list of all UI slots
+	/// <summary>
+	/// Returns a list of all save slots for UI.
+	/// </summary>
 	public static List<SaveSlotData> GetAllSlots(bool includeAutoSave)
 	{
 		var list = new List<SaveSlotData>();
 
+		// Autosave slot
 		if (includeAutoSave)
 		{
 			string autoPath = SaveRepository.GetAutoSavePath();
-			list.Add(new SaveSlotData(autoPath, -1, File.Exists(autoPath), true));
+			list.Add(new SaveSlotData(autoPath, -1, System.IO.File.Exists(autoPath), true));
 		}
 
+		// Manual save slots
 		string[] files = SaveRepository.GetAllSlotFiles();
-
 		foreach (string file in files)
 		{
 			int index = SaveRepository.ExtractIndexFromPath(file);
@@ -41,18 +50,82 @@ public static class SaveService
 		return list;
 	}
 
-	public static void RequestSave(int index, SaveData data)
+	/// <summary>
+	/// Saves the supplied SaveData into the specified slot.
+	/// Fills meta information before writing to disk.
+	/// </summary>
+	public static void RequestSave(int slotIndex, SaveData data)
 	{
-		SaveManager.Save(data, index);
+		if (data == null)
+		{
+			Debug.LogError("[SaveService] Attempted to save NULL data.");
+			return;
+		}
+
+		PrepareMetadata(slotIndex, data);
+
+		SaveManager.Save(data, slotIndex);
+
+		Debug.Log($"[SaveService] Saved slot {slotIndex} | Scene={data.meta.sceneName} | Time={data.meta.saveTime}");
 	}
 
-	public static SaveData RequestLoad(int index)
+	/// <summary>
+	/// Load save data by slot index.
+	/// </summary>
+	public static SaveData RequestLoad(int slotIndex)
 	{
-		return SaveManager.Load(index);
+		SaveData data = SaveManager.Load(slotIndex);
+
+		if (data == null)
+		{
+			Debug.LogError($"[SaveService] Failed to load slot {slotIndex}");
+			return null;
+		}
+
+		return data;
 	}
 
-	public static void RequestDelete(int index)
+	/// <summary>
+	/// Delete a save slot from disk.
+	/// </summary>
+	public static void RequestDelete(int slotIndex)
 	{
-		SaveRepository.DeleteSlot(index);
+		SaveRepository.DeleteSlot(slotIndex);
+		Debug.Log($"[SaveService] Deleted slot {slotIndex}");
+	}
+
+	// ---------------------------------------------------------
+	// META INFORMATION BUILDER
+	// ---------------------------------------------------------
+
+	/// <summary>
+	/// Prepares meta information before saving.
+	/// </summary>
+	private static void PrepareMetadata(int slotIndex, SaveData data)
+	{
+		data.meta.slotIndex   = slotIndex;
+		data.meta.sceneName   = SceneManager.GetActiveScene().name;
+		data.meta.saveTime    = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+		data.meta.saveVersion = SaveDataVersion.Current;
+
+		// Biome detection (if your world manager exists)
+		data.meta.currentBiome = TryGetBiomeIdSafe();
+	}
+
+	/// <summary>
+	/// Safely retrieves the current biome without crashing
+	/// even if WorldManager or biome system is not loaded.
+	/// </summary>
+	private static string TryGetBiomeIdSafe()
+	{
+		try
+		{
+			if (WorldManager.Instance != null)
+				return WorldManager.Instance.CurrentBiomeID;
+		}
+		catch { }
+
+		return "unknown";
 	}
 }
+

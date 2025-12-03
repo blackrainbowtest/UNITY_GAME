@@ -5,8 +5,7 @@
 /*                                                       ( •.• )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
-/*   Created: 2025/12/03 10:10:24 by UDA                                      */
-/*   Updated: 2025/12/03 10:10:24 by UDA                                      */
+/*   Updated to AAA architecture: SaveManager is now a pure I/O layer.        */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +13,23 @@ using System;
 using System.IO;
 using UnityEngine;
 
+/// <summary>
+/// Low-level save/load handler.
+/// Does not modify SaveData, does not write metadata,
+/// and contains no game logic. Pure file I/O only.
+/// </summary>
 public static class SaveManager
 {
+	/// <summary>
+	/// Writes save data to disk. Assumes metadata is already prepared by SaveService.
+	/// </summary>
 	public static void Save(SaveData data, int slotIndex)
 	{
 		if (data == null)
 		{
-			Debug.LogError("Пустые данные сохранения");
+			Debug.LogError("[SaveManager] Attempted to save NULL SaveData.");
 			return;
 		}
-
-		data.meta.slotIndex = slotIndex;
 
 		string fileName = slotIndex < 0
 			? "save_auto.json"
@@ -34,9 +39,14 @@ public static class SaveManager
 
 		string json = JsonUtility.ToJson(data, true);
 		File.WriteAllText(path, json);
-		Debug.Log($"[SaveManager] Сохранено в {path} | player.worldSeed={data.player.worldSeed} world.worldSeed={data.world.worldSeed}");
+
+		Debug.Log($"[SaveManager] Saved -> {path}");
 	}
 
+	/// <summary>
+	/// Loads save data from disk and deserializes it into SaveData.
+	/// Returns NULL if the file does not exist or is corrupted.
+	/// </summary>
 	public static SaveData Load(int slotIndex)
 	{
 		string fileName = slotIndex < 0
@@ -47,16 +57,20 @@ public static class SaveManager
 
 		if (!File.Exists(path))
 		{
-			Debug.LogWarning($"[SaveManager] Файл не найден: {path}");
+			Debug.LogWarning($"[SaveManager] File not found: {path}");
 			return null;
 		}
 
 		string json = File.ReadAllText(path);
 		SaveData data = JsonUtility.FromJson<SaveData>(json);
-		Debug.Log($"[SaveManager] Загрузка из {path} | player.worldSeed={data.player.worldSeed} world.worldSeed={data.world.worldSeed}");
+
+		Debug.Log($"[SaveManager] Loaded <- {path}");
 		return data;
 	}
 
+	/// <summary>
+	/// Helper for autosaves. Behaves just like Save(), but always targets auto slot.
+	/// </summary>
 	public static void SaveAuto(SaveData data)
 	{
 		try
@@ -66,11 +80,11 @@ public static class SaveManager
 			string json = JsonUtility.ToJson(data, true);
 			File.WriteAllText(path, json);
 
-			Debug.Log("[SaveManager] Автосейв выполнен: " + path + $" | player.worldSeed={data.player.worldSeed} world.worldSeed={data.world.worldSeed}");
+			Debug.Log("[SaveManager] Autosave OK -> " + path);
 		}
 		catch (Exception ex)
 		{
-			Debug.LogError("[SaveManager] Ошибка автосохранения: " + ex.Message);
+			Debug.LogError("[SaveManager] Autosave error: " + ex.Message);
 		}
 	}
 }
