@@ -20,11 +20,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+
 public class SaveListController : MonoBehaviour
 {
 	[Header("UI")]
-	public Transform slotContainer;     // Content from ScrollView
-	public GameObject slotPrefab;       // Prefab SaveSlotUI
+	public Transform slotContainer;     // ScrollView/Content
+	public GameObject slotPrefab;       // Prefab with SaveSlotView + SaveSlotController
 	public TextMeshProUGUI titleText;
 
 	private void Awake()
@@ -43,40 +47,54 @@ public class SaveListController : MonoBehaviour
 
 	private void GenerateSlots()
 	{
-		// Cleaning old slots
+		// Clear old
 		foreach (Transform child in slotContainer)
 			Destroy(child.gameObject);
 
-		// We get a list of slots from the service
-		List<SaveSlotData> slots = SaveService.GetAllSlots(
-			includeAutoSave: SaveLoadState.Mode == SaveLoadMode.Load
-		);
+		// get data from service
+		bool includeAuto = SaveLoadState.Mode == SaveLoadMode.Load;
+		List<SaveSlotData> slots = SaveService.GetAllSlots(includeAuto);
 
-		// Generating UI elements
-		foreach (var slot in slots)
+		// Create slots from data
+		foreach (var slotData in slots)
+			CreateSlot(slotData);
+
+		// Add empty slots in SAVE mode
+		if (SaveLoadState.Mode == SaveLoadMode.Save)
+			GenerateEmptySlots(slots);
+	}
+
+	private void CreateSlot(SaveSlotData data)
+	{
+		var obj = Instantiate(slotPrefab, slotContainer);
+
+		var view = obj.GetComponent<SaveSlotView>();
+		var controller = obj.GetComponent<SaveSlotController>();
+
+		if (view == null || controller == null)
 		{
-			var obj = Instantiate(slotPrefab, slotContainer);
-			var ui = obj.GetComponent<SaveSlotUI>();
-			ui.Init(slot.path, slot.isAuto);
+			Debug.LogError("[SaveListController] Slot prefab is missing SaveSlotView / SaveSlotController!");
+			return;
 		}
 
-		// In SAVE mode, always show empty slots first.
-		if (SaveLoadState.Mode == SaveLoadMode.Save)
+		controller.Init(data, view);
+	}
+
+	private void GenerateEmptySlots(List<SaveSlotData> existingSlots)
+	{
+		const int targetSlots = 10;
+
+		// Count non-auto slots
+		int regularCount = 0;
+		foreach (var s in existingSlots)
+			if (!s.isAuto)
+				regularCount++;
+
+		// Add empty ones
+		for (int i = regularCount; i < targetSlots; i++)
 		{
-			const int targetSlotCount = 10;
-			int currentCount = 0;
-
-			foreach (var s in slots)
-				if (!s.isAuto) currentCount++;
-
-			// Adding empty slots
-			for (int i = currentCount; i < targetSlotCount; i++)
-			{
-				string path = SaveRepository.GetSlotPath(i);
-				var obj = Instantiate(slotPrefab, slotContainer);
-				var ui = obj.GetComponent<SaveSlotUI>();
-				ui.Init(path, false);
-			}
+			string path = SaveRepository.GetSlotPath(i);
+			CreateSlot(new SaveSlotData(path, i, false, false));
 		}
 	}
 }
