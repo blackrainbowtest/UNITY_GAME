@@ -11,11 +11,14 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public static class SaveDataFactory
 {
 	public static SaveData CreateNew(string playerName, string classId, int worldSeed)
 	{
+		Debug.Log($"[SaveDataFactory] Creating new save: player={playerName}, class={classId}, seed={worldSeed}");
+		
 		var data = new SaveData();
 
 		// -------------------------

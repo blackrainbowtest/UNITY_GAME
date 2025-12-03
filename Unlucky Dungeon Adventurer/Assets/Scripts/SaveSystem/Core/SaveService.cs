@@ -142,6 +142,12 @@ public static class SaveService
 
 		// Также можно создать persistent слот 0
 		SaveManager.Save(data, 0);
+
+		// ВАЖНО: Загружаем созданные данные в TempSaveCache,
+		// чтобы при загрузке WorldMap сцены они применились
+		TempSaveCache.pendingSave = data;
+
+		Debug.Log($"[SaveService] New game created: {name} ({role}) | seed={seed}");
 	}
 }
 

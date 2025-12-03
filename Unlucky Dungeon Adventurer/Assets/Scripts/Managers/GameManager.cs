@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviour
         }
 
         // --- World ---
-        data.world.worldSeed = 0;
+        data.world.worldSeed = p != null ? p.worldSeed : 0;
         data.world.currentDay = 1;
         data.world.timeOfDay = 12f;
 
@@ -93,9 +93,11 @@ public class GameManager : MonoBehaviour
     {
         if (data == null)
         {
-            Debug.LogWarning("Нет данных для загрузки");
+            Debug.LogWarning("[GameManager] Нет данных для загрузки");
             return;
         }
+
+        Debug.Log($"[GameManager] Loading game data: player.worldSeed={data.player.worldSeed}, world.worldSeed={data.world.worldSeed}");
 
         // получаем базовый шаблон класса
         ClassStats stats;
