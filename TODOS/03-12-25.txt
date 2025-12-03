@@ -1,0 +1,19 @@
+Шаг 6.4 — Что менять на префабе SaveSlotUI?
+
+Теперь у тебя два компонента:
+SaveSlotView
+SaveSlotController
+На префабе слота сделай:
+
+✔ Вместо SaveSlotUI добавить:
+компонент SaveSlotView
+компонент SaveSlotController
+
+Поля из SaveSlotView подключить:
+slotTitle
+slotInfo
+playerNameText
+levelText
+background
+deletePanel
+editPanel
