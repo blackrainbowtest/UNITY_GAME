@@ -1,7 +1,10 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
+/// <summary>
+/// Root save file container.
+/// This object is serialized by SaveManager and stored on disk.
+/// All modules below are stored in separate files for clarity.
+/// </summary>
 [Serializable]
 public class SaveData
 {
@@ -10,107 +13,4 @@ public class SaveData
     public InventorySaveData inventory = new InventorySaveData();
     public QuestSaveData quests = new QuestSaveData();
     public MetaSaveData meta = new MetaSaveData();
-
-    // � �������:
-    // public KillStatsSaveData killStats = new KillStatsSaveData();
-    // public AchievementsSaveData achievements = new AchievementsSaveData();
-}
-
-// -------------------- ����� --------------------
-[Serializable]
-public class PlayerSaveData
-{
-    public string name;
-    public string playerClass;
-
-    public int level;
-    public int gold;
-    public int worldSeed;
-
-    public int experience;       // 🔥
-    public int experienceToNext; // 🔥
-
-    // 🔹 БАЗОВЫЕ статы (то, что задаёт класс/уровень)
-    public int baseMaxHP;
-    public int baseMaxMP;
-    public int baseMaxStamina;
-
-    public int baseAttack;
-    public int baseDefense;
-    public int baseAgility;
-    public int baseLust;
-
-    // 🔹 ТЕКУЩИЕ значения (то, что реально на полосках)
-    public int currentHP;
-    public int currentMP;
-    public int currentStamina;
-
-    public int isPregnant;
-
-    // позиция игрока на карте
-    public float mapPosX;
-    public float mapPosY;
-
-    // 🔹 Инвентарь игрока (мигрировано из InventorySaveData.items)
-    // Используем ItemInstance для прямого доступа к данным предмета.
-    public List<ItemInstance> inventoryItems = new List<ItemInstance>();
-}
-
-// -------------------- ��� --------------------
-[Serializable]
-public class WorldSaveData
-{
-    public int worldSeed;
-    public int currentDay;
-    public float timeOfDay;
-
-    // � �������: �������� ����������, ������ � �.�.
-    // public List<Vector2Int> discoveredDungeons = new List<Vector2Int>();
-    // public List<Vector2Int> discoveredCities = new List<Vector2Int>();
-    public void AddMinutes(int minutes)
-    {
-        float totalMinutes = timeOfDay * 60f + minutes;
-        int minutesPerDay = 24 * 60;
-
-        currentDay += totalMinutes >= minutesPerDay ? (int)(totalMinutes / minutesPerDay) : 0;
-        totalMinutes %= minutesPerDay;
-
-        timeOfDay = totalMinutes / 60f;
-    }
-}
-
-// -------------------- ��������� --------------------
-[Serializable]
-public class InventorySaveData
-{
-    public List<ItemSaveData> items = new List<ItemSaveData>();
-}
-
-// ���� ��������, ����� �������� � ����� ������� ���������
-[Serializable]
-public class ItemSaveData
-{
-    public string itemId;   // �������� "sword_wooden_001"
-    public int quantity;
-}
-
-// -------------------- ������ --------------------
-[Serializable]
-public class QuestSaveData
-{
-    public List<string> active = new List<string>();
-    public List<string> completed = new List<string>();
-
-    // � ������� ���� ����� ��������� ��������, ������� � �.�.
-}
-
-// -------------------- ����-���� ��� ���� --------------------
-[Serializable]
-public class MetaSaveData
-{
-    public int slotIndex;         // -1 = ��������, 0..N = ������� �����
-    public string sceneName;      // "WorldMap", "Dungeon_01" � �.�.
-    public string saveTime;       // ������ ����/������� ��� �����������
-    public string saveVersion;    // ������ ����/����� �����
-    public string currentBiome;   // Биом, на котором стоит персонаж
 }
