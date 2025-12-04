@@ -49,6 +49,9 @@ public class PlayerData
     // World seed for procedural generation (saved with player)
     public int worldSeed;
 
+    // Inventory items
+    public System.Collections.Generic.List<ItemInstance> inventoryItems = new System.Collections.Generic.List<ItemInstance>();
+
     // Свойства для удобства (используют финальные значения)
     public int maxHP => finalMaxHP;
     public int maxMP => finalMaxMP;

@@ -33,17 +33,32 @@ public class SaveListController : MonoBehaviour
 		// Получаем список слотов
 		List<SaveSlotData> slots = SaveService.GetAllSlots(includeAutoSave: true);
 
-		// Добавляем пустые слоты до 10
-		int regularCount = 0;
-		foreach (var s in slots)
-			if (!s.isAuto)
-				regularCount++;
 
-		for (int i = regularCount; i < 10; i++)
+		// Ensure manual slots 0..9 exist exactly once (avoid duplicates)
+		int maxManual = 10;
+		var existing = new System.Collections.Generic.HashSet<int>();
+		foreach (var s in slots)
 		{
-			string path = SaveRepository.GetSlotPath(i);
-			slots.Add(new SaveSlotData(path, i, false, false));
+			if (!s.isAuto)
+				existing.Add(s.index);
 		}
+
+		for (int i = 0; i < maxManual; i++)
+		{
+			if (!existing.Contains(i))
+			{
+				string path = SaveRepository.GetSlotPath(i);
+				slots.Add(new SaveSlotData(path, i, false, false));
+			}
+		}
+
+		// Sort slots: autosave first (if present), then manual slots by index
+		slots.Sort((a, b) => {
+			if (a.isAuto && b.isAuto) return 0;
+			if (a.isAuto) return -1;
+			if (b.isAuto) return 1;
+			return a.index.CompareTo(b.index);
+		});
 
 		// Изменяем размер контента
 		float totalHeight = slots.Count * (SLOT_HEIGHT + SLOT_SPACING);

@@ -29,10 +29,12 @@ public class GameManager : MonoBehaviour
             data.player.name = p.playerName;
             data.player.playerClass = p.playerClass;
             data.player.worldSeed = p.worldSeed;
-            Debug.Log($"[GameManager] Preparing save: player.worldSeed={p.worldSeed}");
+            Debug.Log($"[GameManager] Preparing save: player.worldSeed={p.worldSeed}, gold={p.gold}");
 
             data.player.level = p.level;
             data.player.gold = p.gold;
+            data.player.experience = p.experience;
+            data.player.experienceToNext = p.experienceToNext;
 
             // базовые статы
             data.player.baseMaxHP = p.baseMaxHP;
@@ -53,6 +55,12 @@ public class GameManager : MonoBehaviour
 
             data.player.mapPosX = p.mapPosX;
             data.player.mapPosY = p.mapPosY;
+
+            // Копируем инвентарь
+            if (p.inventoryItems != null && p.inventoryItems.Count > 0)
+            {
+                data.player.inventoryItems = new System.Collections.Generic.List<ItemInstance>(p.inventoryItems);
+            }
         }
 
         // --- World ---
@@ -119,6 +127,8 @@ public class GameManager : MonoBehaviour
         // перезаписываем тем, что есть в сейве
         p.level = data.player.level;
         p.gold = data.player.gold;
+        p.experience = data.player.experience;
+        p.experienceToNext = data.player.experienceToNext;
 
         // базовые статы из сейва (если они уже менялись по уровню и т.п.)
         p.baseMaxHP = data.player.baseMaxHP;
@@ -140,12 +150,22 @@ public class GameManager : MonoBehaviour
         p.mapPosX = data.player.mapPosX;
         p.mapPosY = data.player.mapPosY;
 
+        // Загружаем инвентарь
+        if (data.player.inventoryItems != null && data.player.inventoryItems.Count > 0)
+        {
+            p.inventoryItems = new System.Collections.Generic.List<ItemInstance>(data.player.inventoryItems);
+        }
+        else
+        {
+            p.inventoryItems = new System.Collections.Generic.List<ItemInstance>();
+        }
+
         // пересчёт финальных статов (finalMaxHP и т.п.)
         p.RecalculateFinalStats();
 
         GameData.CurrentPlayer = p;
 
-        Debug.Log($"Загружен персонаж: {p.playerName} [{p.playerClass}] | Уровень {p.level}");
+        Debug.Log($"Загружен персонаж: {p.playerName} [{p.playerClass}] | Уровень {p.level} | Gold {p.gold} | HP {p.currentHP}/{p.finalMaxHP}");
     }
 
 

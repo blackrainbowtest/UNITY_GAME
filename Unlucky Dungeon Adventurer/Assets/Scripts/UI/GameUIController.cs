@@ -23,9 +23,6 @@ public class GameUIController : MonoBehaviour
 
     private void Start()
     {
-        // Подписываемся на изменения статов
-        UIEvents.OnPlayerStatsChanged += UpdateUI;
-
         // Пытаемся обновить UI, если инициализация уже завершена
         if (GameInitializer.IsInitialized() && GameData.CurrentPlayer != null)
         {
@@ -40,10 +37,9 @@ public class GameUIController : MonoBehaviour
             return;
 
         // Check if UI elements are still valid before updating
-        if (hpFill == null || mpFill == null || staFill == null)
+        if (hpFill == null || mpFill == null || staFill == null || this == null)
         {
-            Debug.LogWarning("[GameUIController] UI elements are null or destroyed. Unsubscribing from events.");
-            UIEvents.OnPlayerStatsChanged -= UpdateUI;
+            // Object is being destroyed, OnDisable will handle unsubscribe
             return;
         }
 

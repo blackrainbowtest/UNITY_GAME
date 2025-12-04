@@ -9,6 +9,7 @@
 
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using System.IO;
 
 public class SaveSlotController : MonoBehaviour, IPointerClickHandler
@@ -22,6 +23,17 @@ public class SaveSlotController : MonoBehaviour, IPointerClickHandler
 		this.view = view;
 
 		RefreshView();
+
+		// Wire delete button to this controller
+		if (view != null && view.deleteButton != null)
+		{
+			var btn = view.deleteButton.GetComponent<Button>();
+			if (btn != null)
+			{
+				btn.onClick.RemoveAllListeners();
+				btn.onClick.AddListener(OnDeleteClicked);
+			}
+		}
 	}
 
 	private void RefreshView()
