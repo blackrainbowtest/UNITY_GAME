@@ -45,10 +45,7 @@ namespace WorldLogic
 
         private void RegisterManagers()
         {
-			var mgr = FindObjectOfType<UniqueLocationManager>();
-			if (mgr != null)
-				managers.Add(mgr);
-			var uniqueLocMgr = FindObjectOfType<UniqueLocationManager>();
+			var uniqueLocMgr = FindFirstObjectByType<UniqueLocationManager>();
 			if (uniqueLocMgr != null)
 				managers.Add(uniqueLocMgr);
 			else

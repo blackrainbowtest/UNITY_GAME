@@ -29,7 +29,7 @@ public class SaveLoadFade : MonoBehaviour
 		group.alpha = 0;
 		while (group.alpha < 1)
 		{
-			group.alpha += Time.deltaTime * 2f;
+			group.alpha += Time.unscaledDeltaTime * 2f;
 			yield return null;
 		}
 		group.alpha = 1;
@@ -39,7 +39,7 @@ public class SaveLoadFade : MonoBehaviour
 	{
 		while (group.alpha > 0)
 		{
-			group.alpha -= Time.deltaTime * 2f;
+			group.alpha -= Time.unscaledDeltaTime * 2f;
 			yield return null;
 		}
 		group.alpha = 0;
@@ -59,5 +59,21 @@ public class SaveLoadFade : MonoBehaviour
 			if (CameraMaster.Instance != null)
 				CameraMaster.Instance.EnablePan();
 		}
+	}
+
+	public IEnumerator FadeOutAndLoad(string sceneName)
+	{
+		while (group.alpha > 0)
+		{
+			group.alpha -= Time.unscaledDeltaTime * 2f;
+			yield return null;
+		}
+		group.alpha = 0;
+
+		// Unload save window first
+		SceneManager.UnloadSceneAsync("SaveLoadScene");
+		
+		// Then load game scene
+		SceneLoader.LoadScene(sceneName);
 	}
 }

@@ -23,9 +23,8 @@ public class SaveSlotView : MonoBehaviour
 	public TextMeshProUGUI levelText;
 	public Image background;
 
-	[Header("Delete / Edit Panels")]
-	public GameObject deletePanel;
-	public GameObject editPanel;
+	[Header("Buttons")]
+	public GameObject deleteButton;
 
 	public void SetEmpty()
 	{
@@ -69,15 +68,9 @@ public class SaveSlotView : MonoBehaviour
 			background.color = Color.white;
 	}
 
-	public void ShowDeletePanel(bool state)
+	public void ShowDeleteButton(bool state)
 	{
-		if (deletePanel != null)
-			deletePanel.SetActive(state);
-	}
-
-	public void ShowEditPanel(bool state)
-	{
-		if (editPanel != null)
-			editPanel.SetActive(state);
+		if (deleteButton != null)
+			deleteButton.SetActive(state);
 	}
 }

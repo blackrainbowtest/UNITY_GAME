@@ -1,8 +1,14 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
-public class CloseButtonHandler : MonoBehaviour
+public class CloseButtonHandler : MonoBehaviour, IPointerClickHandler
 {
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        CloseSaveWindow();
+    }
+
     public void CloseSaveWindow()
     {
         var fade = FindFirstObjectByType<SaveLoadFade>();

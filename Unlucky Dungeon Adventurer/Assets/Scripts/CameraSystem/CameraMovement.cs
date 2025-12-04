@@ -20,7 +20,6 @@ public class CameraMovement
 	private Vector3 velocity;    // инерция
 	private float inertiaDamp = 6f;
 	private float minInertia = 0.01f;
-	private float moveFactor = 0.0025f;
 
 	public CameraMovement(Camera camera)
 	{

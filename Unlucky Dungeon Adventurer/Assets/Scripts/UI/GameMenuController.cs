@@ -87,6 +87,11 @@ public class GameMenuController : MonoBehaviour
         SaveLoadState.Mode = SaveLoadMode.Save;
         Close();
         Time.timeScale = 0;  // Оставляем на паузе
+        
+        // Disable camera controls while save/load menu is open
+        if (CameraMaster.Instance != null)
+            CameraMaster.Instance.DisablePan();
+            
         SceneManager.LoadScene("SaveLoadScene", LoadSceneMode.Additive);
     }
 
@@ -95,6 +100,11 @@ public class GameMenuController : MonoBehaviour
         SaveLoadState.Mode = SaveLoadMode.Load;
         Close();
         Time.timeScale = 0;  // Оставляем на паузе
+        
+        // Disable camera controls while save/load menu is open
+        if (CameraMaster.Instance != null)
+            CameraMaster.Instance.DisablePan();
+            
         SceneManager.LoadScene("SaveLoadScene", LoadSceneMode.Additive);
     }
 

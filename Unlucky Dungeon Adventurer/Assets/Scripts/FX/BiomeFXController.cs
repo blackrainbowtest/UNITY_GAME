@@ -16,7 +16,7 @@ public class BiomeFXController : MonoBehaviour
 {
 	public static BiomeFXController Instance;
 
-	public FXRenderer renderer;
+	public FXRenderer fxRenderer;
 
 	private string currentBiome = "";
 
@@ -32,6 +32,6 @@ public class BiomeFXController : MonoBehaviour
 		currentBiome = biomeId;
 
 		FXProfile profile = FXLibrary.Get(biomeId);
-		renderer.ApplyProfile(profile);
+		fxRenderer.ApplyProfile(profile);
 	}
 }

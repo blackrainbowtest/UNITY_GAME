@@ -11,48 +11,34 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using System.IO;
 
-public class SaveSlotController : MonoBehaviour, IPointerClickHandler,
-	IBeginDragHandler, IDragHandler, IEndDragHandler
+public class SaveSlotController : MonoBehaviour, IPointerClickHandler
 {
 	private SaveSlotView view;
 	private SaveSlotData slot;
 
-	// The movable content
-	[SerializeField] private RectTransform mainContent;
-
-	private Vector2 startDragPos;
-	private Vector2 mainContentStartPos;
-	private bool isDragging = false;
-
-	private const float SWIPE_THRESHOLD = 80f;
-
-	private bool deleteRevealed = false;
-	private bool editRevealed = false;
-
-	public void Init(SaveSlotData slot, SaveSlotView view, RectTransform mainContent)
+	public void Init(SaveSlotData slot, SaveSlotView view)
 	{
 		this.slot = slot;
 		this.view = view;
-		this.mainContent = mainContent;
 
 		RefreshView();
 	}
 
 	private void RefreshView()
 	{
-		deleteRevealed = false;
-		editRevealed = false;
-
-		view.ShowDeletePanel(false);
-		view.ShowEditPanel(false);
-
-		// Reset position
-		mainContent.anchoredPosition = Vector2.zero;
-
-		if (!slot.exists)
+		// Check if file actually exists on disk
+		bool fileExists = File.Exists(slot.path);
+		
+		if (!fileExists)
 		{
 			view.SetHeader(Path.GetFileNameWithoutExtension(slot.path));
 			view.SetEmpty();
+			
+			// Update slot state
+			slot.exists = false;
+			
+			// Show delete button for filled slots only
+			view.ShowDeleteButton(false);
 			return;
 		}
 
@@ -60,6 +46,8 @@ public class SaveSlotController : MonoBehaviour, IPointerClickHandler,
 		if (data == null)
 		{
 			view.SetEmpty();
+			slot.exists = false;
+			view.ShowDeleteButton(false);
 			return;
 		}
 
@@ -77,17 +65,15 @@ public class SaveSlotController : MonoBehaviour, IPointerClickHandler,
 
 		view.SetSlotInfo(label);
 		view.SetFilled();
+		slot.exists = true;
+		
+		// Show delete button only for non-auto saves
+		view.ShowDeleteButton(slot.exists && !slot.isAuto);
 	}
 
 	// ---------------- CLICK ----------------
 	public void OnPointerClick(PointerEventData eventData)
 	{
-		if (isDragging)
-		{
-			// Click is ignored if a swipe was detected
-			return;
-		}
-
 		if (!slot.exists && SaveLoadState.Mode == SaveLoadMode.Load)
 			return;
 
@@ -95,7 +81,11 @@ public class SaveSlotController : MonoBehaviour, IPointerClickHandler,
 		{
 			var data = GameManager.Instance.GetCurrentGameData();
 			SaveService.RequestSave(slot.index, data);
-			RefreshView();
+			
+			// Close save window
+			var closeHandler = FindFirstObjectByType<CloseButtonHandler>();
+			if (closeHandler != null)
+				closeHandler.CloseSaveWindow();
 		}
 		else
 		{
@@ -103,66 +93,31 @@ public class SaveSlotController : MonoBehaviour, IPointerClickHandler,
 			if (loaded == null) return;
 
 			TempSaveCache.pendingSave = loaded;
-			SceneLoader.LoadScene(loaded.meta.sceneName);
+			
+			// Resume time before loading
+			Time.timeScale = 1;
+			
+			// Start fade transition
+			var fade = FindFirstObjectByType<SaveLoadFade>();
+			if (fade != null)
+			{
+				fade.StartCoroutine(fade.FadeOutAndLoad(loaded.meta.sceneName));
+			}
+			else
+			{
+				// Fallback: direct load
+				SceneLoader.LoadScene(loaded.meta.sceneName);
+			}
 		}
 	}
 
-	// ---------------- DRAG ----------------
-	public void OnBeginDrag(PointerEventData eventData)
+	// Called by delete button
+	public void OnDeleteClicked()
 	{
-		isDragging = false;
-		startDragPos = eventData.position;
-		mainContentStartPos = mainContent.anchoredPosition;
-	}
-
-	public void OnDrag(PointerEventData eventData)
-	{
-		float deltaX = eventData.position.x - startDragPos.x;
-
-		if (Mathf.Abs(deltaX) > 20f)
-			isDragging = true;
-
-		if (!isDragging)
+		if (!slot.exists || slot.isAuto)
 			return;
 
-		// Move only MainContent
-		mainContent.anchoredPosition = mainContentStartPos + new Vector2(deltaX, 0);
-
-		// Reveal panels
-		if (deltaX < -SWIPE_THRESHOLD && slot.exists && !slot.isAuto)
-		{
-			deleteRevealed = true;
-			view.ShowDeletePanel(true);
-			view.ShowEditPanel(false);
-		}
-		else if (deltaX > SWIPE_THRESHOLD && slot.exists && !slot.isAuto)
-		{
-			editRevealed = true;
-			view.ShowEditPanel(true);
-			view.ShowDeletePanel(false);
-		}
-	}
-
-	public void OnEndDrag(PointerEventData eventData)
-	{
-		// Always slide back to center
-		mainContent.anchoredPosition = Vector2.zero;
-
-		if (deleteRevealed)
-		{
-			SaveService.RequestDelete(slot.index);
-			RefreshView();
-		}
-		else if (editRevealed)
-		{
-			Debug.Log("TODO: rename dialog");
-		}
-
-		// Reset
-		deleteRevealed = false;
-		editRevealed = false;
-
-		view.ShowDeletePanel(false);
-		view.ShowEditPanel(false);
+		SaveService.RequestDelete(slot.index);
+		RefreshView();
 	}
 }

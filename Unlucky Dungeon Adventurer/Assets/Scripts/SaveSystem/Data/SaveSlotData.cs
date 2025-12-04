@@ -15,7 +15,7 @@
  */
 using UnityEngine;
 
-public struct SaveSlotData
+public class SaveSlotData
 {
 	public string path;
 	public int index;
