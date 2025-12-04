@@ -73,4 +73,10 @@ public class SaveSlotView : MonoBehaviour
 		if (deleteButton != null)
 			deleteButton.SetActive(state);
 	}
+
+	public void SetInteractable(bool interactable)
+	{
+		if (background)
+			background.color = interactable ? new Color(1, 1, 1, 0.25f) : new Color(0.5f, 0.5f, 0.5f, 0.15f);
+	}
 }

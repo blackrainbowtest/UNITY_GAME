@@ -48,17 +48,15 @@ public class SaveListController : MonoBehaviour
 		foreach (Transform child in slotContainer)
 			Destroy(child.gameObject);
 
-		// get data from service
-		bool includeAuto = SaveLoadState.Mode == SaveLoadMode.Load;
-		List<SaveSlotData> slots = SaveService.GetAllSlots(includeAuto);
+		// get data from service - always include auto
+		List<SaveSlotData> slots = SaveService.GetAllSlots(true);
 
-		// Create slots from data
+		// Create filled slots
 		foreach (var slotData in slots)
 			CreateSlot(slotData);
 
-		// Add empty slots in SAVE mode
-		if (SaveLoadState.Mode == SaveLoadMode.Save)
-			GenerateEmptySlots(slots);
+		// Always show empty slots (up to 10 total)
+		GenerateEmptySlots(slots);
 	}
 
 	private void CreateSlot(SaveSlotData data)

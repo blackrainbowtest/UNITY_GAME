@@ -39,6 +39,11 @@ public class SaveSlotController : MonoBehaviour, IPointerClickHandler
 			
 			// Show delete button for filled slots only
 			view.ShowDeleteButton(false);
+			
+			// Disable in Load mode
+			bool interactable = SaveLoadState.Mode == SaveLoadMode.Save;
+			view.SetInteractable(interactable);
+			
 			return;
 		}
 
@@ -48,6 +53,7 @@ public class SaveSlotController : MonoBehaviour, IPointerClickHandler
 			view.SetEmpty();
 			slot.exists = false;
 			view.ShowDeleteButton(false);
+			view.SetInteractable(false);
 			return;
 		}
 
@@ -69,6 +75,9 @@ public class SaveSlotController : MonoBehaviour, IPointerClickHandler
 		
 		// Show delete button only for non-auto saves
 		view.ShowDeleteButton(slot.exists && !slot.isAuto);
+		
+		// Always interactable when filled
+		view.SetInteractable(true);
 	}
 
 	// ---------------- CLICK ----------------
