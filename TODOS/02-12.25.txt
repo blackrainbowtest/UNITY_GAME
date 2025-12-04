@@ -1,0 +1,127 @@
+Color Palette for AAA Adventure-Furry Game
+1. Core Colors
+
+Primary Dark: #1A141E
+
+Mystic Violet: #6A2FA0
+
+Romantic Pink: #FF4FAE
+
+Ember Gold (Hero Accent): #FFA632
+
+Soft Dawn (Light UI): #F4E9F7
+
+2. Secondary Colors
+
+Cold Void (Deep Shadow): #0D0A15
+
+Blush Mist (Soft Pink Highlight): #E8A5CF
+
+Electric Lilac (Magic Glow): #C07CFA
+
+3. UI Text & Panels
+
+Main Text: #F4E9F7
+
+Secondary Text: #C0ABC9
+
+Dark Panel: #1A141E (80% opacity)
+
+Mid Panel: #241A2C
+
+Border Neutral: #342C45
+
+Border Accent: #6A2FA0
+
+4. Buttons
+Primary Button
+
+Background: #6A2FA0
+
+Hover: #7E42BA
+
+Pressed: #51247A
+
+Text: #F4E9F7
+
+Border: #C07CFA
+
+Secondary Button
+
+Background: #2D1B2A
+
+Hover: #3A2537
+
+Pressed: #1F131C
+
+Text: #E8A5CF
+
+Border: #6A2FA0
+
+Romance Button
+
+Background: #FF4FAE
+
+Hover: #FF6FC2
+
+Pressed: #D63D8F
+
+Text: #FFFFFF
+
+Border: #FF9CD6
+
+Danger Button
+
+Background: #FF2E63
+
+Hover: #FF4F7C
+
+Pressed: #C61D45
+
+Text: #FFFFFF
+
+Border: #FF6F9C
+
+Disabled Button
+
+Background: #1A141E
+
+Text: #6B5B6B
+
+Border: #342C3A
+
+5. World & Gameplay Indicators
+
+Healing / Buff: #5AFF9C
+
+Warning: #FFCB48
+
+Error / Damage: #FF2E63
+
+Magic Pulse: #C07CFA
+
+6. Map & Minimap Colors
+
+Roads: #3A2537
+
+Cities: #E8A5CF
+
+POI (Points of Interest): #FF9CD6
+
+Enemies: #FF2E63
+
+Player Marker: #FFA632
+
+7. Rarity System
+
+Common: #C0ABC9
+
+Uncommon: #8FFFDA
+
+Rare: #6A2FA0
+
+Epic: #C07CFA
+
+Legendary: #FF9CD6
+
+Unique: #FFA632

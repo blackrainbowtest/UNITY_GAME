@@ -1,0 +1,179 @@
+===============================================================================
+ SAVE SLOT – MASK ARCHITECTURE IMPLEMENTATION GUIDE
+===============================================================================
+
+This document describes how to convert the SaveSlot prefab into a
+"matchbox-style" swipe system using MASK + MainContent movement.
+
+The goal:
+- swipe left → reveal DeletePanel
+- swipe right → reveal EditPanel
+- prevent accidental clicks
+- avoid LayoutGroup conflicts
+- ensure stable slot height
+- AAA-style UI behavior used in mobile apps
+
+-------------------------------------------------------------------------------
+ 1. Prefab Structure (NEW)
+-------------------------------------------------------------------------------
+
+Final hierarchy:
+
+SaveSlot (root)
+ ├── Mask                     <-- new object
+ │     └── MainContent        <-- moved here; ONLY this moves during swipe
+ ├── DeletePanel              <-- left side action
+ └── EditPanel                <-- right side action
+
+IMPORTANT:
+DeletePanel and EditPanel must NOT be inside Mask.
+
+
+-------------------------------------------------------------------------------
+ 2. Creating the MASK object
+-------------------------------------------------------------------------------
+
+Inside SaveSlot:
+
+1) Right-click → UI → Image
+2) Rename to: Mask
+3) Add component: Mask (UnityEngine.UI.Mask)
+4) Disable “Show Mask Graphic”
+5) Configure RectTransform:
+
+   AnchorMin: (0, 0)
+   AnchorMax: (1, 1)
+   OffsetMin: 0
+   OffsetMax: 0
+   Pivot: (0.5, 0.5)
+
+Mask must fully cover the slot.
+
+
+-------------------------------------------------------------------------------
+ 3. Moving MainContent under the Mask
+-------------------------------------------------------------------------------
+
+Move your existing MainContent object:
+
+Old:
+SaveSlot
+ └── MainContent
+
+New:
+SaveSlot
+ └── Mask
+       └── MainContent
+
+RectTransform for MainContent:
+
+   AnchorMin: (0, 0)
+   AnchorMax: (1, 1)
+   OffsetMin: 0
+   OffsetMax: 0
+   Pivot: (0.5, 0.5)
+
+MainContent must fill the Mask area exactly.
+This will be the object we slide left/right.
+
+
+-------------------------------------------------------------------------------
+ 4. DeletePanel and EditPanel positions
+-------------------------------------------------------------------------------
+
+DeletePanel (left side):
+   AnchorMin = (0, 0.5)
+   AnchorMax = (0, 0.5)
+   Pivot     = (0, 0.5)
+   AnchoredPosition.x = positive (e.g., 274)
+   Width = same as before (e.g., 548)
+
+EditPanel (right side):
+   AnchorMin = (1, 0.5)
+   AnchorMax = (1, 0.5)
+   Pivot     = (1, 0.5)
+   AnchoredPosition.x = negative (e.g., -274)
+   Width = same as before (e.g., 548)
+
+Both must have:
+- Image with Raycast Target = ON
+- Their own button elements inside (optional)
+
+
+-------------------------------------------------------------------------------
+ 5. SaveSlotController integration
+-------------------------------------------------------------------------------
+
+The controller must receive:
+
+- SaveSlotData
+- SaveSlotView
+- RectTransform mainContent
+
+Init example:
+
+    slotController.Init(slotData, view, mainContentRect);
+
+Make sure you drag MainContent into the mainContent parameter.
+
+
+-------------------------------------------------------------------------------
+ 6. Swipe logic (summary)
+-------------------------------------------------------------------------------
+
+- Only MainContent moves horizontally.
+- SWIPE_THRESHOLD = 80 pixels.
+- If drag > 20 px → mark as dragging (block click).
+- If dragging:
+    - mainContent.anchoredPosition = drag offset
+    - reveal DeletePanel or EditPanel depending on direction
+
+- OnEndDrag:
+    - snap MainContent back to 0
+    - if Delete was revealed → trigger delete
+    - if Edit was revealed → trigger rename
+    - hide both panels
+
+
+-------------------------------------------------------------------------------
+ 7. Click behavior
+-------------------------------------------------------------------------------
+
+- Click is ignored if a swipe happened.
+- Click works only when:
+      - slot exists
+      - not dragging
+      - player taps MainContent with no horizontal movement
+
+
+-------------------------------------------------------------------------------
+ 8. ScrollView compatibility
+-------------------------------------------------------------------------------
+
+Advantages of Mask approach:
+- Slot height remains stable.
+- LayoutGroup no longer compresses the slot.
+- Scroll works smoothly during vertical movement.
+- Horizontal swipes do not conflict with scroll.
+
+
+-------------------------------------------------------------------------------
+ 9. Notes
+-------------------------------------------------------------------------------
+
+- Mask fixes visual overflow issues and prevents Delete/Edit panels
+  from being visible or clickable when MainContent is centered.
+
+- This approach behaves like native iOS/Android swipe cells
+  used in Gmail, iOS Mail, Spotify, etc.
+
+- The system is fully expandable:
+      * animations
+      * additional panels
+      * long-press behaviour
+      * dynamic slot sizing
+
+
+===============================================================================
+ END OF DOCUMENT
+===============================================================================

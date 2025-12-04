@@ -5,43 +5,50 @@
 /*                                                       ( •.• )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
-/*   Created: 2025/12/03 10:53:39 by UDA                                      */
-/*   Updated: 2025/12/03 10:53:39 by UDA                                      */
-/*                                                                            */
 /* ************************************************************************** */
 
-/**
- * slot brain
- */
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using System.IO;
 
-public class SaveSlotController : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class SaveSlotController : MonoBehaviour, IPointerClickHandler,
+	IBeginDragHandler, IDragHandler, IEndDragHandler
 {
 	private SaveSlotView view;
 	private SaveSlotData slot;
 
-	private Vector2 startPos;
-	private RectTransform rect;
+	// The movable content
+	[SerializeField] private RectTransform mainContent;
 
-	private const float dragThreshold = 80f; // 1/3 widths conditionally
+	private Vector2 startDragPos;
+	private Vector2 mainContentStartPos;
+	private bool isDragging = false;
+
+	private const float SWIPE_THRESHOLD = 80f;
 
 	private bool deleteRevealed = false;
 	private bool editRevealed = false;
 
-	public void Init(SaveSlotData slot, SaveSlotView view)
+	public void Init(SaveSlotData slot, SaveSlotView view, RectTransform mainContent)
 	{
 		this.slot = slot;
 		this.view = view;
-		rect = GetComponent<RectTransform>();
+		this.mainContent = mainContent;
 
 		RefreshView();
 	}
 
 	private void RefreshView()
 	{
+		deleteRevealed = false;
+		editRevealed = false;
+
+		view.ShowDeletePanel(false);
+		view.ShowEditPanel(false);
+
+		// Reset position
+		mainContent.anchoredPosition = Vector2.zero;
+
 		if (!slot.exists)
 		{
 			view.SetHeader(Path.GetFileNameWithoutExtension(slot.path));
@@ -75,6 +82,12 @@ public class SaveSlotController : MonoBehaviour, IPointerClickHandler, IBeginDra
 	// ---------------- CLICK ----------------
 	public void OnPointerClick(PointerEventData eventData)
 	{
+		if (isDragging)
+		{
+			// Click is ignored if a swipe was detected
+			return;
+		}
+
 		if (!slot.exists && SaveLoadState.Mode == SaveLoadMode.Load)
 			return;
 
@@ -97,44 +110,57 @@ public class SaveSlotController : MonoBehaviour, IPointerClickHandler, IBeginDra
 	// ---------------- DRAG ----------------
 	public void OnBeginDrag(PointerEventData eventData)
 	{
-		startPos = rect.anchoredPosition;
+		isDragging = false;
+		startDragPos = eventData.position;
+		mainContentStartPos = mainContent.anchoredPosition;
 	}
 
 	public void OnDrag(PointerEventData eventData)
 	{
-		float deltaX = eventData.position.x - eventData.pressPosition.x;
+		float deltaX = eventData.position.x - startDragPos.x;
 
-		rect.anchoredPosition = startPos + new Vector2(deltaX, 0);
+		if (Mathf.Abs(deltaX) > 20f)
+			isDragging = true;
 
-		if (deltaX > dragThreshold && !slot.isAuto && slot.exists)
+		if (!isDragging)
+			return;
+
+		// Move only MainContent
+		mainContent.anchoredPosition = mainContentStartPos + new Vector2(deltaX, 0);
+
+		// Reveal panels
+		if (deltaX < -SWIPE_THRESHOLD && slot.exists && !slot.isAuto)
 		{
-			view.ShowEditPanel(true);
-			editRevealed = true;
-		}
-		else if (deltaX < -dragThreshold && !slot.isAuto && slot.exists)
-		{
-			view.ShowDeletePanel(true);
 			deleteRevealed = true;
+			view.ShowDeletePanel(true);
+			view.ShowEditPanel(false);
+		}
+		else if (deltaX > SWIPE_THRESHOLD && slot.exists && !slot.isAuto)
+		{
+			editRevealed = true;
+			view.ShowEditPanel(true);
+			view.ShowDeletePanel(false);
 		}
 	}
 
 	public void OnEndDrag(PointerEventData eventData)
 	{
-		rect.anchoredPosition = startPos;
+		// Always slide back to center
+		mainContent.anchoredPosition = Vector2.zero;
 
 		if (deleteRevealed)
 		{
 			SaveService.RequestDelete(slot.index);
-			deleteRevealed = false;
 			RefreshView();
 		}
-
-		if (editRevealed)
+		else if (editRevealed)
 		{
-			Debug.Log("TODO: open rename dialog");
-			editRevealed = false;
-			view.ShowEditPanel(false);
+			Debug.Log("TODO: rename dialog");
 		}
+
+		// Reset
+		deleteRevealed = false;
+		editRevealed = false;
 
 		view.ShowDeletePanel(false);
 		view.ShowEditPanel(false);
