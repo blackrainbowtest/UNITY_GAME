@@ -46,7 +46,22 @@ public class RestUIController : MonoBehaviour
 
         // Hide panel by default if assigned
         if (panel != null)
+        {
             panel.SetActive(false);
+
+            // Allow closing by clicking on the background
+            var bgImage = panel.GetComponent<UnityEngine.UI.Image>();
+            var bgButton = panel.GetComponent<UnityEngine.UI.Button>();
+            if (bgButton == null)
+            {
+                bgButton = panel.AddComponent<UnityEngine.UI.Button>();
+                bgButton.transition = UnityEngine.UI.Selectable.Transition.None;
+                bgButton.targetGraphic = bgImage; // reuse background image if exists
+            }
+
+            bgButton.onClick.RemoveAllListeners();
+            bgButton.onClick.AddListener(Close);
+        }
     }
 
     /// <summary>
@@ -54,6 +69,12 @@ public class RestUIController : MonoBehaviour
     /// </summary>
     public void Open(RestEnvironment env)
     {
+        if (panel == null || titleText == null)
+        {
+            Debug.LogError("[RestUI] panel/titleText not assigned on RestUIController");
+            return;
+        }
+
         _currentEnvironment = env;
 
         // Заголовок в зависимости от того, где игрок отдыхает
@@ -67,6 +88,19 @@ public class RestUIController : MonoBehaviour
         };
 
         panel.SetActive(true);
+        // Bring on top
+        panel.transform.SetAsLastSibling();
+
+        // Ensure any CanvasGroup (if added later) is visible
+        var cg = panel.GetComponent<CanvasGroup>();
+        if (cg != null)
+        {
+            cg.alpha = 1f;
+            cg.interactable = true;
+            cg.blocksRaycasts = true;
+        }
+
+        Debug.Log("[RestUI] Open called, panel activated");
     }
 
     /// <summary>
@@ -74,6 +108,12 @@ public class RestUIController : MonoBehaviour
     /// </summary>
     private void Choose(RestType type)
     {
+        if (RestController.Instance == null)
+        {
+            Debug.LogError("[RestUI] RestController.Instance is null!");
+            return;
+        }
+
         RestController.Instance.StartRest(type, _currentEnvironment);
         Close();
     }

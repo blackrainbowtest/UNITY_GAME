@@ -124,6 +124,28 @@ public static class GameData
     // 📂 Загружаем игрока
     public static void LoadPlayer()
     {
+        // Attempt to load from the most recent auto-save or slot 0
+        SaveData loadedData = null;
+
+        // Try to load from auto-save slot first
+        loadedData = SaveManager.Load(-1);  // -1 = auto-save
+        
+        // If auto-save failed, try slot 0
+        if (loadedData == null)
+        {
+            loadedData = SaveManager.Load(0);
+        }
+
+        // If we successfully loaded SaveData, use GameManager to apply it
+        if (loadedData != null)
+        {
+            Debug.Log("[GameData] Loaded SaveData from disk, applying via GameManager");
+            GameManager.Instance.LoadGameData(loadedData);
+            return;
+        }
+
+        // Fallback: Create a new player from PlayerPrefs (legacy support)
+        Debug.Log("[GameData] No save file found, creating player from PlayerPrefs");
         string name = PlayerPrefs.GetString("playerName", "Unknown");
         string role = PlayerPrefs.GetString("playerClass", "None");
 

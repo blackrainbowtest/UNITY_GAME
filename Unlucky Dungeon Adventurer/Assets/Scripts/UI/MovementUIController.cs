@@ -45,6 +45,7 @@ public class MovementUIController : MonoBehaviour
         
         if (pathInfoText != null)
             pathInfoText.text = "";
+
     }
 
     private void UpdateRestButtonState()
@@ -111,7 +112,12 @@ public class MovementUIController : MonoBehaviour
 
         RestEnvironment env = RestEnvironmentDetector.GetEnvironment(coords);
 
-        if (RestUIController.Instance != null)
-            RestUIController.Instance.Open(env);
+        if (RestUIManager.Instance == null)
+        {
+            Debug.LogError("[MovementUI] RestUIManager.Instance not found.");
+            return;
+        }
+
+        RestUIManager.Instance.OpenRestMenu(env);
     }
 }
