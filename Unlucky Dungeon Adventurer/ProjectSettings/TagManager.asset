@@ -44,5 +44,8 @@ TagManager:
   - name: World
     uniqueID: 2377916733
     locked: 0
+  - name: UniqueLocationIcon
+    uniqueID: 3916003381
+    locked: 0
   m_RenderingLayers:
   - Default
