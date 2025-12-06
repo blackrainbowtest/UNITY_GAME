@@ -161,25 +161,6 @@ public class WorldMapController : MonoBehaviour
         Debug.Log("[WorldMap] DIRECTOR START: seed=" + seed);
         generator = new WorldGenerator(seed);
 
-        // === DEBUG: Scan all biomes on map ===
-        Debug.LogWarning("=== Biome scan start ===");
-        System.Collections.Generic.HashSet<string> biomeSet = new System.Collections.Generic.HashSet<string>();
-
-        for (int x = 0; x < 200; x++)
-        {
-            for (int y = 0; y < 200; y++)
-            {
-                var t = generator.GetTile(x, y);
-                if (t != null && !string.IsNullOrEmpty(t.biomeId))
-                    biomeSet.Add(t.biomeId);
-            }
-        }
-
-        foreach (var b in biomeSet)
-            Debug.LogWarning("Biome found: " + b);
-        Debug.LogWarning("=== Biome scan end ===");
-        // === END DEBUG ===
-
         // Initialize WorldLogicDirector
         var director = FindFirstObjectByType<WorldLogic.WorldLogicDirector>();
         if (director != null)
