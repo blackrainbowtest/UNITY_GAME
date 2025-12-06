@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using WorldLogic;
 
 /// <summary>
 /// World state snapshot: seed, time, and dynamic world modifications.
@@ -28,6 +29,9 @@ public class WorldSaveData
 
     // Generated unique world locations (your 50 epic points)
     public List<UniqueLocationSaveData> uniqueLocations = new List<UniqueLocationSaveData>();
+
+    // Full state of all 50 unique locations (runtime states with progress)
+    public List<UniqueLocationState> uniqueLocationStates = new List<UniqueLocationState>();
 
     public void AddMinutes(int minutes)
     {
