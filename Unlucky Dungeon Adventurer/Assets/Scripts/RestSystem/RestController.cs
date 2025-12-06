@@ -32,40 +32,36 @@ public class RestController : MonoBehaviour
         // Определить событие
         RestEvent e = RestEventResolver.RollEvent(type, env);
 
-        if (e.type == RestEventType.None)
-        {
-            // нормальный отдых
-            World.AddMinutes(minutes);
-            RestCalculator.ApplyRest(Player, type, env);
+           if (e.type == RestEventType.None)
+           {
+               // нормальный отдых
+               World.AddMinutes(minutes);
+               RestCalculator.ApplyRest(Player, type, env);
+ 
+               UIEvents.InvokePlayerStatsChanged();
+               return;
+           }
 
-            UIEvents.InvokePlayerStatsChanged();
-            Debug.Log("[Rest] Спокойный отдых без событий.");
-            return;
-        }
+           if (e.type == RestEventType.Noise)
+           {
+               int penalizedMinutes = Mathf.RoundToInt(minutes * e.penaltyMultiplier);
+               World.AddMinutes(penalizedMinutes);
+               RestCalculator.ApplyRest(Player, type, env);
+ 
+               UIEvents.InvokePlayerStatsChanged();
+               return;
+           }
 
-        if (e.type == RestEventType.Noise)
-        {
-            int penalizedMinutes = Mathf.RoundToInt(minutes * e.penaltyMultiplier);
-            World.AddMinutes(penalizedMinutes);
-            RestCalculator.ApplyRest(Player, type, env);
+           if (e.type == RestEventType.MinorAmbush)
+           {
+               // UI-взаимодействие
+               return;
+           }
 
-            UIEvents.InvokePlayerStatsChanged();
-            Debug.Log("[Rest] Шум! Отдых с штрафом.");
-            return;
-        }
-
-        if (e.type == RestEventType.MinorAmbush)
-        {
-            Debug.Log("[Rest] Лёгкое нападение! Показать картинки и дать выбор...");
-            // UI-взаимодействие
-            return;
-        }
-
-        if (e.type == RestEventType.MajorAmbush)
-        {
-            Debug.Log("[Rest] Сильное нападение! Переход на сцену боя!");
-            // SceneManager.LoadScene("BattleScene");
-            return;
-        }
+           if (e.type == RestEventType.MajorAmbush)
+           {
+               // SceneManager.LoadScene("BattleScene");
+               return;
+           }
     }
 }

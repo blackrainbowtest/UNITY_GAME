@@ -71,7 +71,6 @@ public class RestUIController : MonoBehaviour
     {
         if (panel == null || titleText == null)
         {
-            Debug.LogError("[RestUI] panel/titleText not assigned on RestUIController");
             return;
         }
 
@@ -88,10 +87,8 @@ public class RestUIController : MonoBehaviour
         };
 
         panel.SetActive(true);
-        // Bring on top
         panel.transform.SetAsLastSibling();
 
-        // Ensure any CanvasGroup (if added later) is visible
         var cg = panel.GetComponent<CanvasGroup>();
         if (cg != null)
         {
@@ -99,8 +96,6 @@ public class RestUIController : MonoBehaviour
             cg.interactable = true;
             cg.blocksRaycasts = true;
         }
-
-        Debug.Log("[RestUI] Open called, panel activated");
     }
 
     /// <summary>
@@ -108,11 +103,7 @@ public class RestUIController : MonoBehaviour
     /// </summary>
     private void Choose(RestType type)
     {
-        if (RestController.Instance == null)
-        {
-            Debug.LogError("[RestUI] RestController.Instance is null!");
-            return;
-        }
+        if (RestController.Instance == null) return;
 
         RestController.Instance.StartRest(type, _currentEnvironment);
         Close();

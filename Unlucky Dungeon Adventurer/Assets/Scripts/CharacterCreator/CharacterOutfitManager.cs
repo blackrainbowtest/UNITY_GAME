@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -59,7 +59,7 @@ public class CharacterOutfitManager : MonoBehaviour
         spriteMap = OutfitUtils.BuildSpriteMap(spriteEntries);
 
         // Diagnostic: report hardcoded legs sprite fields so we can see if they're assigned at runtime
-        Debug.Log($"[OutfitManager] Hardcoded legs sprites - Paladin: {(legsPaladin!=null?legsPaladin.name:"null")}, Rogue: {(legsRogue!=null?legsRogue.name:"null")}, Slave: {(legsSlave!=null?legsSlave.name:"null")}, Hermit: {(legsHermit!=null?legsHermit.name:"null")} ");
+        UDADebug.Log($"[OutfitManager] Hardcoded legs sprites - Paladin: {(legsPaladin!=null?legsPaladin.name:"null")}, Rogue: {(legsRogue!=null?legsRogue.name:"null")}, Slave: {(legsSlave!=null?legsSlave.name:"null")}, Hermit: {(legsHermit!=null?legsHermit.name:"null")} ");
 
         // Ensure common keys exist in the sprite map by falling back to the hardcoded fields.
         OutfitUtils.TryAddFallback(spriteMap, "Paladin", legsPaladin);
@@ -71,7 +71,7 @@ public class CharacterOutfitManager : MonoBehaviour
     // Apply by index (dropdown index).
     public void ApplySet(int index)
     {
-        Debug.Log($"[OutfitManager] ApplySet(int) called with index: {index}");
+        UDADebug.Log($"[OutfitManager] ApplySet(int) called with index: {index}");
 
         // Try JSON-defined outfit first (log-only will still check and report)
         if (outfitsCollection != null && outfitsCollection.outfits != null && index >= 0 && index < outfitsCollection.outfits.Length)
@@ -79,11 +79,11 @@ public class CharacterOutfitManager : MonoBehaviour
             var def = outfitsCollection.outfits[index];
             if (def != null && !string.IsNullOrEmpty(def.legs))
             {
-                Debug.Log($"[OutfitManager] Found outfit: id={def.id}, legs key={def.legs}");
+                UDADebug.Log($"[OutfitManager] Found outfit: id={def.id}, legs key={def.legs}");
                 if (spriteMap != null && spriteMap.TryGetValue(def.legs, out var sp))
                 {
                     legs.sprite = sp;
-                    Debug.Log($"[OutfitManager] Applied sprite from JSON: {sp.name}");
+                    UDADebug.Log($"[OutfitManager] Applied sprite from JSON: {sp.name}");
                     return;
                 }
                 else
@@ -94,7 +94,7 @@ public class CharacterOutfitManager : MonoBehaviour
                     {
                         spriteMap[def.legs] = resSp;
                         legs.sprite = resSp;
-                        Debug.Log($"[OutfitManager] Loaded and applied sprite from Resources: {resSp.name}");
+                        UDADebug.Log($"[OutfitManager] Loaded and applied sprite from Resources: {resSp.name}");
                         return;
                     }
 
@@ -124,7 +124,7 @@ public class CharacterOutfitManager : MonoBehaviour
         if (fallback != null)
         {
             legs.sprite = fallback;
-            Debug.Log($"[OutfitManager] Applied legacy fallback sprite: {fallback.name}");
+            UDADebug.Log($"[OutfitManager] Applied legacy fallback sprite: {fallback.name}");
         }
         else
         {
@@ -144,7 +144,7 @@ public class CharacterOutfitManager : MonoBehaviour
                 {
                     spriteMap[key] = res;
                     legs.sprite = res;
-                    Debug.Log($"[OutfitManager] Loaded and applied fallback sprite from Resources: {res.name}");
+                    UDADebug.Log($"[OutfitManager] Loaded and applied fallback sprite from Resources: {res.name}");
                     return;
                 }
             }
@@ -156,7 +156,7 @@ public class CharacterOutfitManager : MonoBehaviour
     // Apply by outfit id or legacy name.
     public void ApplySet(string setName)
     {
-        Debug.Log($"[OutfitManager] ApplySet(string) called with setName: '{setName}'");
+        UDADebug.Log($"[OutfitManager] ApplySet(string) called with setName: '{setName}'");
 
         // Try to find outfit by id in JSON (LogOnly will still check and report)
         if (outfitsCollection != null && outfitsCollection.outfits != null && !string.IsNullOrEmpty(setName))
@@ -168,7 +168,7 @@ public class CharacterOutfitManager : MonoBehaviour
                     if (!string.IsNullOrEmpty(def.legs) && spriteMap != null && spriteMap.TryGetValue(def.legs, out var sp))
                     {
                         legs.sprite = sp;
-                        Debug.Log($"[OutfitManager] Applied sprite from JSON by id: {sp.name}");
+                        UDADebug.Log($"[OutfitManager] Applied sprite from JSON by id: {sp.name}");
                         return;
                     }
                     else
@@ -192,7 +192,7 @@ public class CharacterOutfitManager : MonoBehaviour
         if (fallback != null)
         {
             legs.sprite = fallback;
-            Debug.Log($"[OutfitManager] Applied legacy fallback sprite for id '{setName}': {fallback.name}");
+            UDADebug.Log($"[OutfitManager] Applied legacy fallback sprite for id '{setName}': {fallback.name}");
         }
         else
         {
@@ -200,3 +200,4 @@ public class CharacterOutfitManager : MonoBehaviour
         }
     }
 }
+

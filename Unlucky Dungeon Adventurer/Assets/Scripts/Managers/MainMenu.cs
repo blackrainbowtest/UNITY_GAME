@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
@@ -23,21 +23,22 @@ public class MainMenu : MonoBehaviour
     public void CloseSaveLoadScene()
     {
         SceneManager.UnloadSceneAsync("SaveLoadScene");
-        Time.timeScale = 1;  // Возобновляем игру
+        Time.timeScale = 1;  // Р’РѕР·РѕР±РЅРѕРІР»СЏРµРј РёРіСЂСѓ
         
-        // Включаем камеру обратно, если есть
+        // Р’РєР»СЋС‡Р°РµРј РєР°РјРµСЂСѓ РѕР±СЂР°С‚РЅРѕ, РµСЃР»Рё РµСЃС‚СЊ
         if (CameraMaster.Instance != null)
             CameraMaster.Instance.EnablePan();
     }
 
     public void OpenSettings()
     {
-        Debug.Log("Settings clicked � ����� ������� ��������� ����� ��������");
+        UDADebug.Log("Settings clicked пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
     }
 
     public void ExitGame()
     {
-        Debug.Log("Exit clicked");
+        UDADebug.Log("Exit clicked");
         Application.Quit();
     }
 }
+

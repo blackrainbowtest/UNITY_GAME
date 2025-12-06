@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public static class OutfitUtils
@@ -25,7 +25,7 @@ public static class OutfitUtils
         if (!map.ContainsKey(key))
         {
             map[key] = sprite;
-            Debug.Log($"[OutfitUtils] Added fallback sprite map entry '{key}' -> {sprite.name}");
+            UDADebug.Log($"[OutfitUtils] Added fallback sprite map entry '{key}' -> {sprite.name}");
         }
     }
 
@@ -44,3 +44,4 @@ public static class OutfitUtils
         }
     }
 }
+

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 /// <summary>
@@ -45,7 +45,7 @@ public class GameInitializer : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            Debug.Log("[GameInitializer] Создан и отмечен как DontDestroyOnLoad");
+            UDADebug.Log("[GameInitializer] РЎРѕР·РґР°РЅ Рё РѕС‚РјРµС‡РµРЅ РєР°Рє DontDestroyOnLoad");
         }
         else
         {
@@ -64,42 +64,42 @@ public class GameInitializer : MonoBehaviour
     }
 
     /// <summary>
-    /// Initialization coroutine — performs ordered loading and event dispatch.
+    /// Initialization coroutine вЂ” performs ordered loading and event dispatch.
     /// </summary>
     private IEnumerator InitializeGame()
     {
         isInitializing = true;
-        // Debug.Log("[GameInitializer] Starting initialization...");
+        // UDADebug.Log("[GameInitializer] Starting initialization...");
 
         // Phase 1: apply pending save if present
         if (TempSaveCache.pendingSave != null)
         {
-            // Debug.Log("[GameInitializer] Pending save found in TempSaveCache");
+            // UDADebug.Log("[GameInitializer] Pending save found in TempSaveCache");
             GameManager.Instance.LoadGameData(TempSaveCache.pendingSave);
             TempSaveCache.pendingSave = null;
         }
         // Phase 2: attempt to load player from PlayerPrefs if none present
         else if (GameData.CurrentPlayer == null)
         {
-            // Debug.Log("[GameInitializer] Loading player from PlayerPrefs...");
+            // UDADebug.Log("[GameInitializer] Loading player from PlayerPrefs...");
             GameData.LoadPlayer();
 
             if (GameData.CurrentPlayer == null)
             {
-                // Debug.Log("[GameInitializer] No saved player found, creating default player");
+                // UDADebug.Log("[GameInitializer] No saved player found, creating default player");
                 GameData.CurrentPlayer = new PlayerData("", "Hermit", new ClassStats());
             }
         }
         else
         {
-            // Debug.Log("[GameInitializer] CurrentPlayer already initialized");
+            // UDADebug.Log("[GameInitializer] CurrentPlayer already initialized");
         }
 
         // Phase 3: wait one frame to allow other scripts to finish their Awake/Start
         yield return null;
 
         // Phase 4: fire initialization events so UI and other systems can update
-        // Debug.Log("[GameInitializer] Initialization complete; notifying systems...");
+        // UDADebug.Log("[GameInitializer] Initialization complete; notifying systems...");
         UIEvents.InvokeGameInitialized();
         UIEvents.InvokePlayerStatsChanged();
 
@@ -108,7 +108,7 @@ public class GameInitializer : MonoBehaviour
     }
 
     /// <summary>
-    /// Проверка: инициализирована ли игра
+    /// РџСЂРѕРІРµСЂРєР°: РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅР° Р»Рё РёРіСЂР°
     /// </summary>
     public static bool IsInitialized()
     {
@@ -116,10 +116,11 @@ public class GameInitializer : MonoBehaviour
     }
 
     /// <summary>
-    /// Проверка: идёт ли процесс инициализации
+    /// РџСЂРѕРІРµСЂРєР°: РёРґС‘С‚ Р»Рё РїСЂРѕС†РµСЃСЃ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
     /// </summary>
     public static bool IsInitializing()
     {
         return Instance != null && Instance.isInitializing;
     }
 }
+

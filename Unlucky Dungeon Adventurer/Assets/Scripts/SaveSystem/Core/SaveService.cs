@@ -1,8 +1,8 @@
-/* ************************************************************************** */
+﻿/* ************************************************************************** */
 /*                                                                            */
 /*   File: Assets/Scripts/SaveSystem/Core/SaveService.cs                      */
 /*                                                        /\_/\               */
-/*                                                       ( •.• )              */
+/*                                                       ( вЂў.вЂў )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
 /*   Created: 2025/12/03 10:34:18 by UDA                                      */
@@ -66,7 +66,7 @@ public static class SaveService
 
 		SaveManager.Save(data, slotIndex);
 
-		Debug.Log($"[SaveService] Saved slot {slotIndex} | Scene={data.meta.sceneName} | Time={data.meta.lastPlayedTime}");
+		UDADebug.Log($"[SaveService] Saved slot {slotIndex} | Scene={data.meta.sceneName} | Time={data.meta.lastPlayedTime}");
 	}
 
 	/// <summary>
@@ -91,7 +91,7 @@ public static class SaveService
 	public static void RequestDelete(int slotIndex)
 	{
 		SaveRepository.DeleteSlot(slotIndex);
-		Debug.Log($"[SaveService] Deleted slot {slotIndex}");
+		UDADebug.Log($"[SaveService] Deleted slot {slotIndex}");
 	}
 
 	// ---------------------------------------------------------
@@ -137,17 +137,18 @@ public static class SaveService
 	{
 		var data = SaveDataFactory.CreateNew(name, role, seed);
 
-		// Автосейв нового персонажа
+		// РђРІС‚РѕСЃРµР№РІ РЅРѕРІРѕРіРѕ РїРµСЂСЃРѕРЅР°Р¶Р°
 		SaveManager.SaveAuto(data);
 
-		// Также можно создать persistent слот 0
+		// РўР°РєР¶Рµ РјРѕР¶РЅРѕ СЃРѕР·РґР°С‚СЊ persistent СЃР»РѕС‚ 0
 		SaveManager.Save(data, 0);
 
-		// ВАЖНО: Загружаем созданные данные в TempSaveCache,
-		// чтобы при загрузке WorldMap сцены они применились
+		// Р’РђР–РќРћ: Р—Р°РіСЂСѓР¶Р°РµРј СЃРѕР·РґР°РЅРЅС‹Рµ РґР°РЅРЅС‹Рµ РІ TempSaveCache,
+		// С‡С‚РѕР±С‹ РїСЂРё Р·Р°РіСЂСѓР·РєРµ WorldMap СЃС†РµРЅС‹ РѕРЅРё РїСЂРёРјРµРЅРёР»РёСЃСЊ
 		TempSaveCache.pendingSave = data;
 
-		Debug.Log($"[SaveService] New game created: {name} ({role}) | seed={seed}");
+		UDADebug.Log($"[SaveService] New game created: {name} ({role}) | seed={seed}");
 	}
 }
+
 

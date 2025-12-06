@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Linq; // For OfType and ToArray LINQ extensions
@@ -48,13 +48,13 @@ public class TileSet47AutoGenerator : EditorWindow
             return;
         }
 
-        // --- Настройка текстуры под slicing ---
+        // --- РќР°СЃС‚СЂРѕР№РєР° С‚РµРєСЃС‚СѓСЂС‹ РїРѕРґ slicing ---
         importer.textureType = TextureImporterType.Sprite;
         importer.spriteImportMode = SpriteImportMode.Multiple;
         importer.filterMode = FilterMode.Point;
         importer.mipmapEnabled = false;
 
-        int sliceSize = sourceTexture.width / 8; // предполагаем 8x6 или 8x_(до 48)
+        int sliceSize = sourceTexture.width / 8; // РїСЂРµРґРїРѕР»Р°РіР°РµРј 8x6 РёР»Рё 8x_(РґРѕ 48)
         int columns = 8;
         int rows = Mathf.CeilToInt(sourceTexture.height / (float)sliceSize);
 
@@ -81,7 +81,7 @@ public class TileSet47AutoGenerator : EditorWindow
 #pragma warning restore 618
         AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
 
-        // --- Создание TileSet47 ---
+        // --- РЎРѕР·РґР°РЅРёРµ TileSet47 ---
         if (!Directory.Exists(outputFolder))
             Directory.CreateDirectory(outputFolder);
 
@@ -109,6 +109,7 @@ public class TileSet47AutoGenerator : EditorWindow
         AssetDatabase.SaveAssets();
 
         EditorUtility.DisplayDialog("Success", $"TileSet47 generated:\n{assetPath}", "OK");
-        Debug.Log($"[TileSet47Auto] SUCCESS! Created {assetPath}");
+        UDADebug.Log($"[TileSet47Auto] SUCCESS! Created {assetPath}");
     }
 }
+

@@ -112,11 +112,7 @@ public class MovementUIController : MonoBehaviour
 
         RestEnvironment env = RestEnvironmentDetector.GetEnvironment(coords);
 
-        if (RestUIManager.Instance == null)
-        {
-            Debug.LogError("[MovementUI] RestUIManager.Instance not found.");
-            return;
-        }
+        if (RestUIManager.Instance == null) return;
 
         RestUIManager.Instance.OpenRestMenu(env);
     }

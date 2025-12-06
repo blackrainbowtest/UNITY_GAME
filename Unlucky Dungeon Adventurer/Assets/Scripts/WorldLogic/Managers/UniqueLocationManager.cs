@@ -1,8 +1,8 @@
-/* ************************************************************************** */
+﻿/* ************************************************************************** */
 /*                                                                            */
 /*   File: Assets/Scripts/WorldLogic/Managers/UniqueLocationManager.cs        */
 /*                                                        /\_/\               */
-/*                                                       ( •.• )              */
+/*                                                       ( вЂў.вЂў )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
 /*   Created: 2025/12/02 14:36:35 by UDA                                      */
@@ -16,18 +16,18 @@ using UnityEngine;
 namespace WorldLogic
 {
     /// <summary>
-    /// Главный менеджер уникальных локаций.
-    /// Управляет всеми 50 инстансами после генерации.
-    /// Сохраняет/загружает state и предоставляет API для игры.
+    /// Р“Р»Р°РІРЅС‹Р№ РјРµРЅРµРґР¶РµСЂ СѓРЅРёРєР°Р»СЊРЅС‹С… Р»РѕРєР°С†РёР№.
+    /// РЈРїСЂР°РІР»СЏРµС‚ РІСЃРµРјРё 50 РёРЅСЃС‚Р°РЅСЃР°РјРё РїРѕСЃР»Рµ РіРµРЅРµСЂР°С†РёРё.
+    /// РЎРѕС…СЂР°РЅСЏРµС‚/Р·Р°РіСЂСѓР¶Р°РµС‚ state Рё РїСЂРµРґРѕСЃС‚Р°РІР»СЏРµС‚ API РґР»СЏ РёРіСЂС‹.
     /// </summary>
     public class UniqueLocationManager : MonoBehaviour, IWorldManager
     {
         public static UniqueLocationManager Instance { get; private set; }
 
-        // Все 50 уникальных локаций (после генерации)
+        // Р’СЃРµ 50 СѓРЅРёРєР°Р»СЊРЅС‹С… Р»РѕРєР°С†РёР№ (РїРѕСЃР»Рµ РіРµРЅРµСЂР°С†РёРё)
         public List<UniqueLocationInstance> Locations { get; private set; }
 
-        // Быстрый доступ: ID → Instance
+        // Р‘С‹СЃС‚СЂС‹Р№ РґРѕСЃС‚СѓРї: ID в†’ Instance
         private Dictionary<string, UniqueLocationInstance> lookup;
 
         public void Awake()
@@ -35,23 +35,23 @@ namespace WorldLogic
             Instance = this;
         }
 
-        // Вызывается из WorldLogicDirector
+        // Р’С‹Р·С‹РІР°РµС‚СЃСЏ РёР· WorldLogicDirector
         public void Initialize()
         {
             LoadGeneratedLocations();
 
             BuildLookup();
 
-            Debug.Log($"[UniqueLocationManager] Loaded {Locations.Count} unique locations.");
+            UDADebug.Log($"[UniqueLocationManager] Loaded {Locations.Count} unique locations.");
         }
 
         // ============================================================
-        // Загрузка сгенерированных данных после WorldLogicDirector.RunGenerators
+        // Р—Р°РіСЂСѓР·РєР° СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅС‹С… РґР°РЅРЅС‹С… РїРѕСЃР»Рµ WorldLogicDirector.RunGenerators
         // ============================================================
 
         private void LoadGeneratedLocations()
         {
-            // Берётся статический список из генератора
+            // Р‘РµСЂС‘С‚СЃСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёР№ СЃРїРёСЃРѕРє РёР· РіРµРЅРµСЂР°С‚РѕСЂР°
             Locations = UniqueLocationsGenerator.Instances;
 
             if (Locations == null)
@@ -70,7 +70,7 @@ namespace WorldLogic
         }
 
         // ============================================================
-        //             ДОСТУП К ЛОКАЦИЯМ
+        //             Р”РћРЎРўРЈРџ Рљ Р›РћРљРђР¦РРЇРњ
         // ============================================================
 
         public UniqueLocationInstance GetById(string id)
@@ -90,7 +90,7 @@ namespace WorldLogic
         }
 
         // ============================================================
-        //         ОБНОВЛЕНИЕ СОСТОЯНИЯ ЛОКАЦИЙ
+        //         РћР‘РќРћР’Р›Р•РќРР• РЎРћРЎРўРћРЇРќРРЇ Р›РћРљРђР¦РР™
         // ============================================================
 
         public void Discover(string id)
@@ -98,7 +98,7 @@ namespace WorldLogic
             if (lookup.TryGetValue(id, out var inst))
             {
                 inst.MarkDiscovered();
-                Debug.Log($"[UniqueLocationManager] Discovered {id}");
+                UDADebug.Log($"[UniqueLocationManager] Discovered {id}");
             }
         }
 
@@ -107,12 +107,12 @@ namespace WorldLogic
             if (lookup.TryGetValue(id, out var inst))
             {
                 inst.MarkCleared(timestamp);
-                Debug.Log($"[UniqueLocationManager] Cleared {id}");
+                UDADebug.Log($"[UniqueLocationManager] Cleared {id}");
             }
         }
 
         // ============================================================
-        //      ПОЛЕЗНЫЕ ФУНКЦИИ ДЛЯ UI/ГЕЙМПЛЕЯ
+        //      РџРћР›Р•Р—РќР«Р• Р¤РЈРќРљР¦РР Р”Р›РЇ UI/Р“Р•Р™РњРџР›Р•РЇ
         // ============================================================
 
         public int CountCleared()
@@ -146,7 +146,7 @@ namespace WorldLogic
         }
 
         // ============================================================
-        //         Сохранение / загрузка состояния игрока
+        //         РЎРѕС…СЂР°РЅРµРЅРёРµ / Р·Р°РіСЂСѓР·РєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РёРіСЂРѕРєР°
         // ============================================================
 
         public List<UniqueLocationState> GetStatesForSave()
@@ -175,4 +175,5 @@ namespace WorldLogic
         }
     }
 }
+
 

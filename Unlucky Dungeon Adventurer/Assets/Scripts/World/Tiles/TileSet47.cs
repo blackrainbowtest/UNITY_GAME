@@ -1,27 +1,27 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "TileSet47", menuName = "World/Tileset 47", order = 1)]
 public class TileSet47 : ScriptableObject
 {
     [Header("Tiles sliced in Unity (0..46)")]
-    public Sprite[] tiles;   // 47 спрайтов в точном порядке
+    public Sprite[] tiles;   // 47 СЃРїСЂР°Р№С‚РѕРІ РІ С‚РѕС‡РЅРѕРј РїРѕСЂСЏРґРєРµ
 
-    // Статистика встреченных паттернов (для анализа недостижимых комбинаций)
+    // РЎС‚Р°С‚РёСЃС‚РёРєР° РІСЃС‚СЂРµС‡РµРЅРЅС‹С… РїР°С‚С‚РµСЂРЅРѕРІ (РґР»СЏ Р°РЅР°Р»РёР·Р° РЅРµРґРѕСЃС‚РёР¶РёРјС‹С… РєРѕРјР±РёРЅР°С†РёР№)
     private static readonly System.Collections.Generic.Dictionary<int,int> FourSideCutUsage = new System.Collections.Generic.Dictionary<int,int>();
     private static readonly System.Collections.Generic.HashSet<byte> ObservedMasks = new System.Collections.Generic.HashSet<byte>();
     private static int totalCalls;
 
     /// <summary>
-    /// Индекс по 8-направленной маске (0..255)
-    /// Маппинг для классической 47-tile autotile системы (RPG Maker style)
-    /// ВАЖНО: тайлы показывают ВЫРЕЗЫ (где НЕТ союзников в углах)
+    /// РРЅРґРµРєСЃ РїРѕ 8-РЅР°РїСЂР°РІР»РµРЅРЅРѕР№ РјР°СЃРєРµ (0..255)
+    /// РњР°РїРїРёРЅРі РґР»СЏ РєР»Р°СЃСЃРёС‡РµСЃРєРѕР№ 47-tile autotile СЃРёСЃС‚РµРјС‹ (RPG Maker style)
+    /// Р’РђР–РќРћ: С‚Р°Р№Р»С‹ РїРѕРєР°Р·С‹РІР°СЋС‚ Р’Р«Р Р•Р—Р« (РіРґРµ РќР•Рў СЃРѕСЋР·РЅРёРєРѕРІ РІ СѓРіР»Р°С…)
     /// </summary>
     public int GetTileIndex(byte mask)
     {
-        // Биты маски (из BiomeMaskUtils):
+        // Р‘РёС‚С‹ РјР°СЃРєРё (РёР· BiomeMaskUtils):
         // UP=1, RIGHT=2, DOWN=4, LEFT=8, UP_LEFT=16, UP_RIGHT=32, DOWN_LEFT=64, DOWN_RIGHT=128
         
-        if (mask == 0) return 0; // Пустой (нет союзников вообще)
+        if (mask == 0) return 0; // РџСѓСЃС‚РѕР№ (РЅРµС‚ СЃРѕСЋР·РЅРёРєРѕРІ РІРѕРѕР±С‰Рµ)
 
         bool u  = (mask & 1) != 0;    // UP
         bool r  = (mask & 2) != 0;    // RIGHT
@@ -34,9 +34,9 @@ public class TileSet47 : ScriptableObject
         
         int result = 0;
 
-        // ═══════════════════════════════════════════════════════════
-        // РУЧНОЙ МАППИНГ - МЕНЯЙТЕ ЧИСЛА ПОД СВОЙ ТАЙЛСЕТ
-        // ═══════════════════════════════════════════════════════════
+        // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+        // Р РЈР§РќРћР™ РњРђРџРџРРќР“ - РњР•РќРЇР™РўР• Р§РРЎР›Рђ РџРћР” РЎР’РћР™ РўРђР™Р›РЎР•Рў
+        // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
 
         // [ ]
         if (!ul && !u && !ur && !r && !dr && !d && !dl && !l) { result = 0; return result; }
@@ -143,16 +143,17 @@ public class TileSet47 : ScriptableObject
 
     [ContextMenu("Dump Observed TileSet47 Patterns")]
     public void DumpObservedTilePatterns() {
-        Debug.Log($"[TileSet47] ==== Patterns Dump (total calls={totalCalls}) ====");
-        Debug.Log("4-sides cuts usage:");
+        UDADebug.Log($"[TileSet47] ==== Patterns Dump (total calls={totalCalls}) ====");
+        UDADebug.Log("4-sides cuts usage:");
         for (int i = 0; i <= 15; i++) {
             int count = FourSideCutUsage.ContainsKey(i) ? FourSideCutUsage[i] : 0;
-            Debug.Log($" cuts={i:D2} -> {count} occurrences");
+            UDADebug.Log($" cuts={i:D2} -> {count} occurrences");
         }
-        Debug.Log("All observed raw masks:");
+        UDADebug.Log("All observed raw masks:");
         foreach (var m in ObservedMasks) {
-            Debug.Log($" mask={m}");
+            UDADebug.Log($" mask={m}");
         }
-        Debug.Log("====================================================");
+        UDADebug.Log("====================================================");
     }
 }
+

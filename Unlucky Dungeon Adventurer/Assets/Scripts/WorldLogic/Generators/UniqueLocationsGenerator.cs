@@ -1,8 +1,8 @@
-/* ************************************************************************** */
+﻿/* ************************************************************************** */
 /*                                                                            */
 /*   File: Assets/Scripts/WorldLogic/Generators/UniqueLocationsGenerator.cs   */
 /*                                                        /\_/\               */
-/*                                                       ( •.• )              */
+/*                                                       ( вЂў.вЂў )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
 /*   Created: 2025/12/02 14:34:51 by UDA                                      */
@@ -19,10 +19,10 @@ namespace WorldLogic
     {
         private static readonly int TARGET_COUNT = 50;
 
-        // Все 50 уникальных локаций после генерации
+        // Р’СЃРµ 50 СѓРЅРёРєР°Р»СЊРЅС‹С… Р»РѕРєР°С†РёР№ РїРѕСЃР»Рµ РіРµРЅРµСЂР°С†РёРё
         public static List<UniqueLocationInstance> Instances { get; private set; }
 
-        // Все дефы
+        // Р’СЃРµ РґРµС„С‹
         private List<UniqueLocationDef> defs;
 
         public void Generate(int seed, WorldGenerator worldGen)
@@ -31,11 +31,11 @@ namespace WorldLogic
             PrepareDefOrder();
             GenerateInstances(worldGen, seed);
 
-            Debug.Log($"[UniqueLocationsGenerator] Generated {Instances.Count} unique locations (deterministic).");
+            UDADebug.Log($"[UniqueLocationsGenerator] Generated {Instances.Count} unique locations (deterministic).");
         }
 
         // ============================================================
-        // 1) Загружаем дефы из Resources
+        // 1) Р—Р°РіСЂСѓР¶Р°РµРј РґРµС„С‹ РёР· Resources
         // ============================================================
 
         private void LoadAllDefs()
@@ -49,7 +49,7 @@ namespace WorldLogic
         }
 
         // ============================================================
-        // 2) Сортировка дефов по rarity
+        // 2) РЎРѕСЂС‚РёСЂРѕРІРєР° РґРµС„РѕРІ РїРѕ rarity
         // ============================================================
 
         private void PrepareDefOrder()
@@ -58,7 +58,7 @@ namespace WorldLogic
         }
 
         // ============================================================
-        // 3) Генерация 50 локаций (детерминированно)
+        // 3) Р“РµРЅРµСЂР°С†РёСЏ 50 Р»РѕРєР°С†РёР№ (РґРµС‚РµСЂРјРёРЅРёСЂРѕРІР°РЅРЅРѕ)
         // ============================================================
 
         private void GenerateInstances(WorldGenerator worldGen, int seed)
@@ -82,7 +82,7 @@ namespace WorldLogic
         }
 
         // ============================================================
-        // 4) Поиск подходящего тайла
+        // 4) РџРѕРёСЃРє РїРѕРґС…РѕРґСЏС‰РµРіРѕ С‚Р°Р№Р»Р°
         // ============================================================
 
         private WorldTilePos FindValidTileFor(
@@ -93,35 +93,35 @@ namespace WorldLogic
         {
             while (true)
             {
-                // Генерируем детерминированную координату
+                // Р“РµРЅРµСЂРёСЂСѓРµРј РґРµС‚РµСЂРјРёРЅРёСЂРѕРІР°РЅРЅСѓСЋ РєРѕРѕСЂРґРёРЅР°С‚Сѓ
                 WorldTilePos pos = GetDeterministicCoord(seed, index);
                 index++;
 
                 if (TileIsValid(def, worldGen, pos))
                     return pos;
 
-                // fallback: смотрим окрестность
+                // fallback: СЃРјРѕС‚СЂРёРј РѕРєСЂРµСЃС‚РЅРѕСЃС‚СЊ
                 WorldTilePos? near = TryFindNearbyValidTile(def, worldGen, pos);
                 if (near.HasValue)
                     return near.Value;
 
-                // иначе продолжаем поиск
+                // РёРЅР°С‡Рµ РїСЂРѕРґРѕР»Р¶Р°РµРј РїРѕРёСЃРє
             }
         }
 
-        // Проверка, подходит ли тайл
+        // РџСЂРѕРІРµСЂРєР°, РїРѕРґС…РѕРґРёС‚ Р»Рё С‚Р°Р№Р»
         private bool TileIsValid(UniqueLocationDef def, WorldGenerator gen, WorldTilePos pos)
         {
             var tile = gen.GetTile(pos.X, pos.Y);
             if (tile == null)
                 return false;
 
-            // Базовый биом
+            // Р‘Р°Р·РѕРІС‹Р№ Р±РёРѕРј
             if (!string.IsNullOrEmpty(def.requiredBiome))
                 if (tile.biomeId != def.requiredBiome)
                     return false;
 
-            // Доп. условия
+            // Р”РѕРї. СѓСЃР»РѕРІРёСЏ
             if (def.nearMountains && !IsNearBiome(gen, pos, "mountain"))
                 return false;
 
@@ -131,7 +131,7 @@ namespace WorldLogic
             return true;
         }
 
-        // Поиск подходящего тайла поблизости
+        // РџРѕРёСЃРє РїРѕРґС…РѕРґСЏС‰РµРіРѕ С‚Р°Р№Р»Р° РїРѕР±Р»РёР·РѕСЃС‚Рё
         private WorldTilePos? TryFindNearbyValidTile(
             UniqueLocationDef def,
             WorldGenerator gen,
@@ -150,7 +150,7 @@ namespace WorldLogic
             return null;
         }
 
-        // Проверка биома вокруг (для nearMountains и nearWater)
+        // РџСЂРѕРІРµСЂРєР° Р±РёРѕРјР° РІРѕРєСЂСѓРі (РґР»СЏ nearMountains Рё nearWater)
         private bool IsNearBiome(WorldGenerator gen, WorldTilePos pos, string biome)
         {
             for (int dx = -defSpawnCheckRange; dx <= defSpawnCheckRange; dx++)
@@ -165,7 +165,7 @@ namespace WorldLogic
         }
 
         // ============================================================
-        // 5) Minecraft-style детерминированная координата
+        // 5) Minecraft-style РґРµС‚РµСЂРјРёРЅРёСЂРѕРІР°РЅРЅР°СЏ РєРѕРѕСЂРґРёРЅР°С‚Р°
         // ============================================================
 
         private WorldTilePos GetDeterministicCoord(int seed, int index)
@@ -179,4 +179,5 @@ namespace WorldLogic
         private const int defSpawnCheckRange = 2;
     }
 }
+
 

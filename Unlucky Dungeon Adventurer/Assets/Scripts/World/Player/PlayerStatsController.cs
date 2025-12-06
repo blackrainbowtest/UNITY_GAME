@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerStatsController : MonoBehaviour
 {
@@ -18,7 +18,7 @@ public class PlayerStatsController : MonoBehaviour
         {
             var obj = new GameObject("PlayerStatsController");
             obj.AddComponent<PlayerStatsController>();
-            Debug.Log("[PlayerStatsController] Created automatically");
+            UDADebug.Log("[PlayerStatsController] Created automatically");
         }
     }
 
@@ -28,7 +28,7 @@ public class PlayerStatsController : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            Debug.Log("[PlayerStatsController] Singleton initialized");
+            UDADebug.Log("[PlayerStatsController] Singleton initialized");
         }
         else
         {
@@ -51,7 +51,7 @@ public class PlayerStatsController : MonoBehaviour
 
         UIEvents.InvokePlayerStatsChanged();
 
-        Debug.Log($"[HP] HP changed by {amount}, now {Player.currentHP}/{Player.baseMaxHP}");
+        UDADebug.Log($"[HP] HP changed by {amount}, now {Player.currentHP}/{Player.baseMaxHP}");
     }
 
     // ============================
@@ -69,7 +69,7 @@ public class PlayerStatsController : MonoBehaviour
 
         UIEvents.InvokePlayerStatsChanged();
 
-        Debug.Log($"[MP] MP changed by {amount}, now {Player.currentMP}/{Player.baseMaxMP}");
+        UDADebug.Log($"[MP] MP changed by {amount}, now {Player.currentMP}/{Player.baseMaxMP}");
     }
 
     // ============================
@@ -87,7 +87,7 @@ public class PlayerStatsController : MonoBehaviour
 
         UIEvents.InvokePlayerStatsChanged();
 
-        Debug.Log($"[Stamina] Stamina changed by {amount}, now {Player.currentStamina}/{Player.baseMaxStamina}");
+        UDADebug.Log($"[Stamina] Stamina changed by {amount}, now {Player.currentStamina}/{Player.baseMaxStamina}");
     }
 
     // ============================
@@ -98,6 +98,7 @@ public class PlayerStatsController : MonoBehaviour
         Player.mapPosX = x;
         Player.mapPosY = y;
 
-        Debug.Log($"[Position] Player moved to ({x}, {y})");
+        UDADebug.Log($"[Position] Player moved to ({x}, {y})");
     }
 }
+

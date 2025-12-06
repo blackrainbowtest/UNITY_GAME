@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("[GameManager] Awake — Singleton готов");
+        UDADebug.Log("[GameManager] Awake — Singleton готов");
         if (Instance == null)
         {
             Instance = this;
@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
             data.player.name = p.playerName;
             data.player.playerClass = p.playerClass;
             data.player.worldSeed = p.worldSeed;
-            Debug.Log($"[GameManager] Preparing save: player.worldSeed={p.worldSeed}, gold={p.gold}");
+            UDADebug.Log($"[GameManager] Preparing save: player.worldSeed={p.worldSeed}, gold={p.gold}");
 
             data.player.level = p.level;
             data.player.gold = p.gold;
@@ -105,7 +105,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[GameManager] Loading game data: player.worldSeed={data.player.worldSeed}, world.worldSeed={data.world.worldSeed}");
+        UDADebug.Log($"[GameManager] Loading game data: player.worldSeed={data.player.worldSeed}, world.worldSeed={data.world.worldSeed}");
 
         // получаем базовый шаблон класса
         ClassStats stats;
@@ -122,7 +122,7 @@ public class GameManager : MonoBehaviour
             stats
         );
         p.worldSeed = data.player.worldSeed;
-        Debug.Log($"[GameManager] Loaded player.worldSeed from save: {data.player.worldSeed} -> assigned to p.worldSeed={p.worldSeed}");
+        UDADebug.Log($"[GameManager] Loaded player.worldSeed from save: {data.player.worldSeed} -> assigned to p.worldSeed={p.worldSeed}");
 
         // перезаписываем тем, что есть в сейве
         p.level = data.player.level;
@@ -165,7 +165,7 @@ public class GameManager : MonoBehaviour
 
         GameData.CurrentPlayer = p;
 
-        Debug.Log($"Загружен персонаж: {p.playerName} [{p.playerClass}] | Уровень {p.level} | Gold {p.gold} | HP {p.currentHP}/{p.finalMaxHP}");
+        UDADebug.Log($"Загружен персонаж: {p.playerName} [{p.playerClass}] | Уровень {p.level} | Gold {p.gold} | HP {p.currentHP}/{p.finalMaxHP}");
     }
 
 
@@ -173,6 +173,7 @@ public class GameManager : MonoBehaviour
     {
         // GameInitializer будет управлять инициализацией
         // GameManager только предоставляет методы для загрузки/сохранения
-        Debug.Log("[GameManager] Start — готов к работе");
+        UDADebug.Log("[GameManager] Start — готов к работе");
     }
 }
+

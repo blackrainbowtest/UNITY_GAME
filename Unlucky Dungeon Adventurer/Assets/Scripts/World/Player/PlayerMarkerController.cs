@@ -1,8 +1,8 @@
-/* ************************************************************************** */
+﻿/* ************************************************************************** */
 /*                                                                            */
 /*   File: Assets/Scripts/World/Player/PlayerMarkerController.cs              */
 /*                                                        /\_/\               */
-/*                                                       ( •.• )              */
+/*                                                       ( вЂў.вЂў )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
 /*   Created: 2025/12/02 09:48:32 by UDA                                      */
@@ -25,15 +25,15 @@ public class PlayerMarkerController : MonoBehaviour, IPointerClickHandler, IPoin
     private bool isPressing = false;
     private float pressTimer = 0f;
 
-    // текущая позиция игрока в мировой сетке
+    // С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ РёРіСЂРѕРєР° РІ РјРёСЂРѕРІРѕР№ СЃРµС‚РєРµ
     public Vector2Int mapCoords;
 
     private void Awake()
     {
-        // создаём визуальную часть
+        // СЃРѕР·РґР°С‘Рј РІРёР·СѓР°Р»СЊРЅСѓСЋ С‡Р°СЃС‚СЊ
         spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = playerSprite;
-        spriteRenderer.sortingOrder = 50; // поверх тайлов
+        spriteRenderer.sortingOrder = 50; // РїРѕРІРµСЂС… С‚Р°Р№Р»РѕРІ
     }
 
     private void Update()
@@ -42,7 +42,7 @@ public class PlayerMarkerController : MonoBehaviour, IPointerClickHandler, IPoin
     }
 
     // =============================
-    //         ПЕРЕДВИЖЕНИЕ
+    //         РџР•Р Р•Р”Р’РР–Р•РќРР•
     // =============================
 
     public void SetPosition(Vector2Int coords, float tileSize)
@@ -57,17 +57,17 @@ public class PlayerMarkerController : MonoBehaviour, IPointerClickHandler, IPoin
 
     public void MoveTo(Vector2Int newCoords, float tileSize)
     {
-        // Debug.Log($"[PlayerMarker] MoveTo called: {newCoords}");
+        // UDADebug.Log($"[PlayerMarker] MoveTo called: {newCoords}");
         SetPosition(newCoords, tileSize);
     }
 
     // =============================
-    //      КЛИКИ / УДЕРЖАНИЕ
+    //      РљР›РРљР / РЈР”Р•Р Р–РђРќРР•
     // =============================
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // Debug.Log("[PlayerMarker] CLICK on player marker");
+        // UDADebug.Log("[PlayerMarker] CLICK on player marker");
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -80,7 +80,7 @@ public class PlayerMarkerController : MonoBehaviour, IPointerClickHandler, IPoin
     {
         if (isPressing && pressTimer < longPressThreshold)
         {
-            // короткое нажатие (но обработка клика уже есть выше)
+            // РєРѕСЂРѕС‚РєРѕРµ РЅР°Р¶Р°С‚РёРµ (РЅРѕ РѕР±СЂР°Р±РѕС‚РєР° РєР»РёРєР° СѓР¶Рµ РµСЃС‚СЊ РІС‹С€Рµ)
         }
 
         isPressing = false;
@@ -96,8 +96,9 @@ public class PlayerMarkerController : MonoBehaviour, IPointerClickHandler, IPoin
 
         if (pressTimer >= longPressThreshold)
         {
-            // Debug.Log("[PlayerMarker] LONG PRESS on player marker");
+            // UDADebug.Log("[PlayerMarker] LONG PRESS on player marker");
             isPressing = false;
         }
     }
 }
+

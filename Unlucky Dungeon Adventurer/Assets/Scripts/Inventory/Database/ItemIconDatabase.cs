@@ -1,8 +1,8 @@
-/* ************************************************************************** */
+﻿/* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
 /*   ItemIconDatabase.cs                                  /\_/\               */
-/*                                                       ( •.• )              */
+/*                                                       ( вЂў.вЂў )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
 /*   Created: 2025/12/01 14:17:02 by UDA                                      */
@@ -43,7 +43,7 @@ public class ItemIconDatabase : MonoBehaviour
             _icons[id] = sprite;
         }
 
-        Debug.Log("[ItemIconDB] Загружено иконок: " + _icons.Count);
+        UDADebug.Log("[ItemIconDB] Р—Р°РіСЂСѓР¶РµРЅРѕ РёРєРѕРЅРѕРє: " + _icons.Count);
     }
 
     public static Sprite Get(string itemId)
@@ -53,7 +53,8 @@ public class ItemIconDatabase : MonoBehaviour
         if (Instance._icons.TryGetValue(id, out var sprite))
             return sprite;
 
-        Debug.LogWarning($"[ItemIconDB] Нет иконки для {itemId}, возвращаю default.");
+        Debug.LogWarning($"[ItemIconDB] РќРµС‚ РёРєРѕРЅРєРё РґР»СЏ {itemId}, РІРѕР·РІСЂР°С‰Р°СЋ default.");
         return Instance.defaultIcon;
     }
 }
+

@@ -195,7 +195,8 @@ public class PlayerData
         // новый порог опыта
         experienceToNext = ExperienceTable.GetExpRequiredForLevel(level);
 
-        Debug.Log($"LEVEL UP! {playerName} теперь уровня {level}");
+        UDADebug.Log($"LEVEL UP! {playerName} теперь уровня {level}");
     }
 
 }
+

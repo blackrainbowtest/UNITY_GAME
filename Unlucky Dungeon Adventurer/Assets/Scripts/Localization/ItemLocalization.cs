@@ -1,8 +1,8 @@
-/* ************************************************************************** */
+﻿/* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
 /*   ItemLocalization.cs                                  /\_/\               */
-/*                                                       ( •.• )              */
+/*                                                       ( вЂў.вЂў )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
 /*   Created: 2025/12/01 13:26:16 by UDA                                      */
@@ -27,7 +27,7 @@ public static class ItemLocalization
 
         if (!File.Exists(path))
         {
-            Debug.LogError("[ItemLocalization] Нет файла: " + path);
+            Debug.LogError("[ItemLocalization] РќРµС‚ С„Р°Р№Р»Р°: " + path);
             local = new Dictionary<string, LocalizedItem>();
             return;
         }
@@ -36,7 +36,7 @@ public static class ItemLocalization
         Wrapper wrapper = JsonUtility.FromJson<Wrapper>(json);
 
         local = wrapper.items;
-        Debug.Log($"[ItemLocalization] Загружено: {local.Count} предметов для языка {lang}");
+        UDADebug.Log($"[ItemLocalization] Р—Р°РіСЂСѓР¶РµРЅРѕ: {local.Count} РїСЂРµРґРјРµС‚РѕРІ РґР»СЏ СЏР·С‹РєР° {lang}");
     }
 
     public static LocalizedItem Get(string id)
@@ -57,3 +57,4 @@ public class LocalizedItem
     public string name;
     public string description;
 }
+

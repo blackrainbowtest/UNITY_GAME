@@ -1,8 +1,8 @@
-/* ************************************************************************** */
+﻿/* ************************************************************************** */
 /*                                                                            */
 /*   File: Assets/Scripts/World/Controllers/WorldMapController.cs             */
 /*                                                        /\_/\               */
-/*                                                       ( •.• )              */
+/*                                                       ( вЂў.вЂў )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
 /*   Created: 2025/12/02 09:47:31 by UDA                                      */
@@ -96,14 +96,14 @@ public class WorldMapController : MonoBehaviour
         var controllers = FindObjectsByType<WorldMapController>(FindObjectsSortMode.None);
         if (controllers.Length > 1 && controllers[0] != this)
         {
-            Debug.LogWarning("[WorldMap] Duplicate controller found – disabling this instance.");
+            Debug.LogWarning("[WorldMap] Duplicate controller found вЂ“ disabling this instance.");
             this.enabled = false;
             return;
         }
 
         if (!GameInitializer.IsInitialized())
         {
-            Debug.Log("[WorldMap] Waiting for GameInitializer...");
+            UDADebug.Log("[WorldMap] Waiting for GameInitializer...");
             UIEvents.OnGameInitialized += OnGameInitialized;
             return;
         }
@@ -126,7 +126,7 @@ public class WorldMapController : MonoBehaviour
     {
         if (GameManager.Instance == null)
         {
-            Debug.LogWarning("[WorldMap] GameManager missing — returning to Preloader scene.");
+            Debug.LogWarning("[WorldMap] GameManager missing вЂ” returning to Preloader scene.");
             SceneLoader.LoadScene("Preloader");
             return;
         }
@@ -136,7 +136,7 @@ public class WorldMapController : MonoBehaviour
             if (!waitingForPlayer)
             {
                 waitingForPlayer = true;
-                Debug.Log("[WorldMap] Waiting for CurrentPlayer...");
+                UDADebug.Log("[WorldMap] Waiting for CurrentPlayer...");
                 UIEvents.OnPlayerLoaded += OnPlayerLoaded;
             }
             return;
@@ -144,7 +144,7 @@ public class WorldMapController : MonoBehaviour
 
         if (TempSaveCache.pendingSave != null)
         {
-            Debug.Log("[WorldMap] Applying pending save...");
+            UDADebug.Log("[WorldMap] Applying pending save...");
             GameManager.Instance.LoadGameData(TempSaveCache.pendingSave);
             TempSaveCache.pendingSave = null;
             UIEvents.InvokePlayerLoaded();
@@ -278,7 +278,7 @@ public class WorldMapController : MonoBehaviour
         TileData tile = generator.GetTile(tx, ty);
         if (tile == null)
         {
-            Debug.Log($"[Click] Tile not found at {tx}, {ty}");
+            UDADebug.Log($"[Click] Tile not found at {tx}, {ty}");
             return;
         }
         Vector2Int coords = new Vector2Int(tx, ty);
@@ -296,7 +296,7 @@ public class WorldMapController : MonoBehaviour
     {
         if (LocationText == null)
         {
-            Debug.LogError("LocationText is NULL — не привязан в инспекторе!");
+            Debug.LogError("LocationText is NULL вЂ” РЅРµ РїСЂРёРІСЏР·Р°РЅ РІ РёРЅСЃРїРµРєС‚РѕСЂРµ!");
             return;
         }
 
@@ -308,7 +308,7 @@ public class WorldMapController : MonoBehaviour
             $"Coords: ({coords.x}, {coords.y})\n" +
             $"Move Cost: {tile.moveCost:F1}";
 
-        Debug.Log("INFOBAR UPDATED: " + LocationText.text);
+        UDADebug.Log("INFOBAR UPDATED: " + LocationText.text);
     }
 
 
@@ -467,7 +467,7 @@ public class WorldMapController : MonoBehaviour
         if (tile.edgeMask != 0 && !string.IsNullOrEmpty(tile.edgeBiome))
         {
             string edgeName = LanguageManager.Get(tile.edgeBiome);
-            transition = $" → {edgeName}";
+            transition = $" в†’ {edgeName}";
         }
 
         LocationText.text = $"{biomeName}{transition}\n(X: {coords.x}, Y: {coords.y})";
@@ -603,3 +603,4 @@ public class WorldMapController : MonoBehaviour
         }
     }
 }
+

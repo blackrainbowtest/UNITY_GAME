@@ -1,8 +1,8 @@
-/* ************************************************************************** */
+﻿/* ************************************************************************** */
 /*                                                                            */
 /*   File: Assets/Scripts/SaveSystem/Core/SaveManager.cs                      */
 /*                                                        /\_/\               */
-/*                                                       ( •.• )              */
+/*                                                       ( вЂў.вЂў )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
 /*   Updated to AAA architecture: SaveManager is now a pure I/O layer.        */
@@ -40,7 +40,7 @@ public static class SaveManager
 		string json = JsonUtility.ToJson(data, true);
 		File.WriteAllText(path, json);
 
-		Debug.Log($"[SaveManager] Saved -> {path}");
+		UDADebug.Log($"[SaveManager] Saved -> {path}");
 	}
 
 	/// <summary>
@@ -64,7 +64,7 @@ public static class SaveManager
 		string json = File.ReadAllText(path);
 		SaveData data = JsonUtility.FromJson<SaveData>(json);
 
-		Debug.Log($"[SaveManager] Loaded <- {path}");
+		UDADebug.Log($"[SaveManager] Loaded <- {path}");
 		return data;
 	}
 
@@ -80,7 +80,7 @@ public static class SaveManager
 			string json = JsonUtility.ToJson(data, true);
 			File.WriteAllText(path, json);
 
-			Debug.Log("[SaveManager] Autosave OK -> " + path);
+			UDADebug.Log("[SaveManager] Autosave OK -> " + path);
 		}
 		catch (Exception ex)
 		{
@@ -88,3 +88,4 @@ public static class SaveManager
 		}
 	}
 }
+

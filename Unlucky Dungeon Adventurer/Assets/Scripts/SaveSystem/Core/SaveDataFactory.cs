@@ -1,8 +1,8 @@
-/* ************************************************************************** */
+﻿/* ************************************************************************** */
 /*                                                                            */
 /*   File: Assets/Scripts/SaveSystem/Core/SaveDataFactory.cs                  */
 /*                                                        /\_/\               */
-/*                                                       ( •.• )              */
+/*                                                       ( вЂў.вЂў )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
 /*   Created: 2025/12/03                                                      */
@@ -17,7 +17,7 @@ public static class SaveDataFactory
 {
 	public static SaveData CreateNew(string playerName, string classId, int worldSeed)
 	{
-		Debug.Log($"[SaveDataFactory] Creating new save: player={playerName}, class={classId}, seed={worldSeed}");
+		UDADebug.Log($"[SaveDataFactory] Creating new save: player={playerName}, class={classId}, seed={worldSeed}");
 		
 		var data = new SaveData();
 
@@ -86,3 +86,4 @@ public static class SaveDataFactory
 		return data;
 	}
 }
+

@@ -1,8 +1,8 @@
-/* ************************************************************************** */
+﻿/* ************************************************************************** */
 /*                                                                            */
 /*   File: Assets/Scripts/Inventory/Database/ItemDatabase.cs                  */
 /*                                                        /\_/\               */
-/*                                                       ( •.• )              */
+/*                                                       ( вЂў.вЂў )              */
 /*   By: unluckydungeonadventure.gmail.com                > ^ <               */
 /*                                                                            */
 /*   Created: 2025/12/01 13:31:04 by UDA                                      */
@@ -32,7 +32,7 @@ public class ItemDatabase : MonoBehaviour
         TextAsset json = Resources.Load<TextAsset>("items");
         if (json == null)
         {
-            Debug.LogError("[ItemDB] Не найден Resources/items.json");
+            Debug.LogError("[ItemDB] РќРµ РЅР°Р№РґРµРЅ Resources/items.json");
             return;
         }
 
@@ -43,7 +43,7 @@ public class ItemDatabase : MonoBehaviour
             items[def.id] = def;
         }
 
-        Debug.Log("[ItemDB] Загружено defs: " + items.Count);
+        UDADebug.Log("[ItemDB] Р—Р°РіСЂСѓР¶РµРЅРѕ defs: " + items.Count);
     }
 
     public ItemDefinition Get(string id)
@@ -52,3 +52,4 @@ public class ItemDatabase : MonoBehaviour
         return def;
     }
 }
+

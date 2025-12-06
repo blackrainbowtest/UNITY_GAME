@@ -74,8 +74,8 @@ public static class GameData
     // If 'seed' is provided, use it when creating the player; otherwise create as before.
     public static void SavePlayer(string name, string role, int? seed = null)
     {
-        Debug.Log($"[SavePlayer] Создан игрок: {name}, класс={role}");
-        Debug.Log($"[SavePlayer] CurrentPlayer теперь: {CurrentPlayer != null}");
+        UDADebug.Log($"[SavePlayer] Создан игрок: {name}, класс={role}");
+        UDADebug.Log($"[SavePlayer] CurrentPlayer теперь: {CurrentPlayer != null}");
 
         if (!classDatabase.ContainsKey(role))
         {
@@ -139,13 +139,13 @@ public static class GameData
         // If we successfully loaded SaveData, use GameManager to apply it
         if (loadedData != null)
         {
-            Debug.Log("[GameData] Loaded SaveData from disk, applying via GameManager");
+            UDADebug.Log("[GameData] Loaded SaveData from disk, applying via GameManager");
             GameManager.Instance.LoadGameData(loadedData);
             return;
         }
 
         // Fallback: Create a new player from PlayerPrefs (legacy support)
-        Debug.Log("[GameData] No save file found, creating player from PlayerPrefs");
+        UDADebug.Log("[GameData] No save file found, creating player from PlayerPrefs");
         string name = PlayerPrefs.GetString("playerName", "Unknown");
         string role = PlayerPrefs.GetString("playerClass", "None");
 
@@ -159,7 +159,8 @@ public static class GameData
         if (storedSeed >= 0)
         {
             CurrentPlayer.worldSeed = storedSeed;
-            Debug.Log($"[GameData] Loaded worldSeed from PlayerPrefs: {storedSeed}");
+            UDADebug.Log($"[GameData] Loaded worldSeed from PlayerPrefs: {storedSeed}");
         }
     }
 }
+
