@@ -5,7 +5,7 @@
 /// </summary>
 public static class UDADebug
 {
-    public static bool Enabled = false;
+    public static bool Enabled = true;
 
     public static void Log(object message)
     {

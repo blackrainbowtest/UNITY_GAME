@@ -29,7 +29,6 @@ public class GameManager : MonoBehaviour
             data.player.name = p.playerName;
             data.player.playerClass = p.playerClass;
             data.player.worldSeed = p.worldSeed;
-            UDADebug.Log($"[GameManager] Preparing save: player.worldSeed={p.worldSeed}, gold={p.gold}");
 
             data.player.level = p.level;
             data.player.gold = p.gold;
@@ -67,6 +66,19 @@ public class GameManager : MonoBehaviour
         data.world.worldSeed = p != null ? p.worldSeed : 0;
         data.world.currentDay = 1;
         data.world.timeOfDay = 12f;
+
+        // === Копируем состояния уникальных локаций ===
+        var locMgr = FindFirstObjectByType<WorldLogic.UniqueLocationManager>();
+        if (locMgr != null)
+        {
+            data.world.uniqueLocationStates = locMgr.GetStatesForSave();
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] UniqueLocationManager not found - unique locations won't be saved!");
+            data.world.uniqueLocationStates = new System.Collections.Generic.List<WorldLogic.UniqueLocationState>();
+        }
+        // === END ===
 
         // --- Inventory ---
         // оставим заглушку

@@ -43,6 +43,10 @@ namespace WorldLogic
 		[Header("Spawn distribution settings")]
 		public int spawnRadius = 3;
 		public int spawnAttempts = 500;
+
+		[Header("Localization keys")]
+		public string nameKey;        // e.g. "dragon_lair.name"
+		public string descriptionKey; // e.g. "dragon_lair.description"
 	}
 }
 

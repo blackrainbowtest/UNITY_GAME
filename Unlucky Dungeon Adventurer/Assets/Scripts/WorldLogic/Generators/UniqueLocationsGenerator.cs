@@ -27,6 +27,7 @@ namespace WorldLogic
 
         public void Generate(int seed, WorldGenerator worldGen)
         {
+            Debug.Log("[UniqueLocationsGenerator] UNIQUE GEN CALLED");
             LoadAllDefs();
             PrepareDefOrder();
             GenerateInstances(worldGen, seed);
@@ -64,18 +65,25 @@ namespace WorldLogic
         private void GenerateInstances(WorldGenerator worldGen, int seed)
         {
             Instances = new List<UniqueLocationInstance>();
+            var occupiedPositions = new HashSet<(int, int)>();
 
-            int index = 0;
-
+            int defIndex = 0;
             foreach (var def in defs)
             {
-                WorldTilePos pos = FindValidTileFor(def, worldGen, seed, ref index);
+                WorldTilePos pos = FindValidTileFor(def, worldGen, seed, occupiedPositions);
+                
+                // Проверяем валидность (не fallback -1,-1)
+                if (pos.X >= 0 && pos.Y >= 0 && !occupiedPositions.Contains((pos.X, pos.Y)))
+                {
+                    occupiedPositions.Add((pos.X, pos.Y));
 
-                var state = new UniqueLocationState(def.id, pos);
-                var instance = new UniqueLocationInstance(def, state);
+                    var state = new UniqueLocationState(def.id, pos);
+                    var instance = new UniqueLocationInstance(def, state);
+                    Instances.Add(instance);
+                }
 
-                Instances.Add(instance);
-
+                defIndex++;
+                
                 if (Instances.Count >= TARGET_COUNT)
                     break;
             }
@@ -89,53 +97,74 @@ namespace WorldLogic
             UniqueLocationDef def,
             WorldGenerator worldGen,
             int seed,
-            ref int index)
+            HashSet<(int, int)> occupiedPositions)
         {
-            while (true)
+            const int MAX_CANDIDATES = 50;
+            
+            // РџРµСЂРµР±РёСЂР°РµРј РІСЃРµ 50 РґРµС‚РµСЂРјРёРЅРёСЂРѕРІР°РЅРЅС‹С… РєР°РЅРґРёРґР°С‚РѕРІ
+            for (int candidateIndex = 0; candidateIndex < MAX_CANDIDATES; candidateIndex++)
             {
-                // Р“РµРЅРµСЂРёСЂСѓРµРј РґРµС‚РµСЂРјРёРЅРёСЂРѕРІР°РЅРЅСѓСЋ РєРѕРѕСЂРґРёРЅР°С‚Сѓ
-                WorldTilePos pos = GetDeterministicCoord(seed, index);
-                index++;
+                WorldTilePos pos = GetDeterministicCoord(seed, candidateIndex);
+
+                // РџСЂРѕРїСѓСЃРєР°РµРј СѓР¶Рµ Р·Р°РЅСЏС‚С‹Рµ РїРѕР·РёС†РёРё
+                if (occupiedPositions.Contains((pos.X, pos.Y)))
+                    continue;
 
                 if (TileIsValid(def, worldGen, pos))
+                {
                     return pos;
+                }
 
-                // fallback: СЃРјРѕС‚СЂРёРј РѕРєСЂРµСЃС‚РЅРѕСЃС‚СЊ
-                WorldTilePos? near = TryFindNearbyValidTile(def, worldGen, pos);
+                // Fallback: смотрим окрестность (чтобы не пропустить хорошую позицию)
+                WorldTilePos? near = TryFindNearbyValidTile(def, worldGen, pos, occupiedPositions);
                 if (near.HasValue)
+                {
                     return near.Value;
-
-                // РёРЅР°С‡Рµ РїСЂРѕРґРѕР»Р¶Р°РµРј РїРѕРёСЃРє
+                }
             }
+
+            // Fallback: ни один из 50 кандидатов не подошёл
+            return new WorldTilePos(-1, -1);
         }
 
-        // РџСЂРѕРІРµСЂРєР°, РїРѕРґС…РѕРґРёС‚ Р»Рё С‚Р°Р№Р»
+        // Проверка, подходит ли тайл
         private bool TileIsValid(UniqueLocationDef def, WorldGenerator gen, WorldTilePos pos)
         {
             var tile = gen.GetTile(pos.X, pos.Y);
             if (tile == null)
                 return false;
 
-            // Р‘Р°Р·РѕРІС‹Р№ Р±РёРѕРј
-            if (!string.IsNullOrEmpty(def.requiredBiome))
-                if (tile.biomeId != def.requiredBiome)
-                    return false;
+            // ОТКЛЮЧЕНА: Проверка по биому
+            // if (!string.IsNullOrEmpty(def.requiredBiome))
+            // {
+            //     if (string.IsNullOrEmpty(tile.biomeId))
+            //     {
+            //         Debug.LogWarning($"[UniqueLocationsGenerator] Tile at {pos.X},{pos.Y} has null/empty biomeId!");
+            //         return false;
+            //     }
+            //     
+            //     if (!tile.biomeId.Contains(def.requiredBiome))
+            //     {
+            //         return false;
+            //     }
+            // }
 
-            // Р”РѕРї. СѓСЃР»РѕРІРёСЏ
-            if (def.nearMountains && !IsNearBiome(gen, pos, "mountain"))
-                return false;
+            // ОТКЛЮЧЕНЫ: Доп. условия по биомам
+            // if (def.nearMountains && !IsNearBiome(gen, pos, "mountain"))
+            //     return false;
+            //
+            // if (def.nearWater && !IsNearBiome(gen, pos, "water"))
+            //     return false;
 
-            if (def.nearWater && !IsNearBiome(gen, pos, "water"))
-                return false;
-
+            // Все тайлы валидны (пока)
             return true;
         }
 
-        // РџРѕРёСЃРє РїРѕРґС…РѕРґСЏС‰РµРіРѕ С‚Р°Р№Р»Р° РїРѕР±Р»РёР·РѕСЃС‚Рё
         private WorldTilePos? TryFindNearbyValidTile(
             UniqueLocationDef def,
             WorldGenerator gen,
-            WorldTilePos pos)
+            WorldTilePos pos,
+            HashSet<(int, int)> occupiedPositions)
         {
             const int R = 3;
 
@@ -143,6 +172,11 @@ namespace WorldLogic
                 for (int dy = -R; dy <= R; dy++)
                 {
                     var p = new WorldTilePos(pos.X + dx, pos.Y + dy);
+                    
+                    // Не размещаем на занятых позициях
+                    if (occupiedPositions.Contains((p.X, p.Y)))
+                        continue;
+                    
                     if (TileIsValid(def, gen, p))
                         return p;
                 }

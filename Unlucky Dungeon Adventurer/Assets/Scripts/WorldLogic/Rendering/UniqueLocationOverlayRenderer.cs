@@ -1,69 +1,66 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*   File: Assets/Scripts/WorldLogic/Rendering/UniqueLocationOverlayRenderer.cs*/
-/*                                                        /\_/\               */
-/*                                                       ( •.• )              */
-/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
-/*                                                                            */
-/* ************************************************************************** */
-
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace WorldLogic
 {
-    /// <summary>
-    /// Overlay renderer for unique locations.
-    /// Spawns small icons above tiles when they appear on screen.
-    /// Removes icons when tiles disappear.
-    /// Reacts to discovered/cleared state.
-    /// </summary>
     public class UniqueLocationOverlayRenderer : MonoBehaviour
     {
         public static UniqueLocationOverlayRenderer Instance { get; private set; }
 
-        private GameObject iconPrefab;
+        [Header("Icon prefab")]
+        public GameObject iconPrefab;
 
-        // Active icons: tile position → icon GameObject
         private Dictionary<WorldTilePos, GameObject> activeIcons = new();
+        private UniqueLocationManager manager;
 
         private void Awake()
         {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
             Instance = this;
         }
 
         private void Start()
         {
-            // Load prefab from Resources
-            iconPrefab = Resources.Load<GameObject>("Prefabs/World/UniqueLocationIcon");
+            manager = FindFirstObjectByType<UniqueLocationManager>();
+
+            if (manager == null)
+            {
+                Debug.LogError("[UniqueLocationOverlay] Manager not found");
+                return;
+            }
+
+            // Load prefab if not assigned
+            if (iconPrefab == null)
+                iconPrefab = Resources.Load<GameObject>("Prefabs/World/UniqueLocationIcon");
 
             if (iconPrefab == null)
-                Debug.LogError("[UniqueLocationOverlay] Icon prefab not found at Prefabs/World/UniqueLocationIcon!");
+                Debug.LogError("[UniqueLocationOverlay] iconPrefab missing!");
+            else
+                Debug.Log("[UniqueLocationOverlay] Renderer initialized!");
         }
 
-        // =====================================================================
-        //  When a tile appears in world (created by WorldMapController)
-        // =====================================================================
-        public void OnTileSpawned(WorldTilePos pos, Transform tileTransform)
+        // Вызывается из WorldMapController.SpawnTile()
+        public void OnTileSpawned(WorldTilePos pos, GameObject tileObj)
         {
-            var mgr = UniqueLocationManager.Instance;
-            if (mgr == null)
+            if (manager == null || manager.Locations == null)
                 return;
 
-            var loc = mgr.GetAtTile(pos);
+            // Ищем локацию на этом тайле
+            var loc = manager.GetAtTile(pos);
             if (loc == null)
                 return;
 
-            // Undiscovered locations are not shown yet
-            if (!loc.IsDiscovered)
+            if (activeIcons.ContainsKey(pos))
                 return;
 
-            SpawnIcon(loc, tileTransform);
+            SpawnIcon(loc, pos, tileObj);
         }
 
-        // =====================================================================
-        //  When tile disappears (camera moved)
-        // =====================================================================
+        // Вызывается из WorldMapController при удалении тайла
         public void OnTileDespawned(WorldTilePos pos)
         {
             if (activeIcons.TryGetValue(pos, out var obj))
@@ -73,43 +70,105 @@ namespace WorldLogic
             }
         }
 
-        // =====================================================================
-        //  Spawn icon over tile
-        // =====================================================================
-        private void SpawnIcon(UniqueLocationInstance loc, Transform tile)
+        private void SpawnIcon(UniqueLocationInstance loc, WorldTilePos pos, GameObject tileObj)
         {
-            var pos = loc.Position;
-
-            // Already spawned
-            if (activeIcons.ContainsKey(pos))
+            if (iconPrefab == null)
+            {
+                Debug.LogError("[UniqueLocationOverlay] iconPrefab is null!");
                 return;
+            }
 
-            var icon = Instantiate(iconPrefab, tile);
+            var icon = Instantiate(iconPrefab, tileObj.transform);
             icon.transform.localPosition = new Vector3(0, 0, -0.1f);
 
-            // Choose sprite based on state
-            var sr = icon.GetComponent<SpriteRenderer>();
-            if (sr != null)
+            // Set sprite
+            using System.Collections.Generic;
+            using UnityEngine;
+
+            namespace WorldLogic
             {
-                sr.sprite = loc.IsCleared ? loc.Def.iconCleared : loc.Def.icon;
+                public class UniqueLocationOverlayRenderer : MonoBehaviour
+                {
+                    public static UniqueLocationOverlayRenderer Instance { get; private set; }
+
+                    [Header("Icon prefab")]
+                    public GameObject iconPrefab;
+
+                    private Dictionary<WorldTilePos, GameObject> activeIcons = new();
+                    private UniqueLocationManager manager;
+
+                    private void Awake()
+                    {
+                        if (Instance != null && Instance != this)
+                        {
+                            Destroy(gameObject);
+                            return;
+                        }
+                        Instance = this;
+                    }
+
+                    private void Start()
+                    {
+                        manager = FindFirstObjectByType<UniqueLocationManager>();
+
+                        if (manager == null)
+                        {
+                            Debug.LogError("[UniqueLocationOverlay] Manager not found");
+                            return;
+                        }
+
+                        // Load prefab if not assigned
+                        if (iconPrefab == null)
+                            iconPrefab = Resources.Load<GameObject>("Prefabs/World/UniqueLocationIcon");
+
+                        if (iconPrefab == null)
+                            Debug.LogError("[UniqueLocationOverlay] iconPrefab missing!");
+                    }
+
+                    // Called from WorldMapController.SpawnTile()
+                    public void OnTileSpawned(WorldTilePos pos, GameObject tileObj)
+                    {
+                        if (manager == null || manager.Locations == null)
+                            return;
+
+                        var loc = manager.GetAtTile(pos);
+                        if (loc == null)
+                            return;
+
+                        if (activeIcons.ContainsKey(pos))
+                            return;
+
+                        SpawnIcon(loc, pos, tileObj);
+                    }
+
+                    // Called from WorldMapController when tile despawns
+                    public void OnTileDespawned(WorldTilePos pos)
+                    {
+                        if (activeIcons.TryGetValue(pos, out var obj))
+                        {
+                            Destroy(obj);
+                            activeIcons.Remove(pos);
+                        }
+                    }
+
+                    private void SpawnIcon(UniqueLocationInstance loc, WorldTilePos pos, GameObject tileObj)
+                    {
+                        if (iconPrefab == null)
+                        {
+                            Debug.LogError("[UniqueLocationOverlay] iconPrefab is null!");
+                            return;
+                        }
+
+                        var icon = Instantiate(iconPrefab, tileObj.transform);
+                        icon.transform.localPosition = new Vector3(0, 0, -0.1f);
+
+                        var sr = icon.GetComponent<SpriteRenderer>();
+                        if (sr != null && loc.Def != null && loc.Def.icon != null)
+                        {
+                            sr.sprite = loc.Def.icon;
+                        }
+
+                        activeIcons[pos] = icon;
+                    }
+                }
             }
-
-            activeIcons[pos] = icon;
-        }
-
-        // =====================================================================
-        //  When state changes (e.g., location cleared)
-        // =====================================================================
-        public void RefreshIcon(UniqueLocationInstance loc)
-        {
-            if (!activeIcons.TryGetValue(loc.Position, out var icon))
-                return;
-
-            var sr = icon.GetComponent<SpriteRenderer>();
-            if (sr != null)
-            {
-                sr.sprite = loc.IsCleared ? loc.Def.iconCleared : loc.Def.icon;
-            }
-        }
-    }
-}

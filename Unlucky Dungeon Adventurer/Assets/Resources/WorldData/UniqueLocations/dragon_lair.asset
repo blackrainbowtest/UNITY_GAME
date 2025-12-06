@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd10743a8b8517546bc87110db969669, type: 3}
+  m_Name: dragon_lair
+  m_EditorClassIdentifier: Assembly-CSharp::WorldLogic.UniqueLocationDef
+  id: dragon_lair
+  icon: {fileID: 2376935135116005869, guid: cefad2ed550c6ad4eb8c5685ed15fa96, type: 3}
+  requiredBiome: 
+  rarity: 10
+  dangerLevel: 1
+  nearMountains: 0
+  nearWater: 0
+  farFromCities: 0
+  spawnRadius: 3
+  spawnAttempts: 500
+  nameKey: dragon_lair.name
+  descriptionKey: dragon_lair.description

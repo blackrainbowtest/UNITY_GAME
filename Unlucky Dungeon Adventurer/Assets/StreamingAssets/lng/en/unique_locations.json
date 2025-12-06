@@ -1,0 +1,10 @@
+{
+	"dragon_lair": {
+		"name": "Dragon's Lair",
+		"description": "An ancient red dragon sleeps here."
+	},
+	"lich_crypt": {
+		"name": "Lich's Crypt",
+		"description": "An ominous place where death and eternity merge."
+	}
+}

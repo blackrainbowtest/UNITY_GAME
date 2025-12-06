@@ -33,16 +33,14 @@ namespace WorldLogic
         public void Awake()
         {
             Instance = this;
+            Locations = new List<UniqueLocationInstance>(); // Инициализируем, чтобы избежать null
         }
 
-        // Р’С‹Р·С‹РІР°РµС‚СЃСЏ РёР· WorldLogicDirector
+        // Вызывается из WorldLogicDirector
         public void Initialize()
         {
             LoadGeneratedLocations();
-
             BuildLookup();
-
-            UDADebug.Log($"[UniqueLocationManager] Loaded {Locations.Count} unique locations.");
         }
 
         // ============================================================
@@ -51,7 +49,7 @@ namespace WorldLogic
 
         private void LoadGeneratedLocations()
         {
-            // Р‘РµСЂС‘С‚СЃСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёР№ СЃРїРёСЃРѕРє РёР· РіРµРЅРµСЂР°С‚РѕСЂР°
+            // Берётся статический список из генератора
             Locations = UniqueLocationsGenerator.Instances;
 
             if (Locations == null)
@@ -153,8 +151,15 @@ namespace WorldLogic
         {
             List<UniqueLocationState> states = new();
 
+            // Защита от null
+            if (Locations == null || Locations.Count == 0)
+                return states;
+
             foreach (var loc in Locations)
-                states.Add(loc.State);
+            {
+                if (loc != null && loc.State != null)
+                    states.Add(loc.State);
+            }
 
             return states;
         }

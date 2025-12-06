@@ -44,6 +44,7 @@ namespace WorldLogic
                         Resources.LoadAll<UniqueLocationDef>("WorldData/UniqueLocations")
                     );
                     mgr.LoadInitialFromSave(worldSave.uniqueLocationStates, defs);
+                    mgr.Initialize(); // Initialize to print coordinates
                 }
 
                 // Initialize all managers after loading from save
@@ -61,6 +62,10 @@ namespace WorldLogic
                 {
                     mgr.Initialize();
                     worldSave.uniqueLocationStates = mgr.GetStatesForSave();
+                }
+                else
+                {
+                    Debug.LogError("[WorldLogicDirector] UniqueLocationManager not found in scene!");
                 }
 
                 // Initialize any remaining managers after generation

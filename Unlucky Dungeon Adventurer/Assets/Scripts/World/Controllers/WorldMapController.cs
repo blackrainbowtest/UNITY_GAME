@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
+using WorldLogic;
 
 /// <summary>
 /// WorldMapController is responsible for:
@@ -157,9 +158,39 @@ public class WorldMapController : MonoBehaviour
             seed = 10000;
         }
 
+        Debug.Log("[WorldMap] DIRECTOR START: seed=" + seed);
         generator = new WorldGenerator(seed);
-        // Removed WorldLogicDirector integration (type missing). If reintroduced,
-        // ensure the class exists and add a safe initialization hook here.
+
+        // === DEBUG: Scan all biomes on map ===
+        Debug.LogWarning("=== Biome scan start ===");
+        System.Collections.Generic.HashSet<string> biomeSet = new System.Collections.Generic.HashSet<string>();
+
+        for (int x = 0; x < 200; x++)
+        {
+            for (int y = 0; y < 200; y++)
+            {
+                var t = generator.GetTile(x, y);
+                if (t != null && !string.IsNullOrEmpty(t.biomeId))
+                    biomeSet.Add(t.biomeId);
+            }
+        }
+
+        foreach (var b in biomeSet)
+            Debug.LogWarning("Biome found: " + b);
+        Debug.LogWarning("=== Biome scan end ===");
+        // === END DEBUG ===
+
+        // Initialize WorldLogicDirector
+        var director = FindFirstObjectByType<WorldLogic.WorldLogicDirector>();
+        if (director != null)
+        {
+            director.Initialize(seed, generator);
+            Debug.Log("[WorldMap] WorldLogicDirector initialized.");
+        }
+        else
+        {
+            Debug.LogWarning("[WorldMap] WorldLogicDirector not found in scene!");
+        }
 
         visibleTiles = new Dictionary<Vector2Int, GameObject>();
 
@@ -369,6 +400,11 @@ public class WorldMapController : MonoBehaviour
 
         foreach (Vector2Int pos in toRemove)
         {
+            // === OverlayRenderer integration ===
+            UniqueLocationOverlayRenderer.Instance?.OnTileDespawned(
+                new WorldTilePos(pos.x, pos.y)
+            );
+
             Destroy(visibleTiles[pos]);
             visibleTiles.Remove(pos);
         }
@@ -416,6 +452,12 @@ public class WorldMapController : MonoBehaviour
         {
             tr.RenderTile(data);
         }
+
+        // === OverlayRenderer integration ===
+        UniqueLocationOverlayRenderer.Instance?.OnTileSpawned(
+            new WorldTilePos(pos.x, pos.y),
+            obj
+        );
 
         minimap?.UpdateTile(pos, data.color);
 
