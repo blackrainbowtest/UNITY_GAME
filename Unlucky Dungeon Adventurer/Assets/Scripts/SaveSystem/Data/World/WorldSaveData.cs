@@ -33,6 +33,11 @@ public class WorldSaveData
     // Full state of all 50 unique locations (runtime states with progress)
     public List<UniqueLocationState> uniqueLocationStates = new List<UniqueLocationState>();
 
+    public bool HasUniqueLocations()
+    {
+        return uniqueLocationStates != null && uniqueLocationStates.Count > 0;
+    }
+
     public void AddMinutes(int minutes)
     {
         float totalMinutes = timeOfDay * 60f + minutes;

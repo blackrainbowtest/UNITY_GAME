@@ -173,6 +173,32 @@ namespace WorldLogic
                 }
             }
         }
+
+        /// <summary>
+        /// Load unique locations from save on world initialization.
+        /// Called by WorldLogicDirector when save already contains generated locations.
+        /// </summary>
+        public void LoadInitialFromSave(List<UniqueLocationState> savedStates, List<UniqueLocationDef> defs)
+        {
+            Locations = new List<UniqueLocationInstance>();
+
+            foreach (var state in savedStates)
+            {
+                // Find matching def
+                var def = defs.Find(d => d.id == state.id);
+                if (def == null)
+                {
+                    Debug.LogWarning($"[UniqueLocationManager] No def found for saved location: {state.id}");
+                    continue;
+                }
+
+                // Reconstruct instance from state + def
+                var instance = new UniqueLocationInstance(def, state);
+                Locations.Add(instance);
+            }
+
+            BuildLookup();
+        }
     }
 }
 

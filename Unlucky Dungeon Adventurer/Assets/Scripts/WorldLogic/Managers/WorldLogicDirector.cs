@@ -28,11 +28,44 @@ namespace WorldLogic
             WorldSeed = seed;
             Generator = generator;
 
-            RegisterGenerators();
             RegisterManagers();
 
-            RunGenerators();
-            InitializeManagers();
+            // Check if unique locations already exist in save
+            var saveData = GameManager.Instance.GetCurrentGameData();
+            var worldSave = saveData.world;
+
+            if (worldSave.HasUniqueLocations())
+            {
+                // Load existing locations from save
+                var mgr = FindFirstObjectByType<UniqueLocationManager>();
+                if (mgr != null)
+                {
+                    var defs = new List<UniqueLocationDef>(
+                        Resources.LoadAll<UniqueLocationDef>("WorldData/UniqueLocations")
+                    );
+                    mgr.LoadInitialFromSave(worldSave.uniqueLocationStates, defs);
+                }
+
+                // Initialize all managers after loading from save
+                InitializeManagers();
+            }
+            else
+            {
+                // Generate new locations for first-time world
+                RegisterGenerators();
+                RunGenerators();
+
+                // Save generated locations to save data
+                var mgr = FindFirstObjectByType<UniqueLocationManager>();
+                if (mgr != null)
+                {
+                    mgr.Initialize();
+                    worldSave.uniqueLocationStates = mgr.GetStatesForSave();
+                }
+
+                // Initialize any remaining managers after generation
+                InitializeManagers();
+            }
         }
 
         private void RegisterGenerators()
@@ -66,20 +99,3 @@ namespace WorldLogic
         }
     }
 }
-
-/**
-Шаг 2. Подключаем Дирижёра к твоему миру
-
-Сейчас твой мир рендерится, тайлы генерируются — но никто не “ведёт” объекты, события, уникальные места.
-
-Делаем так:
-
-В сцене WorldMap создаём пустой GameObject:
-WorldLogicDirector
-
-Навешиваем на него компонент WorldLogicDirector.
-
-WorldLogicDirector (GameObject)
-   - WorldLogicDirector.cs (компонент)
-
-*/
