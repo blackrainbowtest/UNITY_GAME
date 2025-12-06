@@ -23,7 +23,11 @@ using UnityEngine.EventSystems;
 public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
     #region Inspector Fields
-    
+    /// <summary>
+    /// Событие, вызываемое после любого обновления миникарты (перерисовка, изменение тайлов, очистка и т.д.)
+    /// </summary>
+    public event Action OnMinimapUpdated;
+
     [Header("References")]
     [SerializeField] private RawImage minimapImage;
 
@@ -138,6 +142,7 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         if (MinimapRenderer.UpdateTile(minimapTexture, worldTile, originX, originY, tilesPerSide, color))
         {
             dirty = true;
+            OnMinimapUpdated?.Invoke();
         }
     }
 
@@ -159,6 +164,7 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
             cameraFrameColor
         );
         dirty = true;
+        OnMinimapUpdated?.Invoke();
     }
 
     /// <summary>
@@ -176,6 +182,7 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
             playerMarkerColor))
         {
             dirty = true;
+            OnMinimapUpdated?.Invoke();
         }
     }
 
@@ -187,6 +194,7 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     {
         MinimapRenderer.ClearTexture(minimapTexture, emptyColor);
         dirty = true;
+        OnMinimapUpdated?.Invoke();
     }
     
     #endregion
@@ -203,6 +211,7 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         {
             minimapTexture.Apply();
             dirty = false;
+            OnMinimapUpdated?.Invoke();
         }
     }
     
@@ -333,4 +342,17 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     }
     
     #endregion
+
+    // Draws a unique marker (icon/color) on a minimap tile
+    public void DrawUniqueMarker(Vector2Int tilePos, Color color)
+    {
+        Vector2Int localPos = tilePos - new Vector2Int(originX, originY);
+
+        if (minimapTexture == null) return;
+        if (localPos.x < 0 || localPos.x >= tilesPerSide || localPos.y < 0 || localPos.y >= tilesPerSide)
+            return;
+
+        minimapTexture.SetPixel(localPos.x, localPos.y, color);
+        dirty = true;
+    }
 }

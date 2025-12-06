@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: lich_crypt
   m_EditorClassIdentifier: Assembly-CSharp::WorldLogic.UniqueLocationDef
   id: lich_crypt
-  icon: {fileID: -6120970874063252335, guid: 923d61885ad732d45a5d1e7a93c97e05, type: 3}
+  icon: {fileID: 21300000, guid: 923d61885ad732d45a5d1e7a93c97e05, type: 3}
   requiredBiome: 
   rarity: 8
   dangerLevel: 1
