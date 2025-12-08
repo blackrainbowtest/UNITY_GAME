@@ -18,7 +18,7 @@ public class CameraPanController
 
 	// --- PAN SETTINGS ---
 	private float dragSpeed = 1f;				// Множитель скорости (1.0 = 1:1 с движением мыши)
-	private float touchDragSpeed = 0.0048f;		// Чувствительность мобиля (для сенсорного ввода)
+	private float touchDragSpeed = 0.0032f;		// Чувствительность мобиля (было 0.0048, уменьшено на 1/3)
 	private float inertiaDamping = 6f;			// Выше = быстрее затухает инерция
 	private float inertiaMultiplier = 0.2f;		// Сила инерции при отпускании
 	private float zoomScaleFactor = 0.01f;		// Больше не используется (держу для совместимости)
