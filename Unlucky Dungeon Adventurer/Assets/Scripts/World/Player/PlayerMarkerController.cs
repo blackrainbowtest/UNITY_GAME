@@ -30,10 +30,18 @@ public class PlayerMarkerController : MonoBehaviour, IPointerClickHandler, IPoin
 
     private void Awake()
     {
-        // СЃРѕР·РґР°С‘Рј РІРёР·СѓР°Р»СЊРЅСѓСЋ С‡Р°СЃС‚СЊ
-        spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
-        spriteRenderer.sprite = playerSprite;
-        spriteRenderer.sortingOrder = 50; // РїРѕРІРµСЂС… С‚Р°Р№Р»РѕРІ
+        // Получить существующий SpriteRenderer или создать новый
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
+        }
+        
+        // Установить спрайт, если назначен в инспекторе
+        if (playerSprite != null)
+        {
+            spriteRenderer.sprite = playerSprite;
+        }
     }
 
     private void Update()

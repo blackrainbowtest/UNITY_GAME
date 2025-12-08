@@ -17,11 +17,11 @@ public class CameraPanController
 	private Camera cam;
 
 	// --- PAN SETTINGS ---
-	private float dragSpeed = 16f;				// reduced sensitivity (was 50)
-	private float touchDragSpeed = 0.002f;		// sensitivity (mobile)
-	private float inertiaDamping = 4f;			// Lower = longer inertia (was 6)
-	private float inertiaMultiplier = 0.2f;		// Stronger inertia capture
-	private float zoomScaleFactor = 0.05f;		// Scale movement with zoom level
+	private float dragSpeed = 1f;				// Множитель скорости (1.0 = 1:1 с движением мыши)
+	private float touchDragSpeed = 0.0048f;		// Чувствительность мобиля (для сенсорного ввода)
+	private float inertiaDamping = 6f;			// Выше = быстрее затухает инерция
+	private float inertiaMultiplier = 0.2f;		// Сила инерции при отпускании
+	private float zoomScaleFactor = 0.01f;		// Больше не используется (держу для совместимости)
 	private Vector3 inertia = Vector3.zero;
 
 	private Vector3 lastScreenPos;
@@ -76,15 +76,14 @@ public class CameraPanController
 			Vector3 delta = cur - lastScreenPos;
 			lastScreenPos = cur;
 
-			// Scale movement by current zoom level (orthographicSize)
-			float zoomScale = cam.orthographicSize * zoomScaleFactor;
-
-			// Move camera directly in screen space
-			Vector3 move = new Vector3(-delta.x, -delta.y, 0) * dragSpeed * Time.deltaTime * zoomScale;
-			cam.transform.position += cam.transform.TransformDirection(move);
+			// Конвертировать пиксели в мировые координаты (независимо от FPS)
+			Vector3 worldDelta = cam.ScreenToWorldPoint(delta) - cam.ScreenToWorldPoint(Vector3.zero);
 			
-			// Capture velocity for inertia (stronger capture), also scaled by zoom
-			inertia = delta * inertiaMultiplier * zoomScale;
+			// Двигать камеру напрямую (без Time.deltaTime для стабильности на слабых устройствах)
+			cam.transform.position -= worldDelta * dragSpeed;
+			
+			// Capture velocity for inertia
+			inertia = worldDelta * inertiaMultiplier;
 		}
 
 		if (Input.GetMouseButtonUp(0))
@@ -141,8 +140,9 @@ public class CameraPanController
 
 		if (inertia.magnitude > 0.01f)
 		{
-			cam.transform.position -= inertia * Time.deltaTime;
-			inertia = Vector3.Lerp(inertia, Vector3.zero, Time.deltaTime * inertiaDamping);
+			// Инерция без зависимости от Time.deltaTime для одинаковой скорости на всех устройствах
+			cam.transform.position -= inertia;
+			inertia = Vector3.Lerp(inertia, Vector3.zero, inertiaDamping * 0.1f);
 		}
 	}
 }

@@ -33,6 +33,12 @@ public class CameraAutoCenter
 
 	public void StartAutoCenter(Vector3 worldPos)
 	{
+		// Cancel any ongoing animation to prevent stacking
+		if (active)
+		{
+			active = false;
+		}
+		
 		target = new Vector3(worldPos.x, worldPos.y, cam.transform.position.z);
 		active = true;
 	}

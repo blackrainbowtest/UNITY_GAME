@@ -30,7 +30,7 @@ public class CameraMaster : MonoBehaviour
 	private Camera cam;
 
 	[Header("Autocenter Settings")]
-	public float autoCenterSpeed = 12f;				// camera flight speed
+	public float autoCenterSpeed = 4f;				// camera flight speed (units per second)
 	public float autoCenterStopRadius = 0.05f;
 
 	[Header("Zoom Settings")]
