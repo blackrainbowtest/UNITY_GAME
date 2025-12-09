@@ -5,7 +5,7 @@ public class MapUIController : MonoBehaviour
 {
     [Header("Teleport Settings")]
     [SerializeField] private float teleportDistanceThreshold = 50f; // tiles
-    [SerializeField] private GameObject loadingOverlay; // Optional: UI overlay for fade
+    [SerializeField] private LoadingOverlayController loadingOverlay; // Overlay с анимацией загрузки
 
     private bool isCentering = false; // Prevent multiple simultaneous center commands
 
@@ -47,9 +47,9 @@ public class MapUIController : MonoBehaviour
     {
         isCentering = true;
         
-        // Show loading overlay (if assigned)
+        // Show loading overlay with runner animation
         if (loadingOverlay != null)
-            loadingOverlay.SetActive(true);
+            loadingOverlay.Show();
 
         // Teleport camera instantly
         CameraMaster.Instance.TeleportToPlayer();
@@ -57,9 +57,9 @@ public class MapUIController : MonoBehaviour
         // Wait until all rendering complete (Update + LateUpdate finished)
         yield return new WaitForEndOfFrame();
 
-        // Hide loading overlay
+        // Hide loading overlay (with minimum display time guarantee)
         if (loadingOverlay != null)
-            loadingOverlay.SetActive(false);
+            yield return StartCoroutine(loadingOverlay.HideAsync());
 
         isCentering = false;
     }
