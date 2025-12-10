@@ -29,4 +29,7 @@
   "plains_green": "Зелёные равнины",
   "plains_flowers": "Цветочные равнины",
   "plains_savanna": "Саванна"
+
+  ,"biome_transition_arrow": " → "
+  ,"location_info_text": "{0}{1}\n(X: {2}, Y: {3})"
 }

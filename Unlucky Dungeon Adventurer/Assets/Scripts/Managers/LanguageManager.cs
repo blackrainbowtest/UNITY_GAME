@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public static class LanguageManager
@@ -40,23 +41,22 @@ public static class LanguageManager
         return key;
     }
 
-    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ JSON пїЅпїЅпїЅпїЅпїЅпїЅпїЅ { "пїЅпїЅпїЅпїЅ": "пїЅпїЅпїЅпїЅпїЅ" }
+    public static string GetFormat(string key, params object[] args)
+    {
+        string format = Get(key);
+        return string.Format(format, args);
+    }
+
     private static Dictionary<string, string> ParseSimpleJson(string json)
     {
         var dict = new Dictionary<string, string>();
+        if (string.IsNullOrEmpty(json)) return dict;
 
-        json = json.Trim().TrimStart('{').TrimEnd('}');
-        string[] pairs = json.Split(',');
-
-        foreach (var p in pairs)
+        var matches = Regex.Matches(json, @"""(?<k>[^""]+)""\s*:\s*""(?<v>[^""]*)""");
+        foreach (Match m in matches)
         {
-            string[] kv = p.Split(':');
-            if (kv.Length == 2)
-            {
-                string key = kv[0].Trim().Trim('"');
-                string value = kv[1].Trim().Trim('"');
-                dict[key] = value;
-            }
+            string key = m.Groups["k"].Value;
+            dict[key] = m.Groups["v"].Value;
         }
 
         return dict;

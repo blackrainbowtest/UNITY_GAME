@@ -9,5 +9,7 @@
     "confirm_delete": "Удалить сохранение?",
     "title_save": "Сохранения",
     "title_load": "Загрузки",
-    "delete_save": "X"
+    "delete_save": "X",
+    "not_enough_stamina_for_path": "Недостаточно стамины для такого маршрута!",
+    "path_info_text": "Путь: стамина {0}, время {1:D2}:{2:D2}"
 }

@@ -486,14 +486,15 @@ public class WorldMapController : MonoBehaviour
         LanguageManager.LoadLanguage("biomes_" + LanguageManager.CurrentLanguage);
         string biomeName = LanguageManager.Get(tile.biomeId);
 
-        string transition = "";
-        if (tile.edgeMask != 0 && !string.IsNullOrEmpty(tile.edgeBiome))
-        {
-            string edgeName = LanguageManager.Get(tile.edgeBiome);
-            transition = $" в†’ {edgeName}";
-        }
+            string transition = "";
+            if (tile.edgeMask != 0 && !string.IsNullOrEmpty(tile.edgeBiome))
+            {
+                string edgeName = LanguageManager.Get(tile.edgeBiome);
+                string arrow = LanguageManager.Get("biome_transition_arrow");
+                transition = string.Concat(arrow, edgeName);
+            }
 
-        LocationText.text = $"{biomeName}{transition}\n(X: {coords.x}, Y: {coords.y})";
+            LocationText.text = LanguageManager.GetFormat("location_info_text", biomeName, transition, coords.x, coords.y);
         BiomeFXController.Instance?.OnBiomeChanged(tile.biomeId);
     }
 

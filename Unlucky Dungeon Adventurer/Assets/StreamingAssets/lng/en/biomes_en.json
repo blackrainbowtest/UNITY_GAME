@@ -17,5 +17,8 @@
   "cave_default": "Cave",
   "cave_lava": "Lava Cave",
   "cave_crystal": "Crystal Cave",
-  "cave_demonic": "Demonic Cave"
+  "cave_demonic": "Demonic Cave",
+
+  "biome_transition_arrow": " → ",
+  "location_info_text": "{0}{1}\n(X: {2}, Y: {3})"
 }

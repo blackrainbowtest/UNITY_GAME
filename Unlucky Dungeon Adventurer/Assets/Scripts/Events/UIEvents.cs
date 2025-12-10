@@ -2,6 +2,10 @@ using System;
 
 public static class UIEvents
 {
+    /// <summary>
+    /// Вызывается, если попытка построить маршрут превышает доступную стамину.
+    /// </summary>
+    public static Action OnNotEnoughStamina;
     // Вызывается, когда игра полностью инициализирована
     public static event Action OnGameInitialized;
 

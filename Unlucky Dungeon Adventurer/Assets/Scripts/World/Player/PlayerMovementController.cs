@@ -44,15 +44,6 @@ public class PlayerMovementController : MonoBehaviour
             Mathf.RoundToInt(transform.position.y / tileSize)
         );
 
-        // Ограничение на максимальную длину маршрута (манхэттенское расстояние)
-        float maxDistance = 15f;
-        float distance = Mathf.Abs(start.x - targetTile.x) + Mathf.Abs(start.y - targetTile.y);
-        if (distance > maxDistance)
-        {
-            CancelPath();
-            return;
-        }
-
         var path = Pathfinding.FindPath(start, targetTile);
         if (path == null || path.Count <= 1)
         {
@@ -67,9 +58,21 @@ public class PlayerMovementController : MonoBehaviour
 
         bool enough = Player != null && Player.currentStamina >= _staminaCost;
 
+        if (!enough)
+        {
+            // Показываем маршрут, но не даём идти и выводим сообщение о недостатке стамины
+            PathRenderer.Show(path);
+            UIEvents.OnPathPreview?.Invoke(_staminaCost, timeCost, false);
+            // Специальное событие для UI — недостаточно стамины
+            UIEvents.OnNotEnoughStamina?.Invoke();
+            if (Player != null)
+                UIEvents.OnRestAvailable?.Invoke(Player.currentStamina < Player.finalMaxStamina);
+            return;
+        }
+
         PathRenderer.Show(path);
 
-        UIEvents.OnPathPreview?.Invoke(_staminaCost, timeCost, enough);
+        UIEvents.OnPathPreview?.Invoke(_staminaCost, timeCost, true);
         if (Player != null)
             UIEvents.OnRestAvailable?.Invoke(Player.currentStamina < Player.finalMaxStamina);
     }

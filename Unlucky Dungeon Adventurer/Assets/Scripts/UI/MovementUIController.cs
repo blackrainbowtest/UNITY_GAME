@@ -4,6 +4,30 @@ using UnityEngine.UI;
 
 public class MovementUIController : MonoBehaviour
 {
+    private void OnEnable()
+    {
+        UIEvents.OnPathPreview += OnPathPreview;
+        UIEvents.OnMovementStarted += OnMovementStarted;
+        UIEvents.OnMovementEnded += OnMovementEnded;
+        UIEvents.OnRestAvailable += OnRestAvailable;
+        UIEvents.OnNotEnoughStamina += OnNotEnoughStamina;
+    }
+
+    private void OnDisable()
+    {
+        UIEvents.OnPathPreview -= OnPathPreview;
+        UIEvents.OnMovementStarted -= OnMovementStarted;
+        UIEvents.OnMovementEnded -= OnMovementEnded;
+        UIEvents.OnRestAvailable -= OnRestAvailable;
+        UIEvents.OnNotEnoughStamina -= OnNotEnoughStamina;
+    }
+
+    private void OnNotEnoughStamina()
+    {
+        if (pathInfoText != null)
+            pathInfoText.text = LanguageManager.Get("not_enough_stamina_for_path");
+    }
+
     [Header("Верхняя панель")]
     public TextMeshProUGUI pathInfoText;
 
@@ -13,22 +37,6 @@ public class MovementUIController : MonoBehaviour
 
     [Header("Ссылка на контроллер движения")]
     public PlayerMovementController movementController;
-
-    private void OnEnable()
-    {
-        UIEvents.OnPathPreview += OnPathPreview;
-        UIEvents.OnMovementStarted += OnMovementStarted;
-        UIEvents.OnMovementEnded += OnMovementEnded;
-        UIEvents.OnRestAvailable += OnRestAvailable;
-    }
-
-    private void OnDisable()
-    {
-        UIEvents.OnPathPreview -= OnPathPreview;
-        UIEvents.OnMovementStarted -= OnMovementStarted;
-        UIEvents.OnMovementEnded -= OnMovementEnded;
-        UIEvents.OnRestAvailable -= OnRestAvailable;
-    }
 
     private void Start()
     {
@@ -63,11 +71,14 @@ public class MovementUIController : MonoBehaviour
 
     private void OnPathPreview(int staminaCost, int timeMinutes, bool hasEnough)
     {
+        // Загружаем UI-переводы перед использованием ключей
+        LanguageManager.LoadLanguage("ui_save_load");
+
         if (pathInfoText != null)
         {
             int hours = timeMinutes / 60;
             int mins = timeMinutes % 60;
-            pathInfoText.text = $"Путь: стамина {staminaCost}, время {hours:D2}:{mins:D2}";
+            pathInfoText.text = LanguageManager.GetFormat("path_info_text", staminaCost, hours, mins);
         }
 
         walkButton.gameObject.SetActive(true);

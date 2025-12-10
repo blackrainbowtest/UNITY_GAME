@@ -77,7 +77,8 @@ public class LoadingOverlayController : MonoBehaviour
             runnerAnimator.runtimeAnimatorController = runnerController;
             runnerAnimator.enabled = true;
             runnerAnimator.speed = animationSpeed;
-            runnerAnimator.Play("runner_run", -1, 0f);
+            // Имя состояния в контроллере: "Run"
+            runnerAnimator.Play("Run", -1, 0f);
         }
     }
 
