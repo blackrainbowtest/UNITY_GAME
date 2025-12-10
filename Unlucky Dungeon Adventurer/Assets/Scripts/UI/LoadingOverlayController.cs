@@ -20,77 +20,75 @@ using UnityEngine.UI;
 public class LoadingOverlayController : MonoBehaviour
 {
     [Header("UI References")]
-    [SerializeField] private Image backgroundPanel;     // Темный фон (полупрозрачный черный)
-    [SerializeField] private Image runnerImage;         // Анимированная иконка бегуна 512x512
-    [SerializeField] private Animator runnerAnimator;   // Animator для проигрывания runner_run
+    [SerializeField] private Image backgroundPanel;
+    [SerializeField] private Image runnerImage;
+    [SerializeField] private Animator runnerAnimator;
+    [SerializeField] private RuntimeAnimatorController runnerController;
 
-    [Header("Appearance Settings")]
-    [SerializeField] private Color backgroundColor = new Color(0, 0, 0, 0.8f); // Темный полупрозрачный фон
-    [SerializeField] [Range(0.1f, 2f)] private float animationSpeed = 0.5f;    // Скорость анимации (0.5 = в 2 раза медленнее)
-    [SerializeField] private float minimumDisplayTime = 1f;                     // Минимальное время показа (секунды)
+    [Header("Settings")]
+    [SerializeField] private Color backgroundColor = new Color(0, 0, 0, 0.8f);
+    [SerializeField] [Range(0.1f, 2f)] private float animationSpeed = 0.5f;
+    [SerializeField] private float minimumDisplayTime = 1f;
 
-    private float showTimestamp = 0f; // Время когда показали overlay
+    private float showTimestamp = 0f;
 
     private void Awake()
     {
-        // Настроить фон
+        // Настройка компонентов
         if (backgroundPanel != null)
         {
             backgroundPanel.color = backgroundColor;
-            backgroundPanel.raycastTarget = true; // Блокировать клики под overlay
-        }
-
-        // Убедиться что Animator установлен и настроен
-        if (runnerAnimator == null && runnerImage != null)
-        {
-            runnerAnimator = runnerImage.GetComponent<Animator>();
-        }
-
-        if (runnerAnimator != null)
-        {
-            // Анимация работает даже при Time.timeScale = 0
-            runnerAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
+            backgroundPanel.raycastTarget = true;
         }
 
         if (runnerImage != null)
         {
-            runnerImage.raycastTarget = false; // Не блокировать клики (только фон блокирует)
+            runnerImage.raycastTarget = false;
+            
+            // Получить Animator если не назначен
+            if (runnerAnimator == null)
+            {
+                runnerAnimator = runnerImage.GetComponent<Animator>();
+                if (runnerAnimator == null)
+                {
+                    runnerAnimator = runnerImage.gameObject.AddComponent<Animator>();
+                }
+            }
         }
 
-        // По умолчанию скрыт
+        // Настройка Animator
+        if (runnerAnimator != null && runnerController != null)
+        {
+            runnerAnimator.runtimeAnimatorController = runnerController;
+            runnerAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
+            runnerAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+        }
+
         gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// Показать оверлей и запустить анимацию
-    /// </summary>
     public void Show()
     {
         gameObject.SetActive(true);
-        showTimestamp = Time.time; // Запомнить время показа
+        showTimestamp = Time.unscaledTime;
         
-        if (runnerAnimator != null)
+        if (runnerAnimator != null && runnerController != null)
         {
+            runnerAnimator.runtimeAnimatorController = runnerController;
             runnerAnimator.enabled = true;
-            runnerAnimator.speed = animationSpeed; // Установить скорость анимации
-            // Анимация запустится автоматически через controller
+            runnerAnimator.speed = animationSpeed;
+            runnerAnimator.Play("runner_run", -1, 0f);
         }
     }
 
-    /// <summary>
-    /// Скрыть оверлей и остановить анимацию
-    /// Асинхронно: гарантирует минимальное время показа
-    /// </summary>
     public System.Collections.IEnumerator HideAsync()
     {
-        // Подождать минимальное время показа
-        float elapsedTime = Time.time - showTimestamp;
-        if (elapsedTime < minimumDisplayTime)
+        float elapsed = Time.unscaledTime - showTimestamp;
+        if (elapsed < minimumDisplayTime)
         {
-            yield return new WaitForSeconds(minimumDisplayTime - elapsedTime);
+            yield return new WaitForSecondsRealtime(minimumDisplayTime - elapsed);
         }
 
-        // Скрыть overlay
         if (runnerAnimator != null)
         {
             runnerAnimator.enabled = false;
@@ -99,21 +97,14 @@ public class LoadingOverlayController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// Скрыть оверлей мгновенно (без минимального времени)
-    /// </summary>
     public void HideImmediate()
     {
         if (runnerAnimator != null)
         {
             runnerAnimator.enabled = false;
         }
-        
         gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// Проверка: активен ли оверлей
-    /// </summary>
     public bool IsVisible => gameObject.activeSelf;
 }
