@@ -2248,7 +2248,7 @@ MonoBehaviour:
   backgroundPanel: {fileID: 1620096355}
   runnerImage: {fileID: 688999555}
   runnerAnimator: {fileID: 0}
-  runnerController: {fileID: 9100000, guid: ac889cfb5ff6ba54e9c9e90ce279a99a, type: 2}
+  runnerController: {fileID: 9100000, guid: ff8e4820f154c5e489b3b62e6baf1282, type: 2}
   backgroundColor: {r: 0, g: 0, b: 0, a: 0.8}
   animationSpeed: 0.5
   minimumDisplayTime: 1
