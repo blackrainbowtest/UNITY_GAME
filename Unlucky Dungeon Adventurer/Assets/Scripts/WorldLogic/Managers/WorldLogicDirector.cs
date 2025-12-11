@@ -12,6 +12,8 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using WorldLogic.Cities;
+using WorldLogic.Generators;
 
 namespace WorldLogic
 {
@@ -34,61 +36,92 @@ namespace WorldLogic
             var saveData = GameManager.Instance.GetCurrentGameData();
             var worldSave = saveData.world;
 
-            if (worldSave.HasUniqueLocations())
+            // --------------------------
+            // ЗАГРУЗКА из сейва
+            // --------------------------
+            if (worldSave.HasUniqueLocations() && worldSave.HasCities())
             {
-                // Load existing locations from save
-                var mgr = FindFirstObjectByType<UniqueLocationManager>();
-                if (mgr != null)
+                Debug.Log("[WorldLogicDirector] Loading world logic from save...");
+
+                // Load unique locations
+                var ulMgr = FindFirstObjectByType<UniqueLocationManager>();
+                if (ulMgr != null)
                 {
                     var defs = new List<UniqueLocationDef>(
                         Resources.LoadAll<UniqueLocationDef>("WorldData/UniqueLocations")
                     );
-                    mgr.LoadInitialFromSave(worldSave.uniqueLocationStates, defs);
-                    mgr.Initialize(); // Initialize to print coordinates
+                    ulMgr.LoadInitialFromSave(worldSave.uniqueLocationStates, defs);
                 }
 
-                // Initialize all managers after loading from save
+                // Load cities
+                var cityMgr = FindFirstObjectByType<CityManager>();
+                if (cityMgr != null)
+                {
+                    var defs = new List<CityDef>(
+                        Resources.LoadAll<CityDef>("WorldData/Cities")
+                    );
+                    cityMgr.LoadInitialFromSave(worldSave.cityStates, defs);
+                }
+
                 InitializeManagers();
+                return;
             }
-            else
+
+            // --------------------------
+            // ПЕРВОЕ СОЗДАНИЕ МИРА
+            // --------------------------
+
+            RegisterGenerators();
+            RunGenerators();
+
+            // Save unique locations
             {
-                // Generate new locations for first-time world
-                RegisterGenerators();
-                RunGenerators();
-
-                // Save generated locations to save data
-                var mgr = FindFirstObjectByType<UniqueLocationManager>();
-                if (mgr != null)
+                var ulMgr = FindFirstObjectByType<UniqueLocationManager>();
+                if (ulMgr != null)
                 {
-                    mgr.Initialize();
-                    worldSave.uniqueLocationStates = mgr.GetStatesForSave();
+                    ulMgr.Initialize();
+                    worldSave.uniqueLocationStates = ulMgr.GetStatesForSave();
                 }
-                else
-                {
-                    Debug.LogError("[WorldLogicDirector] UniqueLocationManager not found in scene!");
-                }
-
-                // Initialize any remaining managers after generation
-                InitializeManagers();
             }
+
+            // Save cities
+            {
+                var cityMgr = FindFirstObjectByType<CityManager>();
+                if (cityMgr != null)
+                {
+                    cityMgr.Initialize(CityGenerator.GeneratedStates);
+                    worldSave.cityStates = cityMgr.GetStatesForSave();
+                }
+            }
+
+            InitializeManagers();
+
+            Debug.Log("[WorldLogicDirector] World logic initialized for new world.");
         }
 
         private void RegisterGenerators()
         {
-			generators.Add(new UniqueLocationsGenerator());
+            generators.Add(new UniqueLocationsGenerator());
+            generators.Add(new CityGenerator());
             // В будущем:
-            // generators.Add(new CityGenerator());
-            // generators.Add(new EventGenerator());
+            // generators.Add(new VillageGenerator());
+            // generators.Add(new PointsOfInterestGenerator());
+            // generators.Add(new EnemyCampsGenerator());
         }
 
         private void RegisterManagers()
         {
-			var uniqueLocMgr = FindFirstObjectByType<UniqueLocationManager>();
-			if (uniqueLocMgr != null)
-				managers.Add(uniqueLocMgr);
-			else
-				Debug.LogWarning("[WorldLogic] UniqueLocationManager not found in scene!");
-			// Сюда мы добавим ссылки на акторов, события, фракции
+            var ulMgr = FindFirstObjectByType<UniqueLocationManager>();
+            if (ulMgr != null)
+                managers.Add(ulMgr);
+            else
+                Debug.LogWarning("[WorldLogic] UniqueLocationManager not found in scene!");
+
+            var cityMgr = FindFirstObjectByType<CityManager>();
+            if (cityMgr != null)
+                managers.Add(cityMgr);
+            else
+                Debug.LogWarning("[WorldLogic] CityManager not found in scene!");
         }
 
         private void RunGenerators()

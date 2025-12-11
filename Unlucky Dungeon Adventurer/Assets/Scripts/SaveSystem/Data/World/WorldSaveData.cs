@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using WorldLogic;
+using WorldLogic.Cities;
 
 /// <summary>
 /// World state snapshot: seed, time, and dynamic world modifications.
@@ -33,9 +34,17 @@ public class WorldSaveData
     // Full state of all 50 unique locations (runtime states with progress)
     public List<UniqueLocationState> uniqueLocationStates = new List<UniqueLocationState>();
 
+    // Full state of all cities
+    public List<CityState> cityStates = new List<CityState>();
+
     public bool HasUniqueLocations()
     {
         return uniqueLocationStates != null && uniqueLocationStates.Count > 0;
+    }
+
+    public bool HasCities()
+    {
+        return cityStates != null && cityStates.Count > 0;
     }
 
     public void AddMinutes(int minutes)
