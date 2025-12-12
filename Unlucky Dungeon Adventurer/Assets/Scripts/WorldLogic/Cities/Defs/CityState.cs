@@ -18,11 +18,14 @@ namespace WorldLogic.Cities
     [System.Serializable]
     public class CityState
     {
-        /// <summary>Ссылка на CityDef.id</summary>
+        /// <summary>Детерминированный ID города (city_{index}_{biome})</summary>
         public string id;
 
         /// <summary>Позиция города на карте</summary>
         public WorldTilePos position;
+
+        /// <summary>Индекс города в генерации (для восстановления имени)</summary>
+        public int generationIndex;
 
         /// <summary>Текущее население города</summary>
         public int currentPopulation;

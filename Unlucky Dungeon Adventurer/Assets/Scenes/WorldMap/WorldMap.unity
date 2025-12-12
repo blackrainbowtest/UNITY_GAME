@@ -2673,6 +2673,8 @@ GameObject:
   m_Component:
   - component: {fileID: 693030644}
   - component: {fileID: 693030645}
+  - component: {fileID: 693030650}
+  - component: {fileID: 693030651}
   m_Layer: 0
   m_Name: WorldRoot
   m_TagString: Untagged
@@ -2724,6 +2726,30 @@ MonoBehaviour:
   tileSize: 10
   playerMarker: {fileID: 1539624590}
   minimap: {fileID: 1337224853}
+--- !u!114 &693030650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 693030643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e69cae5348b93334ab76a29bc4d3301b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WorldLogic.Cities.CityManager
+--- !u!114 &693030651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 693030643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc02c25b96092394f9a216336279341e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CityMinimapRenderer
 --- !u!1 &724683970
 GameObject:
   m_ObjectHideFlags: 0
