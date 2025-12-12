@@ -27,6 +27,8 @@ namespace WorldLogic
 
         public void Initialize(int seed, WorldGenerator generator)
         {
+            Debug.Log($"[WorldLogicDirector] ===== INITIALIZE CALLED ===== seed={seed}");
+            
             WorldSeed = seed;
             Generator = generator;
 
@@ -39,28 +41,59 @@ namespace WorldLogic
             // --------------------------
             // ЗАГРУЗКА из сейва
             // --------------------------
-            if (worldSave.HasUniqueLocations() && worldSave.HasCities())
-            {
-                Debug.Log("[WorldLogicDirector] Loading world logic from save...");
+            bool hasUniqueLocations = worldSave.HasUniqueLocations();
+            bool hasCities = worldSave.HasCities();
 
-                // Load unique locations
-                var ulMgr = FindFirstObjectByType<UniqueLocationManager>();
-                if (ulMgr != null)
+            Debug.Log($"[WorldLogicDirector] Save check: hasUniqueLocations={hasUniqueLocations}, hasCities={hasCities}");
+            Debug.Log($"[WorldLogicDirector] cityStates count: {(worldSave.cityStates != null ? worldSave.cityStates.Count : 0)}");
+
+            if (hasUniqueLocations || hasCities)
+            {
+                Debug.Log("[WorldLogicDirector] Loading world logic from save... (UL:" + hasUniqueLocations + ", Cities:" + hasCities + ")");
+
+                // Load unique locations if they exist
+                if (hasUniqueLocations)
                 {
-                    var defs = new List<UniqueLocationDef>(
-                        Resources.LoadAll<UniqueLocationDef>("WorldData/UniqueLocations")
-                    );
-                    ulMgr.LoadInitialFromSave(worldSave.uniqueLocationStates, defs);
+                    var ulMgr = FindFirstObjectByType<UniqueLocationManager>();
+                    if (ulMgr != null)
+                    {
+                        var defs = new List<UniqueLocationDef>(
+                            Resources.LoadAll<UniqueLocationDef>("WorldData/UniqueLocations")
+                        );
+                        ulMgr.LoadInitialFromSave(worldSave.uniqueLocationStates, defs);
+                    }
                 }
 
-                // Load cities
-                var cityMgr = FindFirstObjectByType<CityManager>();
-                if (cityMgr != null)
+                // Always generate cities deterministically, then patch from save
+                RegisterGenerators();
+                RunGenerators();
                 {
-                    var defs = new List<CityDef>(
-                        Resources.LoadAll<CityDef>("WorldData/Cities")
-                    );
-                    cityMgr.LoadInitialFromSave(worldSave.cityStates, defs);
+                    var cityMgr = FindFirstObjectByType<CityManager>();
+                    if (cityMgr != null)
+                    {
+                        // Initialize from freshly generated deterministic states
+                        cityMgr.Initialize(CityGenerator.GeneratedStates, WorldSeed, Generator);
+
+                        // Patch from save only discovered/changed states
+                        if (hasCities && worldSave.cityStates != null && worldSave.cityStates.Count > 0)
+                        {
+                            Debug.Log($"[WorldLogicDirector] Patching {worldSave.cityStates.Count} saved city overrides...");
+                            cityMgr.ApplyOverrides(worldSave.cityStates);
+                        }
+                    }
+                }
+
+                // If some data missing, generate it (unique locations only)
+                if (!hasUniqueLocations)
+                {
+                    Debug.Log("[WorldLogicDirector] Missing unique locations, generating...");
+                    // unique locations generator may already be registered above; ensure save
+                    var ulMgr = FindFirstObjectByType<UniqueLocationManager>();
+                    if (ulMgr != null)
+                    {
+                        ulMgr.Initialize();
+                        worldSave.uniqueLocationStates = ulMgr.GetStatesForSave();
+                    }
                 }
 
                 InitializeManagers();
@@ -89,7 +122,7 @@ namespace WorldLogic
                 var cityMgr = FindFirstObjectByType<CityManager>();
                 if (cityMgr != null)
                 {
-                    cityMgr.Initialize(CityGenerator.GeneratedStates);
+                    cityMgr.Initialize(CityGenerator.GeneratedStates, WorldSeed, Generator);
                     worldSave.cityStates = cityMgr.GetStatesForSave();
                 }
             }

@@ -42,41 +42,44 @@ namespace WorldLogic.Cities
         }
 
         /// <summary>Инициализировать менеджер из списка CityState.</summary>
-        public void Initialize(List<CityState> cityStates)
-    {
-        cities.Clear();
-        
-        if (cityStates == null || cityStates.Count == 0)
+        public void Initialize(List<CityState> cityStates, int worldSeed, WorldGenerator worldGen)
         {
-            Debug.LogWarning("[CityManager] No city states provided.");
-            return;
-        }
-
-        // Загружаем все CityDef из Resources
-        var cityDefs = Resources.LoadAll<CityDef>("WorldData/Cities");
-        var defDict = new Dictionary<string, CityDef>();
-        foreach (var def in cityDefs)
-        {
-            if (!string.IsNullOrEmpty(def.id))
-                defDict[def.id] = def;
-        }
-
-        // Создаём CityInstance для каждого CityState
-        foreach (var state in cityStates)
-        {
-            if (defDict.TryGetValue(state.id, out var def))
+            Debug.Log($"[CityManager] ===== Initialize called with {(cityStates != null ? cityStates.Count : 0)} city states =====");
+            
+            cities.Clear();
+            
+            if (cityStates == null || cityStates.Count == 0)
             {
-                var instance = new CityInstance(def, state);
+                Debug.LogWarning("[CityManager] No city states provided.");
+                return;
+            }
+
+            // Загружаем все CityDef из Resources
+            var cityDefs = Resources.LoadAll<CityDef>("WorldData/Cities");
+            var defDict = new Dictionary<string, CityDef>();
+            foreach (var def in cityDefs)
+            {
+                if (!string.IsNullOrEmpty(def.id))
+                    defDict[def.id] = def;
+            }
+
+            // Используем первый доступный def (т.к. у городов теперь динамический id)
+            CityDef defaultDef = cityDefs.Length > 0 ? cityDefs[0] : null;
+            if (defaultDef == null)
+            {
+                Debug.LogError("[CityManager] No CityDef found in Resources!");
+                return;
+            }
+
+            // Создаём CityInstance для каждого CityState
+            foreach (var state in cityStates)
+            {
+                var instance = new CityInstance(defaultDef, state, worldSeed, worldGen);
                 cities[state.id] = instance;
             }
-            else
-            {
-                Debug.LogWarning($"[CityManager] CityDef not found for id: {state.id}");
-            }
-        }
 
-        Debug.Log($"[CityManager] Initialized {cities.Count} cities.");
-    }
+            Debug.Log($"[CityManager] Initialized {cities.Count} cities.");
+        }
 
         /// <summary>Получить город по ID.</summary>
         public CityInstance GetCity(string cityId)
@@ -121,13 +124,15 @@ namespace WorldLogic.Cities
             var states = new List<CityState>();
             foreach (var city in cities.Values)
             {
-                states.Add(city.state);
+                // Save only discovered or changed cities (simple heuristic)
+                if (city.state.discovered || city.state.lastVisitedDay >= 0 || !string.IsNullOrEmpty(city.state.additionalData))
+                    states.Add(city.state);
             }
             return states;
         }
 
         /// <summary>Загрузить города из сохранённого состояния (вызывается из WorldLogicDirector).</summary>
-        public void LoadInitialFromSave(List<CityState> savedStates, List<CityDef> allDefs)
+        public void LoadInitialFromSave(List<CityState> savedStates, List<CityDef> allDefs, int worldSeed, WorldGenerator worldGen)
         {
             cities.Clear();
 
@@ -137,27 +142,43 @@ namespace WorldLogic.Cities
                 return;
             }
 
-            var defDict = new Dictionary<string, CityDef>();
-            foreach (var def in allDefs)
+            // Используем первый доступный def (т.к. города теперь не привязаны к конкретному CityDef)
+            CityDef defaultDef = allDefs != null && allDefs.Count > 0 ? allDefs[0] : null;
+            if (defaultDef == null)
             {
-                if (!string.IsNullOrEmpty(def.id))
-                    defDict[def.id] = def;
+                Debug.LogError("[CityManager] No CityDef available for loading cities!");
+                return;
             }
 
             foreach (var state in savedStates)
             {
-                if (defDict.TryGetValue(state.id, out var def))
-                {
-                    var instance = new CityInstance(def, state);
-                    cities[state.id] = instance;
-                }
-                else
-                {
-                    Debug.LogWarning($"[CityManager] CityDef not found for saved city: {state.id}");
-                }
+                var instance = new CityInstance(defaultDef, state, worldSeed, worldGen);
+                cities[state.id] = instance;
             }
 
             Debug.Log($"[CityManager] Loaded {cities.Count} cities from save.");
+        }
+
+        /// <summary>
+        /// Apply overrides from save onto existing generated cities.
+        /// </summary>
+        public void ApplyOverrides(List<CityState> overrides)
+        {
+            if (overrides == null || overrides.Count == 0) return;
+            int applied = 0;
+            foreach (var ov in overrides)
+            {
+                if (cities.TryGetValue(ov.id, out var inst))
+                {
+                    inst.state.discovered = ov.discovered;
+                    inst.state.lastVisitedDay = ov.lastVisitedDay;
+                    if (!string.IsNullOrEmpty(ov.factionId)) inst.state.factionId = ov.factionId;
+                    if (ov.currentPopulation != 0) inst.state.currentPopulation = ov.currentPopulation; // optional
+                    if (!string.IsNullOrEmpty(ov.additionalData)) inst.state.additionalData = ov.additionalData;
+                    applied++;
+                }
+            }
+            Debug.Log($"[CityManager] Applied {applied} city overrides from save.");
         }
     }
 }
