@@ -15,7 +15,7 @@ namespace WorldLogic.Cities
 {
     /// <summary>
     /// Runtime представление города на карте.
-    /// Содержит ссылку на CityDef, CityState и реальные данные в памяти.
+    /// Содержит ссылку на CityDef, CityState и детерминированно сгенерированное имя.
     /// </summary>
     public class CityInstance
     {
@@ -28,22 +28,25 @@ namespace WorldLogic.Cities
         /// <summary>Позиция на карте (в тайлах).</summary>
         public WorldTilePos position => state.position;
 
-        /// <summary>Display name из переводов.</summary>
+        /// <summary>Детерминированное имя города (генерируется из биома + seed + index).</summary>
         public string displayName;
 
-        /// <summary>Description из переводов.</summary>
+        /// <summary>Описание, детерминированно выбранное для биома.</summary>
         public string description;
 
-        /// <summary>Конструктор из CityDef и CityState.</summary>
-        public CityInstance(CityDef cityDef, CityState cityState)
+        /// <summary>Конструктор из CityDef, CityState и WorldGenerator для получения биома.</summary>
+        public CityInstance(CityDef cityDef, CityState cityState, int worldSeed, WorldGenerator worldGen)
         {
             def = cityDef;
             state = cityState;
             
-            // Загружаем локализованные строки
-            LanguageManager.LoadLanguage("cities");
-            displayName = LanguageManager.Get(cityDef.displayNameKey);
-            description = LanguageManager.Get(cityDef.descriptionKey);
+            // Получаем биом из позиции города
+            var tile = worldGen.GetTile(cityState.position.X, cityState.position.Y);
+            string biomeId = tile?.biomeId ?? "unknown";
+
+            // Генерируем детерминированные имя и описание
+            displayName = CityNameDatabase.GetName(biomeId, worldSeed, cityState.generationIndex);
+            description = CityNameDatabase.GetDescription(biomeId, worldSeed, cityState.generationIndex);
         }
     }
 }
