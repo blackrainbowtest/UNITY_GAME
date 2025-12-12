@@ -1,0 +1,37 @@
+{
+  "forest": [
+    "A woodland town where paths hide beneath ancient canopies.",
+    "Trade in timber and herbs thrives by the forest’s edge.",
+    "Whispering crowns shelter homes from wind and storm.",
+    "Rangers’ outpost — the deep woods are guarded day and night.",
+    "A fair of potions and curios draws herbalists from nearby hamlets."
+  ],
+  "plains": [
+    "A crossroads of trade — caravans flow year-round.",
+    "Granary of the realm: barns brim with grain and flour.",
+    "Open skies and steady winds keep the sun shining often.",
+    "Renowned craft: weavers, tanners and potters famed across the valley.",
+    "Good roads and inns make it the perfect stop for travelers."
+  ],
+  "mountains": [
+    "A fortress on the slope: stone walls withstood many sieges.",
+    "Mines and smelters feed entire quarters of workers.",
+    "Harsh mountain trails welcome only the stubborn and brave.",
+    "Taverns at the foothills brim with tales and songs of summits.",
+    "Citizens pride themselves on iron will and master smiths."
+  ],
+  "desert": [
+    "An oasis in the sands — palms and water gift life to travelers.",
+    "The caravanserai hosts merchants from distant lands.",
+    "Days scorch and nights freeze — the city beats to the desert’s rhythm.",
+    "Charms against sandstorms and tokens of luck are prized here.",
+    "A market of spices and incense famed across the region."
+  ],
+  "tundra": [
+    "Frozen soil and hardy folk — the hearth’s warmth is treasured.",
+    "Fishers and hunters keep the town well-provisioned.",
+    "Auroras paint the night sky above the roofs.",
+    "A harsh land where a neighbor’s aid outweighs gold.",
+    "Stores of furs and fat — staples of trade and survival."
+  ]
+}

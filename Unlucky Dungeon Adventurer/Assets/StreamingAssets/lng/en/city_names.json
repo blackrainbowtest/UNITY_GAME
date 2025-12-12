@@ -1,0 +1,28 @@
+{
+  "forest": [
+    "Greenhaven",
+    "Whisperwood",
+    "Pinecrest",
+    "Mossgrove"
+  ],
+  "plains": [
+    "Sunreach",
+    "Whitefields",
+    "Plainstone",
+    "Goldensteppe"
+  ],
+  "mountains": [
+    "Stonehold",
+    "Highspire",
+    "Ironridge"
+  ],
+  "desert": [
+    "Sandfang",
+    "Drywind",
+    "Crimson Oasis"
+  ],
+  "tundra": [
+    "Frostmarch",
+    "Snowbound"
+  ]
+}
