@@ -40,10 +40,16 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     #region Private Fields
     
-    /// <summary>Number of tiles per side (e.g., 31 when viewRadius = 15)</summary>
+    /// <summary>Максимальный радиус миникарты (при максимальном zoom out)</summary>
+    private const int MAX_VIEW_RADIUS = 30;
+    
+    /// <summary>Текущий радиус видимости (меняется при зуме)</summary>
+    private int currentViewRadius;
+    
+    /// <summary>Number of tiles per side в текущем радиусе (e.g., 31 when viewRadius = 15)</summary>
     private int tilesPerSide;
 
-    /// <summary>Texture representing the minimap (1 pixel = 1 tile)</summary>
+    /// <summary>Texture representing the minimap (1 pixel = 1 tile) - всегда максимального размера</summary>
     private Texture2D minimapTexture;
 
     /// <summary>World coordinates of the minimap window's bottom-left corner</summary>
@@ -75,6 +81,12 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     /// <summary>Global flag preventing world input while minimap is being interacted with</summary>
     public static bool InputCaptured { get; private set; }
+
+    /// <summary>Текущий радиус видимой области миникарты (read-only)</summary>
+    public int ViewRadius => currentViewRadius;
+
+    /// <summary>Текущее количество тайлов по стороне (read-only)</summary>
+    public int TilesPerSide => tilesPerSide;
     
     #endregion
 
@@ -88,20 +100,25 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     /// <param name="playerTile">Initial player tile position in world coordinates</param>
     public void Initialize(int viewRadius, Vector2Int playerTile)
     {
+        currentViewRadius = viewRadius;
         tilesPerSide = viewRadius * 2 + 1;
         inputHandler = new MinimapInputHandler();
 
-        // Create texture: 1 pixel per tile, no mipmaps
-        minimapTexture = new Texture2D(
-            tilesPerSide,
-            tilesPerSide,
-            TextureFormat.RGBA32,
-            false
-        );
-        minimapTexture.filterMode = FilterMode.Point; // Crisp pixel art rendering
-        minimapTexture.wrapMode = TextureWrapMode.Clamp;
+        // Создаём текстуру ОДИН РАЗ максимального размера
+        if (minimapTexture == null)
+        {
+            int maxSize = MAX_VIEW_RADIUS * 2 + 1;
+            minimapTexture = new Texture2D(
+                maxSize,
+                maxSize,
+                TextureFormat.RGBA32,
+                false
+            );
+            minimapTexture.filterMode = FilterMode.Point; // Crisp pixel art rendering
+            minimapTexture.wrapMode = TextureWrapMode.Clamp;
 
-        MinimapRenderer.ClearTexture(minimapTexture, emptyColor);
+            MinimapRenderer.ClearTexture(minimapTexture, emptyColor);
+        }
 
         if (minimapImage == null)
         {
@@ -114,6 +131,45 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         }
 
         SetCenter(playerTile);
+        UpdateUVRect();
+    }
+    
+    /// <summary>
+    /// Обновляет UV Rect для отображения только нужной области текстуры при текущем зуме.
+    /// Работает как viewport в Canvas.
+    /// </summary>
+    private void UpdateUVRect()
+    {
+        if (minimapImage == null) return;
+        
+        int maxSize = MAX_VIEW_RADIUS * 2 + 1;
+        int currentSize = tilesPerSide;
+        
+        // Показываем текущую область от центра текстуры
+        // uvSize = какую долю текстуры показываем (1.0 = вся текстура, 0.5 = половина)
+        float uvSize = (float)currentSize / maxSize;
+        
+        // uvOffset = смещение от левого нижнего угла, чтобы центрировать область
+        float uvOffset = (1f - uvSize) / 2f;
+        
+        // Rect(x, y, width, height) где x,y - левый нижний угол в UV пространстве [0..1]
+        minimapImage.uvRect = new Rect(uvOffset, uvOffset, uvSize, uvSize);
+    }
+    
+    /// <summary>
+    /// Изменяет радиус видимости миникарты без пересоздания текстуры.
+    /// Вызывается при изменении зума.
+    /// </summary>
+    public void SetViewRadius(int newRadius)
+    {
+        newRadius = Mathf.Clamp(newRadius, 10, MAX_VIEW_RADIUS);
+        
+        if (currentViewRadius == newRadius) return;
+        
+        currentViewRadius = newRadius;
+        tilesPerSide = newRadius * 2 + 1;
+        
+        UpdateUVRect();
     }
     
     #endregion
@@ -127,8 +183,9 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     /// <param name="centerTile">World tile to center minimap on</param>
     public void SetCenter(Vector2Int centerTile)
     {
-        originX = centerTile.x - tilesPerSide / 2;
-        originY = centerTile.y - tilesPerSide / 2;
+        // Используем MAX_VIEW_RADIUS для расчёта origin, чтобы текстура всегда охватывала максимальную область
+        originX = centerTile.x - MAX_VIEW_RADIUS;
+        originY = centerTile.y - MAX_VIEW_RADIUS;
     }
 
     /// <summary>
@@ -139,7 +196,8 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     /// <param name="color">Color to set (typically from tile's SpriteRenderer)</param>
     public void UpdateTile(Vector2Int worldTile, Color color)
     {
-        if (MinimapRenderer.UpdateTile(minimapTexture, worldTile, originX, originY, tilesPerSide, color))
+        int textureSize = MAX_VIEW_RADIUS * 2 + 1;
+        if (MinimapRenderer.UpdateTile(minimapTexture, worldTile, originX, originY, textureSize, color))
         {
             dirty = true;
             OnMinimapUpdated?.Invoke();
@@ -154,13 +212,14 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     /// <param name="camMaxTile">Top-right corner of camera view in world tiles</param>
     public void DrawCameraFrame(Vector2Int camMinTile, Vector2Int camMaxTile)
     {
+        int textureSize = MAX_VIEW_RADIUS * 2 + 1;
         MinimapRenderer.DrawCameraFrame(
             minimapTexture,
             camMinTile,
             camMaxTile,
             originX,
             originY,
-            tilesPerSide,
+            textureSize,
             cameraFrameColor
         );
         dirty = true;
@@ -173,12 +232,13 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
     /// <param name="playerTile">Current player position in world tiles</param>
     public void DrawPlayerMarker(Vector2Int playerTile)
     {
+        int textureSize = MAX_VIEW_RADIUS * 2 + 1;
         if (MinimapRenderer.DrawPlayerMarker(
             minimapTexture,
             playerTile,
             originX,
             originY,
-            tilesPerSide,
+            textureSize,
             playerMarkerColor))
         {
             dirty = true;
@@ -228,10 +288,11 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         inputHandler?.OnPointerDown(eventData);
         InputCaptured = true;
         
-        // Запоминаем стартовый центр мира (по тайлам, float)
+        // Запоминаем стартовый центр мира (с учётом полной текстуры MAX_VIEW_RADIUS)
+        int maxSize = MAX_VIEW_RADIUS * 2 + 1;
         dragStartCenterWorld = new Vector2(
-            originX + tilesPerSide * 0.5f,
-            originY + tilesPerSide * 0.5f
+            originX + maxSize * 0.5f,
+            originY + maxSize * 0.5f
         );
 
         // И стартовую локальную позицию указателя относительно миникарты
@@ -320,14 +381,22 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         // смещение в пикселях внутри миникарты
         Vector2 localDelta = currentLocalPos - dragStartLocalPos;
 
-        // переводим пиксели → тайловые единицы (1 текстурный пиксель = 1 тайл)
-        // но UI-Rect может иметь любой размер.
+        // переводим пиксели → тайловые единицы
+        // UI-Rect показывает часть текстуры через uvRect
         Rect rect = rectTransform.rect;
         if (Mathf.Approximately(rect.width, 0f) || Mathf.Approximately(rect.height, 0f))
             return;
 
-        float tilesPerPixelX = tilesPerSide / rect.width;
-        float tilesPerPixelY = tilesPerSide / rect.height;
+        // Учитываем uvRect: видимая область текстуры
+        Rect uvRect = minimapImage.uvRect;
+        int maxSize = MAX_VIEW_RADIUS * 2 + 1;
+        
+        // Количество тайлов, видимых в текущем uvRect
+        float visibleTilesX = maxSize * uvRect.width;
+        float visibleTilesY = maxSize * uvRect.height;
+
+        float tilesPerPixelX = visibleTilesX / rect.width;
+        float tilesPerPixelY = visibleTilesY / rect.height;
 
         // Направление: тянем карту — камера двигается в противоположную сторону
         Vector2 worldDelta = new Vector2(
@@ -349,7 +418,10 @@ public class MinimapController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         Vector2Int localPos = tilePos - new Vector2Int(originX, originY);
 
         if (minimapTexture == null) return;
-        if (localPos.x < 0 || localPos.x >= tilesPerSide || localPos.y < 0 || localPos.y >= tilesPerSide)
+        
+        // Проверяем границы по реальному размеру текстуры (MAX_VIEW_RADIUS)
+        int textureSize = MAX_VIEW_RADIUS * 2 + 1;
+        if (localPos.x < 0 || localPos.x >= textureSize || localPos.y < 0 || localPos.y >= textureSize)
             return;
 
         minimapTexture.SetPixel(localPos.x, localPos.y, color);

@@ -9,69 +9,111 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+using System.Collections.Generic;
 using UnityEngine;
 using WorldLogic.Cities;
 using WorldLogic;
 
 /// <summary>
-/// Рендерит маркеры городов на глобальной карте.
-/// Не трогает генерацию/сейвы, только визуализация.
+/// Рендер городов как оверлей к спаунящимся тайлам (аналогично уникальным локациям).
+/// Маркеры вешаются на объект тайла, чтобы совпадали позиция/масштаб/слои.
 /// </summary>
 public class CityWorldRenderer : MonoBehaviour
 {
+    public static CityWorldRenderer Instance { get; private set; }
+
     [SerializeField] private GameObject cityMarkerPrefab;
 
     private CityManager cityManager;
     private WorldGenerator worldGenerator;
     private int worldSeed;
 
-    private void Start()
-    {
-        cityManager = FindFirstObjectByType<CityManager>();
-        worldGenerator = FindFirstObjectByType<WorldMapController>()?.GetWorldGenerator();
-        var director = FindFirstObjectByType<WorldLogicDirector>();
-        worldSeed = director != null ? director.WorldSeed : 0;
+    private readonly System.Collections.Generic.Dictionary<WorldTilePos, GameObject> activeMarkers = new();
 
-        if (cityManager == null || worldGenerator == null || cityMarkerPrefab == null)
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
         {
-            Debug.LogError("[CityWorldRenderer] Missing references (CityManager/WorldGenerator/Prefab)");
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
+    public void Initialize(CityManager manager, WorldGenerator gen, int seed)
+    {
+        cityManager = manager;
+        worldGenerator = gen;
+        worldSeed = seed;
+
+        // Fallback на ресурс, если префаб не задан в инспекторе
+        if (cityMarkerPrefab == null)
+            cityMarkerPrefab = Resources.Load<GameObject>("Prefabs/World/CityMarker");
+
+        if (cityMarkerPrefab == null)
+        {
+            Debug.LogError("[CityWorldRenderer] CityMarker prefab not assigned and not found in Resources");
+        }
+    }
+
+    /// <summary>
+    /// Вызывается из WorldMapController при спауне тайла.
+    /// </summary>
+    public void OnTileSpawned(WorldTilePos pos, GameObject tileObj)
+    {
+        if (cityManager == null || tileObj == null)
+            return;
+
+        // Уже отрисовано
+        if (activeMarkers.ContainsKey(pos))
+            return;
+
+        // Есть ли город на этом тайле
+        var city = cityManager.GetCityAt(pos.ToVector2Int());
+        if (city == null)
+            return;
+
+        if (cityMarkerPrefab == null)
+        {
+            Debug.LogWarning("[CityWorldRenderer] cityMarkerPrefab is missing");
             return;
         }
 
-        RenderCities();
+        var marker = Instantiate(cityMarkerPrefab, tileObj.transform);
+        marker.name = $"City_{city.displayName}";
+        marker.transform.localPosition = new Vector3(0, 0, -0.05f);
+        marker.transform.localScale = Vector3.one; // наследует масштаб тайла от родителя
+
+        var sr = marker.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sprite = PickCityIcon(city, worldGenerator);
+            sr.sortingLayerName = "Default";
+            sr.sortingOrder = 110; // чуть выше тайла/уникалок
+        }
+
+        activeMarkers[pos] = marker;
     }
 
-    private void RenderCities()
+    /// <summary>
+    /// Снять маркер при удалении тайла.
+    /// </summary>
+    public void OnTileDespawned(WorldTilePos pos)
     {
-        foreach (var city in cityManager.GetAllCities())
+        if (activeMarkers.TryGetValue(pos, out var marker))
         {
-            Vector2Int tilePos = city.state.position.ToVector2Int();
-
-            // Допущение: 1 юнит = 1 тайл. При другой сетке заменить конвертацию.
-            Vector3 worldPos = new Vector3(tilePos.x, tilePos.y, 0f);
-
-            var go = Instantiate(cityMarkerPrefab, worldPos, Quaternion.identity, transform);
-
-            var sr = go.GetComponent<SpriteRenderer>();
-            if (sr != null)
-            {
-                sr.sprite = PickCityIcon(city, worldGenerator);
-            }
+            Destroy(marker);
+            activeMarkers.Remove(pos);
         }
     }
 
     private Sprite PickCityIcon(CityInstance city, WorldGenerator gen)
     {
-        var tile = gen.GetTile(city.state.position.X, city.state.position.Y);
-        string biomeId = tile?.biomeId ?? "unknown";
+        // Предпочитаем иконку из дефиниции
+        if (city.def != null && city.def.icon != null)
+            return city.def.icon;
 
-        var sprites = Resources.LoadAll<Sprite>($"WorldUI/CityIcons/city_{biomeId}");
-        if (sprites != null && sprites.Length > 0)
-        {
-            int idx = Mathf.Abs(DeterministicHash.Hash(worldSeed, city.state.generationIndex * 101 + biomeId.GetHashCode())) % sprites.Length;
-            return sprites[idx];
-        }
-
-        return Resources.Load<Sprite>("WorldUI/CityIcons/city_default");
+        var defaultSprite = Resources.Load<Sprite>("WorldData/Cities/city_default");
+        return defaultSprite;
     }
 }

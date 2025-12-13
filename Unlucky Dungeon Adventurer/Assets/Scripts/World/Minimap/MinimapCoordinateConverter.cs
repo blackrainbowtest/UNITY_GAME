@@ -10,11 +10,11 @@ public static class MinimapCoordinateConverter
 {
     /// <summary>
     /// Converts screen pointer position to world tile coordinates.
-    /// Accounts for minimap's RectTransform positioning and texture mapping.
+    /// Accounts for minimap's RectTransform positioning, texture mapping, and UV Rect offset.
     /// </summary>
     /// <param name="eventData">Pointer event containing screen position</param>
     /// <param name="minimapImage">RawImage component displaying the minimap</param>
-    /// <param name="tilesPerSide">Size of minimap texture in tiles</param>
+    /// <param name="tilesPerSide">Size of visible minimap area in tiles</param>
     /// <param name="originX">World X coordinate of minimap's bottom-left corner</param>
     /// <param name="originY">World Y coordinate of minimap's bottom-left corner</param>
     /// <param name="worldTile">Output: world tile coordinates</param>
@@ -46,21 +46,23 @@ public static class MinimapCoordinateConverter
 
         Rect rect = rectTransform.rect;
 
-        // Normalize to 0..1 range
+        // Normalize to 0..1 range в UI-координатах
         float normalizedX = Mathf.InverseLerp(rect.xMin, rect.xMax, localPoint.x);
         float normalizedY = Mathf.InverseLerp(rect.yMin, rect.yMax, localPoint.y);
 
-        // Convert to texture pixel coordinates
-        int pixelX = Mathf.Clamp(
-            Mathf.FloorToInt(normalizedX * tilesPerSide),
-            0, tilesPerSide - 1
-        );
-        int pixelY = Mathf.Clamp(
-            Mathf.FloorToInt(normalizedY * tilesPerSide),
-            0, tilesPerSide - 1
-        );
+        // Учитываем UV Rect: текстура может показывать только часть (при зуме)
+        Rect uvRect = minimapImage.uvRect;
+        
+        // Переводим нормализованные UI-координаты в UV-координаты текстуры
+        float uvX = uvRect.x + normalizedX * uvRect.width;
+        float uvY = uvRect.y + normalizedY * uvRect.height;
 
-        // Convert to world coordinates
+        // UV → текстурные пиксели (полный размер текстуры)
+        int textureSize = minimapImage.texture.width; // текстура всегда квадратная
+        int pixelX = Mathf.Clamp(Mathf.FloorToInt(uvX * textureSize), 0, textureSize - 1);
+        int pixelY = Mathf.Clamp(Mathf.FloorToInt(uvY * textureSize), 0, textureSize - 1);
+
+        // Convert to world coordinates (origin соответствует углу полной текстуры)
         worldTile = new Vector2Int(originX + pixelX, originY + pixelY);
         return true;
     }

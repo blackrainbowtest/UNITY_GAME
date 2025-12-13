@@ -18,6 +18,7 @@ namespace WorldLogic
     public class UniqueLocationsGenerator : IGenerator
     {
         private static readonly int TARGET_COUNT = 50;
+        private const int MAP_HALF_SIZE = 100; // symmetric range [-100, +100]
 
         // Р’СЃРµ 50 СѓРЅРёРєР°Р»СЊРЅС‹С… Р»РѕРєР°С†РёР№ РїРѕСЃР»Рµ РіРµРЅРµСЂР°С†РёРё
         public static List<UniqueLocationInstance> Instances { get; private set; }
@@ -73,7 +74,8 @@ namespace WorldLogic
                 WorldTilePos pos = FindValidTileFor(def, worldGen, seed, occupiedPositions);
                 
                 // Проверяем валидность (не fallback -1,-1)
-                if (pos.X >= 0 && pos.Y >= 0 && !occupiedPositions.Contains((pos.X, pos.Y)))
+                // Accept symmetric coordinates; only skip clearly invalid sentinel values
+                if (pos.X != int.MinValue && pos.Y != int.MinValue && !occupiedPositions.Contains((pos.X, pos.Y)))
                 {
                     occupiedPositions.Add((pos.X, pos.Y));
 
@@ -124,7 +126,7 @@ namespace WorldLogic
             }
 
             // Fallback: ни один из 50 кандидатов не подошёл
-            return new WorldTilePos(-1, -1);
+            return new WorldTilePos(int.MinValue, int.MinValue);
         }
 
         // Проверка, подходит ли тайл
@@ -204,8 +206,11 @@ namespace WorldLogic
 
         private WorldTilePos GetDeterministicCoord(int seed, int index)
         {
-            int x = DeterministicHash.Hash(seed, index * 17) % 200;
-            int y = DeterministicHash.Hash(seed, index * 31) % 200;
+            int range = MAP_HALF_SIZE * 2 + 1; // 201
+
+            // Keep distribution symmetric around zero to avoid +X/+Y bias
+            int x = (DeterministicHash.Hash(seed, index * 17) & 0x7FFFFFFF) % range - MAP_HALF_SIZE;
+            int y = (DeterministicHash.Hash(seed, index * 31) & 0x7FFFFFFF) % range - MAP_HALF_SIZE;
 
             return new WorldTilePos(x, y);
         }

@@ -11,19 +11,24 @@
 /* ************************************************************************** */
 
 using UnityEngine;
+using System;
 
 public class CameraZoomModule
 {
 	private Camera cam;
 
 	// --- zoom state ---
-	private float targetZoom;          // desired zoom
-	private float currentVelocity;     // smooth damp velocity
+	private float targetZoom;
+	private float currentVelocity;
+	private float lastOrthographicSize;
+
+	// --- events ---
+	public event Action<float> OnZoomChanged;
 
 	// --- settings ---
-	private float zoomSmooth = 0.1f;   // smoothing time (lower = faster, less jitter)
+	private float zoomSmooth = 0.1f;
 	private float pinchSensitivity = 0.005f;
-	private float wheelSensitivity = 2f;   // reduced for smoother zoom
+	private float wheelSensitivity = 2f;
 
 	private float minZoom;
 	private float maxZoom;
@@ -39,6 +44,7 @@ public class CameraZoomModule
 		zoomSmooth = smooth;
 
 		targetZoom = cam.orthographicSize;
+		lastOrthographicSize = cam.orthographicSize;
 	}
 
 	// =============================================================
@@ -59,6 +65,13 @@ public class CameraZoomModule
 
 		// Additional clamping to prevent jitter at boundaries
 		cam.orthographicSize = Mathf.Clamp(newSize, minZoom, maxZoom);
+
+		// Fire event if zoom changed
+		if (Mathf.Abs(cam.orthographicSize - lastOrthographicSize) > 0.01f)
+		{
+			lastOrthographicSize = cam.orthographicSize;
+			OnZoomChanged?.Invoke(cam.orthographicSize);
+		}
 	}
 
 	// =============================================================

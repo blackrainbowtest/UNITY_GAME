@@ -180,9 +180,27 @@ public class WorldMapController : MonoBehaviour
             Mathf.RoundToInt(GameData.CurrentPlayer.mapPosY)
         );
 
+        // Subscribe to camera zoom changes BEFORE minimap init
+        if (CameraMaster.Instance != null)
+        {
+            CameraMaster.Instance.OnZoomChanged += HandleZoomChanged;
+        }
+
+        // Вычисляем радиус миникарты на основе текущего зума камеры
+        int initialRadius = viewRadius;
+        if (Camera.main != null)
+        {
+            const float baseZoom = 10f;
+            const int baseRadius = 15;
+            float currentZoom = Camera.main.orthographicSize;
+            initialRadius = Mathf.RoundToInt(baseRadius * (currentZoom / baseZoom));
+            initialRadius = Mathf.Clamp(initialRadius, 10, 30);
+            viewRadius = initialRadius; // Синхронизируем viewRadius для спауна тайлов
+        }
+
         if (minimap != null)
         {
-            minimap.Initialize(viewRadius, playerTile);
+            minimap.Initialize(initialRadius, playerTile);
             minimap.OnMinimapTileClicked += HandleMinimapClick;
             minimap.OnMinimapCenterDragged += HandleMinimapDrag;
         }
@@ -332,14 +350,38 @@ public class WorldMapController : MonoBehaviour
     {
         if (minimap == null) return;
 
-        minimap.Clear();
+        // Перерисовываем все видимые тайлы без предварительной очистки,
+        // чтобы избежать "черного" кадра во время изменения зума
         RefreshMinimapTiles();
 
-        Vector2Int cameraBounds = GetCameraViewBoundsInTiles();
-        Vector2Int camMin = playerTilePos - cameraBounds;
-        Vector2Int camMax = playerTilePos + cameraBounds;
+        // Draw cities
+        var cityRenderer = FindFirstObjectByType<CityMinimapRenderer>();
+        if (cityRenderer != null)
+            cityRenderer.DrawCities();
 
-        minimap.DrawCameraFrame(camMin, camMax);
+        // Вычисляем границы камеры на основе реальной позиции и размера viewport
+        if (Camera.main != null)
+        {
+            Vector3 camPos = Camera.main.transform.position;
+            Vector2Int cameraBounds = GetCameraViewBoundsInTiles();
+            
+            // Используем реальную позицию камеры в тайлах для рамки
+            Vector2Int camCenterTile = new Vector2Int(
+                Mathf.RoundToInt(camPos.x / tileSize),
+                Mathf.RoundToInt(camPos.y / tileSize)
+            );
+            
+            Vector2Int camMin = new Vector2Int(
+                camCenterTile.x - cameraBounds.x,
+                camCenterTile.y - cameraBounds.y
+            );
+            Vector2Int camMax = new Vector2Int(
+                camCenterTile.x + cameraBounds.x,
+                camCenterTile.y + cameraBounds.y
+            );
+
+            minimap.DrawCameraFrame(camMin, camMax);
+        }
 
         if (GameData.CurrentPlayer != null)
         {
@@ -382,8 +424,14 @@ public class WorldMapController : MonoBehaviour
         foreach (Vector2Int pos in toRemove)
         {
             // === OverlayRenderer integration ===
+            var tilePosStruct = new WorldTilePos(pos.x, pos.y);
+
             UniqueLocationOverlayRenderer.Instance?.OnTileDespawned(
-                new WorldTilePos(pos.x, pos.y)
+                tilePosStruct
+            );
+
+            CityWorldRenderer.Instance?.OnTileDespawned(
+                tilePosStruct
             );
 
             Destroy(visibleTiles[pos]);
@@ -435,8 +483,15 @@ public class WorldMapController : MonoBehaviour
         }
 
         // === OverlayRenderer integration ===
+        var tilePosStruct = new WorldTilePos(pos.x, pos.y);
+
         UniqueLocationOverlayRenderer.Instance?.OnTileSpawned(
-            new WorldTilePos(pos.x, pos.y),
+            tilePosStruct,
+            obj
+        );
+
+        CityWorldRenderer.Instance?.OnTileSpawned(
+            tilePosStruct,
             obj
         );
 
@@ -611,6 +666,35 @@ public class WorldMapController : MonoBehaviour
             minimap?.SetCenter(playerTilePos);
             RefreshMinimapTiles();
         }
+    }
+
+    private void HandleZoomChanged(float newZoom)
+    {
+        if (minimap == null) return;
+
+        // Формула: чем ДАЛЬШЕ камера (больше zoom), тем БОЛЬШЕ радиус миникарты и спауна тайлов
+        const float baseZoom = 10f;
+        const int baseRadius = 15;
+
+        int newRadius = Mathf.RoundToInt(baseRadius * (newZoom / baseZoom));
+        newRadius = Mathf.Clamp(newRadius, 10, 30);
+
+        // Обновляем радиус спауна тайлов
+        viewRadius = newRadius;
+
+        // Изменяем ТОЛЬКО видимую область миникарты, без пересоздания текстуры
+        minimap.SetViewRadius(newRadius);
+        
+        // Спаунимся новые тайлы в мире
+        UpdateMapAroundCamera();
+        
+        // Перерисовываем миникарту
+        RefreshMinimapTiles();
+        
+        // Перерисовываем города
+        var cityRenderer = FindFirstObjectByType<CityMinimapRenderer>();
+        if (cityRenderer != null)
+            cityRenderer.DrawCities();
     }
 
 

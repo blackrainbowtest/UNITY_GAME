@@ -68,17 +68,17 @@ namespace WorldLogic
                 RegisterGenerators();
                 RunGenerators();
                 {
-                    var cityMgr = FindFirstObjectByType<CityManager>();
-                    if (cityMgr != null)
+                    var loadedCityMgr = FindFirstObjectByType<CityManager>();
+                    if (loadedCityMgr != null)
                     {
                         // Initialize from freshly generated deterministic states
-                        cityMgr.Initialize(CityGenerator.GeneratedStates, WorldSeed, Generator);
+                        loadedCityMgr.Initialize(CityGenerator.GeneratedStates, WorldSeed, Generator);
 
                         // Patch from save only discovered/changed states
                         if (hasCities && worldSave.cityStates != null && worldSave.cityStates.Count > 0)
                         {
                             Debug.Log($"[WorldLogicDirector] Patching {worldSave.cityStates.Count} saved city overrides...");
-                            cityMgr.ApplyOverrides(worldSave.cityStates);
+                            loadedCityMgr.ApplyOverrides(worldSave.cityStates);
                         }
                     }
                 }
@@ -96,8 +96,15 @@ namespace WorldLogic
                     }
                 }
 
-                InitializeManagers();
-                return;
+            InitializeManagers();
+
+            // Render cities on world map
+            var cityRenderer = FindFirstObjectByType<CityWorldRenderer>();
+            var savedCityMgr = FindFirstObjectByType<CityManager>();
+            if (cityRenderer != null && savedCityMgr != null)
+                cityRenderer.Initialize(savedCityMgr, Generator, WorldSeed);
+
+            return;
             }
 
             // --------------------------
@@ -128,6 +135,12 @@ namespace WorldLogic
             }
 
             InitializeManagers();
+
+            // Render cities on world map
+            var newCityRenderer = FindFirstObjectByType<CityWorldRenderer>();
+            var newCityMgr = FindFirstObjectByType<CityManager>();
+            if (newCityRenderer != null && newCityMgr != null)
+                newCityRenderer.Initialize(newCityMgr, Generator, WorldSeed);
 
             Debug.Log("[WorldLogicDirector] World logic initialized for new world.");
         }

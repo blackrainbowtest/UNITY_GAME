@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 using UnityEngine;
+using System;
 
 /// <summary>
 /// Central camera manager.
@@ -29,8 +30,10 @@ public class CameraMaster : MonoBehaviour
 
 	private Camera cam;
 
+	public event Action<float> OnZoomChanged;
+
 	[Header("Autocenter Settings")]
-	public float autoCenterSpeed = 4f;				// camera flight speed (units per second)
+	public float autoCenterSpeed = 4f;
 	public float autoCenterStopRadius = 0.05f;
 
 	[Header("Zoom Settings")]
@@ -53,6 +56,9 @@ public class CameraMaster : MonoBehaviour
 			maxZoom,
 			zoomSmooth
 		);
+
+		// Subscribe to zoom events
+		zoom.OnZoomChanged += (newZoom) => OnZoomChanged?.Invoke(newZoom);
 	}
 
 	private void Update()

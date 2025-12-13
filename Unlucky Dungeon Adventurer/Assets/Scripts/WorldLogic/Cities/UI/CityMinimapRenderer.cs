@@ -32,31 +32,25 @@ public class CityMinimapRenderer : MonoBehaviour
             return;
         }
 
-        // Рисуем сразу один раз
-        RenderAllCities();
-
-        // Подписываемся ТОЛЬКО на обновления миникарты
-        minimap.OnMinimapUpdated += RenderAllCities;
+        minimap.OnMinimapUpdated += DrawCities;
+        DrawCities();
     }
 
     private void OnDestroy()
     {
         if (minimap != null)
-            minimap.OnMinimapUpdated -= RenderAllCities;
+            minimap.OnMinimapUpdated -= DrawCities;
     }
 
-    private void RenderAllCities()
+    public void DrawCities()
     {
-        if (cityManager == null)
+        if (cityManager == null || minimap == null)
             return;
 
         foreach (var city in cityManager.GetAllCities())
         {
             Vector2Int pos = city.state.position.ToVector2Int();
-
-            // Временный цвет города (жёлтый)
             Color color = Color.yellow;
-
             minimap.DrawUniqueMarker(pos, color);
         }
     }

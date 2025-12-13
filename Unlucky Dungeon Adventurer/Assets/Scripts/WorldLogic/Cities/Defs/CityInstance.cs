@@ -46,6 +46,9 @@ namespace WorldLogic.Cities
 
             // Генерируем детерминированные имя и описание
             displayName = CityNameDatabase.GetName(biomeId, worldSeed, cityState.generationIndex);
+            // Fallback, если в базе нет названий
+            if (string.IsNullOrEmpty(displayName) || displayName == "Unknown City")
+                displayName = $"city_{cityState.position.X}_{cityState.position.Y}";
             description = CityNameDatabase.GetDescription(biomeId, worldSeed, cityState.generationIndex);
         }
     }

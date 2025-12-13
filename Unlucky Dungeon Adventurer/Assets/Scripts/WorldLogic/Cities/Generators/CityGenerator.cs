@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*   File: CityGenerator.cs                               /\_/\               */
-/*                                                       ( •.• )              */
-/*   By: unluckydungeonadventure.gmail.com                > ^ <               */
-/*                                                                            */
-/*   Created: 2025/12/11                                                     */
-/*   Updated: 2025/12/11                                                     */
-/*                                                                            */
-/* ************************************************************************** */
-
 using System.Collections.Generic;
 using UnityEngine;
 using WorldLogic;
@@ -16,41 +5,27 @@ using WorldLogic.Cities;
 
 namespace WorldLogic.Generators
 {
-    /// <summary>
-    /// Детерминированный генератор городов.
-    /// Использует seed для получения одинаковых координат
-    /// при каждом входе в мир.
-    /// </summary>
     public class CityGenerator : IGenerator
     {
         private const int TARGET_CITY_COUNT = 8;   // количество городов
         private const int MIN_CITY_DISTANCE = 10;  // дистанция между городами (уменьшено для тестов)
         private const int MIN_DISTANCE_FROM_UNIQUES = 15; // уменьшено для тестов
         private const int MAX_PLACEMENT_ATTEMPTS = 2000;
-        private const int MAP_SIZE = 100; // уменьшено с 200 для тестов
+        // Диапазон карты: от -MAP_SIZE до +MAP_SIZE (включительно)
+        private const int MAP_SIZE = 100; // полуразмер карты
 
         private List<CityDef> defs;
         public static List<CityState> GeneratedStates { get; private set; }
 
         public void Generate(int seed, WorldGenerator worldGen)
         {
-            Debug.Log($"[CityGenerator] ===== STARTING CITY GENERATION =====");
-            Debug.Log($"[CityGenerator] Seed: {seed}, MapSize: {MAP_SIZE}x{MAP_SIZE}");
-
             LoadDefs();
             GeneratedStates = new List<CityState>();
 
             if (defs.Count == 0)
-            {
-                Debug.LogWarning("[CityGenerator] No CityDef assets found!");
                 return;
-            }
-
-            Debug.Log($"[CityGenerator] Loaded {defs.Count} CityDef templates.");
 
             GenerateCities(seed, worldGen);
-
-            Debug.Log($"[CityGenerator] ===== DONE: generated {GeneratedStates.Count} cities =====");
         }
 
         // ============================
@@ -61,9 +36,6 @@ namespace WorldLogic.Generators
             defs = new List<CityDef>(
                 Resources.LoadAll<CityDef>("WorldData/Cities")
             );
-
-            if (defs.Count == 0)
-                Debug.LogWarning("[CityGenerator] No city defs found in Resources/WorldData/Cities.");
         }
 
         // ============================
@@ -72,16 +44,20 @@ namespace WorldLogic.Generators
         private void GenerateCities(int seed, WorldGenerator gen)
         {
             if (defs == null || defs.Count == 0)
-            {
-                Debug.LogWarning("[CityGenerator] No defs available to generate cities.");
                 return;
-            }
 
             for (int cityIndex = 0; cityIndex < TARGET_CITY_COUNT; cityIndex++)
             {
                 var def = defs[cityIndex % defs.Count];
 
                 WorldTilePos pos = FindValidCityTile(def, gen, seed, cityIndex);
+                
+                // Пропускаем невалидные позиции (если город не смог разместиться)
+                if (pos.X == int.MinValue || pos.Y == int.MinValue)
+                {
+                    Debug.LogWarning($"[CityGenerator] Skipping city {cityIndex} - no valid position found");
+                    continue;
+                }
 
                 // Получаем биом из реальной позиции
                 var tile = gen.GetTile(pos.X, pos.Y);
@@ -107,11 +83,9 @@ namespace WorldLogic.Generators
                 };
 
                 GeneratedStates.Add(st);
-
-                // Лог с детерминированным именем (для отладки)
-                string debugName = CityNameDatabase.GetName(biomeId, seed, cityIndex);
-                Debug.Log($"[CityGenerator] City #{cityIndex} '{debugName}' at ({pos.X},{pos.Y}) biome={biomeId}");
             }
+            
+            Debug.Log($"[CityGenerator] Successfully generated {GeneratedStates.Count} cities out of {TARGET_CITY_COUNT} attempts");
         }
 
         // ============================
@@ -119,51 +93,57 @@ namespace WorldLogic.Generators
         // ============================
         private WorldTilePos FindValidCityTile(CityDef def, WorldGenerator gen, int seed, int index)
         {
-            Debug.Log($"[CityGenerator] Finding position for city #{index}...");
-            
             for (int attempt = 0; attempt < MAX_PLACEMENT_ATTEMPTS; attempt++)
             {
                 WorldTilePos coord = GetDeterministicCoord(seed, index + attempt * 17);
 
                 var tile = gen.GetTile(coord.X, coord.Y);
                 if (tile == null)
-                {
-                    if (attempt % 500 == 0)
-                        Debug.LogWarning($"[CityGenerator] Attempt {attempt}: tile null at {coord}");
                     continue;
-                }
 
                 // 1) biome check
                 if (!IsAllowedBiome(def, tile.biomeId))
-                {
-                    if (attempt % 500 == 0)
-                        Debug.Log($"[CityGenerator] Attempt {attempt}: biome '{tile.biomeId}' not allowed at {coord}");
                     continue;
-                }
 
                 // 2) distance to existing cities
                 if (!IsFarFromCities(coord))
-                {
-                    if (attempt % 500 == 0)
-                        Debug.Log($"[CityGenerator] Attempt {attempt}: too close to other cities at {coord}");
                     continue;
-                }
 
                 // 3) distance to unique locations
                 if (!IsFarFromUniqueLocations(coord))
-                {
-                    if (attempt % 500 == 0)
-                        Debug.Log($"[CityGenerator] Attempt {attempt}: too close to unique locations at {coord}");
                     continue;
-                }
 
-                Debug.Log($"[CityGenerator] Found valid position for city #{index} at {coord} (biome: {tile.biomeId}, attempt: {attempt})");
                 return coord;
             }
 
-            // Fallback: используем центр карты
-            Debug.LogWarning($"[CityGenerator] FALLBACK for city #{index} using center ({MAP_SIZE/2},{MAP_SIZE/2})");
-            return new WorldTilePos(MAP_SIZE / 2, MAP_SIZE / 2);
+            // Fallback: пытаемся найти любую свободную позицию вблизи центра
+            Debug.LogWarning($"[CityGenerator] City {index} failed validation after {MAX_PLACEMENT_ATTEMPTS} attempts. Using fallback search.");
+            
+            // Ищем свободное место по спирали от центра
+            for (int radius = 0; radius < 50; radius++)
+            {
+                for (int dx = -radius; dx <= radius; dx++)
+                {
+                    for (int dy = -radius; dy <= radius; dy++)
+                    {
+                        WorldTilePos coord = new WorldTilePos(dx, dy);
+                        
+                        var tile = gen.GetTile(coord.X, coord.Y);
+                        if (tile == null) continue;
+                        
+                        if (!IsAllowedBiome(def, tile.biomeId)) continue;
+                        if (!IsFarFromCities(coord)) continue;
+                        if (!IsFarFromUniqueLocations(coord)) continue;
+                        
+                        Debug.Log($"[CityGenerator] City {index} placed at fallback position ({coord.X}, {coord.Y})");
+                        return coord;
+                    }
+                }
+            }
+            
+            // Крайний случай: если даже спираль не помогла
+            Debug.LogError($"[CityGenerator] City {index} could not find any valid position! Skipping.");
+            return new WorldTilePos(int.MinValue, int.MinValue); // Невалидная позиция для фильтрации
         }
 
         private bool IsAllowedBiome(CityDef def, string biome)
@@ -209,11 +189,20 @@ namespace WorldLogic.Generators
             return true;
         }
 
-        // Детерминированный выбор координаты
+        // Детерминированный выбор координаты в симметричном диапазоне [-MAP_SIZE, +MAP_SIZE]
         private WorldTilePos GetDeterministicCoord(int seed, int salt)
         {
-            int x = DeterministicHash.Hash(seed, salt * 41) % MAP_SIZE;
-            int y = DeterministicHash.Hash(seed, salt * 113) % MAP_SIZE;
+            // Получаем значения в диапазоне [0, 2*MAP_SIZE], затем смещаем в [-MAP_SIZE, +MAP_SIZE]
+            int range = MAP_SIZE * 2 + 1;
+            
+            // Используем побитовое AND с 0x7FFFFFFF для получения неотрицательного значения
+            // Это более равномерно распределяет значения, чем Mathf.Abs
+            int hx = (DeterministicHash.Hash(seed, salt * 41) & 0x7FFFFFFF) % range;
+            int hy = (DeterministicHash.Hash(seed, salt * 113) & 0x7FFFFFFF) % range;
+
+            int x = hx - MAP_SIZE;
+            int y = hy - MAP_SIZE;
+
             return new WorldTilePos(x, y);
         }
     }

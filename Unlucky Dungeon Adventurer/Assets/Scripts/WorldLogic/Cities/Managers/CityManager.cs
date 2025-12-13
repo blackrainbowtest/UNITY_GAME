@@ -95,7 +95,18 @@ namespace WorldLogic.Cities
             return cities.Values;
         }
 
-        /// <summary>Найти город по позиции на карте.</summary>
+        /// <summary>Получить город по точной позиции тайла.</summary>
+        public CityInstance GetCityAt(Vector2Int tilePos)
+        {
+            foreach (var city in cities.Values)
+            {
+                if (city.state.position.X == tilePos.x && city.state.position.Y == tilePos.y)
+                    return city;
+            }
+            return null;
+        }
+
+        /// <summary>Найти город по позиции на карте с допуском.</summary>
         public CityInstance GetCityAtPosition(Vector2Int position, int maxDistance = 2)
         {
             foreach (var city in cities.Values)
