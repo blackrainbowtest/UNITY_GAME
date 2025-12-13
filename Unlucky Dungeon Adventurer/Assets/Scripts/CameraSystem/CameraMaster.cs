@@ -57,6 +57,11 @@ public class CameraMaster : MonoBehaviour
 			zoomSmooth
 		);
 
+		// Стартуем с максимально отдалённого зума
+		cam.orthographicSize = maxZoom;
+		zoom.SetZoom(maxZoom);
+		OnZoomChanged?.Invoke(maxZoom);
+
 		// Subscribe to zoom events
 		zoom.OnZoomChanged += (newZoom) => OnZoomChanged?.Invoke(newZoom);
 	}
